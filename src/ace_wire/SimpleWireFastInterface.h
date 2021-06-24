@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_SIMPLE_WIRE_FAST_INTERFACE_H
-#define ACE_SEGMENT_SIMPLE_WIRE_FAST_INTERFACE_H
+#ifndef ACE_WIRE_SIMPLE_WIRE_FAST_INTERFACE_H
+#define ACE_WIRE_SIMPLE_WIRE_FAST_INTERFACE_H
 
 // This header file requires the digitalWriteFast library on AVR, or the
 // EpoxyMockDigitalWriteFast library on EpoxyDuino.
@@ -32,7 +32,7 @@ SOFTWARE.
 #include <stdint.h>
 #include <Arduino.h> // delayMicroseconds()
 
-namespace ace_segment {
+namespace ace_wire {
 
 /**
  * A version of SimpleWireInterface that uses one of the <digitalWriteFast.h>

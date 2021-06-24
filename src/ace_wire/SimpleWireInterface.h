@@ -22,13 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_SIMPLE_WIRE_INTERFACE_H
-#define ACE_SEGMENT_SIMPLE_WIRE_INTERFACE_H
+#ifndef ACE_WIRE_SIMPLE_WIRE_INTERFACE_H
+#define ACE_WIRE_SIMPLE_WIRE_INTERFACE_H
 
 #include <stdint.h>
 #include <Arduino.h> // pinMode(), digitalWrite()
 
-namespace ace_segment {
+namespace ace_wire {
 
 /**
  * A software I2C implementation for sending LED segment patterns over I2C. This
