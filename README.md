@@ -118,6 +118,26 @@ To use `SimpleWireFastInterface`, use:
 #endif
 ```
 
+<a name="Compatibility"></a>
+### Compatibility
+
+The following I2C libraries (both hardware and software implementations) have
+been verified to work with the `TwoWireInterface` wrapper class:
+
+* pre-installed `<Wire.h>`
+* https://github.com/Testato/SoftwareWire
+* https://github.com/RaemondBW/SWire
+* https://github.com/felias-fogg/SlowSoftWire
+* https://github.com/thexeno/HardWire-Arduino-Library
+* https://github.com/Seeed-Studio/Arduino_Software_I2C
+
+I could not get the following to work:
+
+* https://github.com/stevemarple/SoftWire
+
+See https://github.com/bxparks/AceSegment/tree/develop/examples/Ht16k33Demo
+for the configuration of each library.
+
 <a name="SystemRequirements"></a>
 ## System Requirements
 
