@@ -25,10 +25,6 @@ SOFTWARE.
 #ifndef ACE_WIRE_SIMPLE_WIRE_FAST_INTERFACE_H
 #define ACE_WIRE_SIMPLE_WIRE_FAST_INTERFACE_H
 
-// This header file requires the digitalWriteFast library on AVR, or the
-// EpoxyMockDigitalWriteFast library on EpoxyDuino.
-#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-
 #include <stdint.h>
 #include <Arduino.h> // delayMicroseconds()
 
@@ -164,7 +160,5 @@ class SimpleWireFastInterface {
 };
 
 }
-
-#endif // defined(ARDUINO_ARCH_AVR)
 
 #endif
