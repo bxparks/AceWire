@@ -44,20 +44,31 @@ namespace ace_wire {
 template <typename T_WIRE>
 class TwoWireInterface {
   public:
+    /**
+     * Constructor.
+     * @param wire instance of `T_WIRE`. If the pre-installed Wire.h is
+     *    used, then T_WIRE is `TwoWire` and `wire` is the precreated `Wire`
+     *    object
+     */
     TwoWireInterface(T_WIRE& wire) : mWire(wire) {}
 
+    /** Initial the interface. Currently does nothing. */
     void begin() {}
 
+    /** End the interface. Currently does nothing. */
     void end() {}
 
-    void beginTransmission(uint8_t const addr) {
+    /** Start transmission at specified I2C addr. */
+    void beginTransmission(uint8_t addr) {
       mWire.beginTransmission(addr);
     }
 
+    /** Write data. */
     void write(uint8_t data) {
       mWire.write(data);
     }
 
+    /** End transmission. */
     void endTransmission() {
       mWire.endTransmission();
     }

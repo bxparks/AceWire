@@ -12,7 +12,7 @@ This library provides the following C++ class templates:
 * `SimpleWireInterface.h`
 * `SimpleWireFastInterface.h`
 
-**Version**: 0.1 (2021-06-24)
+**Version**: 0.1 (2021-06-25)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -23,6 +23,7 @@ This library provides the following C++ class templates:
 * [Installation](#Installation)
     * [Source Code](#SourceCode)
     * [Dependencies](#Dependencies)
+* [Documentation](#Documentation)
 * [Usage](#Usage)
     * [Include Header and Namespace](#HeaderAndNamespace)
 * [System Requirements](#SystemRequirements)
@@ -67,6 +68,13 @@ digitalWriteFast libraries, for example:
 * https://github.com/watterott/Arduino-Libs/tree/master/digitalWriteFast
 * https://github.com/NicksonYap/digitalWriteFast
 
+<a name="Documentation"></a>
+## Documentation
+
+* this `README.md` file.
+* [Doxygen docs](https://bxparks.github.io/AceWire/html)
+    * On Github pages.
+
 <a name="Usage"></a>
 ## Usage
 
@@ -103,7 +111,6 @@ To use `SimpleWireFastInterface`, use:
 
 ```C++
 #include <AceWire.h>
-
 #if defined(ARDUINO_ARCH_AVR)
   #include <digitalWriteFast.h>
   #include <ace_wire/SoftWireFastInterface.h>
