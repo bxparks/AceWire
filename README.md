@@ -2,15 +2,28 @@
 
 Unified interface for selecting different I2C implementations on Arduino
 platforms. Uses C++ templates to achieve minimal or zero-cost runtime overhead
-for the abstraction. The code was initially part of the
-[AceSegment](https://github.com/bxparks/AceSegment) library, but was extracted
-into a separate library so that it can be shared with other projects.
+for the abstraction. In more technical terms, the library provides compile-time
+polymorphism instead of runtime polymorphism to avoid the overhead of the
+`virtual` keyword.
 
-This library provides the following C++ class templates:
+The code was initially part of the
+[AceSegment](https://github.com/bxparks/AceSegment) library, but was extracted
+into a separate library so that it can be shared with other projects. It
+provides the following implementations:
 
 * `TwoWireInterface.h`
+    * Thin wrapper around the `TwoWire` class in the pre-installed `<Wire.h>`
+      library.
+    * Other hardware and software implementations are supported as long as
+      they use implement a handful of methods that are syntactically compatible
+      with `TwoWire`. See [Compatibility](#Compatibility) below for a
+      non-exhaustive list of compatible 3rd party libraries.
 * `SimpleWireInterface.h`
+    * AceWire's own software bitbanging implementation that supports just
+      enough I2C to communicate with the HT16K33 controller chip.
 * `SimpleWireFastInterface.h`
+    * Same as `SimpleWireInterface.h` using one of the `<digitalWriteFast.h>`
+      libraries.
 
 **Version**: 0.1 (2021-06-25)
 
@@ -74,6 +87,8 @@ digitalWriteFast libraries, for example:
 * this `README.md` file.
 * [Doxygen docs](https://bxparks.github.io/AceWire/html)
     * On Github pages.
+* Examples:
+    * https://github.com/bxparks/AceSegment/tree/develop/examples/Ht16k33Demo
 
 <a name="Usage"></a>
 ## Usage
