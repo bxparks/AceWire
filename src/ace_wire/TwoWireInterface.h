@@ -73,8 +73,12 @@ class TwoWireInterface {
       mWire.endTransmission();
     }
 
+    // Use default copy constructor and assignment operator.
+    TwoWireInterface(const TwoWireInterface&) = default;
+    TwoWireInterface& operator=(const TwoWireInterface&) = default;
+
   private:
-    T_WIRE &mWire;
+    T_WIRE& mWire;
 };
 
 }

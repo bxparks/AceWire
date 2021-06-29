@@ -135,6 +135,10 @@ class SimpleWireInterface {
       return readAck();
     }
 
+    // Use default copy constructor and assignment operator.
+    SimpleWireInterface(const SimpleWireInterface&) = default;
+    SimpleWireInterface& operator=(const SimpleWireInterface&) = default;
+
   private:
     /**
      * Read the ACK/NACK bit from the device upon the falling edge of the 8th
