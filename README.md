@@ -29,7 +29,9 @@ provides the following implementations:
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
-**Status**: Works, but needs documentation.
+**See Also**:
+* https://github.com/bxparks/AceSPI
+* https://github.com/bxparks/AceTMI
 
 ## Table of Contents
 
@@ -39,6 +41,11 @@ provides the following implementations:
 * [Documentation](#Documentation)
 * [Usage](#Usage)
     * [Include Header and Namespace](#HeaderAndNamespace)
+    * [Unified Interface](#UnifiedInterface)
+    * [TwoWireInterface](#TwoWireInterface)
+    * [SimpleWireInterface](#SimpleWireInterface)
+    * [SimpleWireFastInterface](#SimpleWireFastInterface)
+    * [Compatibility of TwoWireInterface](#Compatibility)
 * [System Requirements](#SystemRequirements)
     * [Hardware](#Hardware)
     * [Tool Chain](#ToolChain)
@@ -133,8 +140,152 @@ To use `SimpleWireFastInterface`, use:
 #endif
 ```
 
+<a name="UnifiedInterface"></a>
+### Unified Interface
+
+The classes in this library provide the following unified interface for handling
+I2C communication. Downstream classes can code against this unified interface
+using C++ templates so that different implementations can be selected at
+compile-time.
+
+```C++
+class XxxInterface {
+  public:
+    XxxInterface(T& wire);
+    void begin();
+    void end();
+
+    void beginTransmission(uint8_t addr);
+    void write(uint8_t data);
+    void endTransmission();
+};
+```
+
+<a name="TwoWireInterface"></a>
+### TwoWireInterface
+
+The `TwoWireInterface` is a thin wrapper around the pre-installed `TwoWire`
+class provided by the `<Wire.h>` library. In addition, it is flexible enough to
+become a wrapper around any I2C implementation class (hardware or software) as
+long as it is "similar enough" to the `TwoWire` class (see
+[Compatibility](#Compatibility) below).
+
+```C++
+#include <Arduino.h>
+#include <Wire.h>
+#include <AceWire.h>
+using ace_wire::TwoWireInterface;
+
+const uint8_t SCL_PIN = SCL;
+const uint8_t SDA_PIN = SDA;
+
+template <typename T_WIRE>
+class MyClass {
+  public:
+    MyClass(T_WIRE& wireInterface)
+        : mWireInterface(wireInterface)
+    { ... }
+
+  [...]
+
+  private:
+    T_WIRE mWireInterface; // reference will also work
+};
+
+using WireInterface = TwoWireInterface<TwoWire>;
+WireInterface wireInterface(Wire);
+MyClass<WireInterface> myClass(wireInterface);
+
+void setup() {
+  Wire.begin();
+  wireInterface.begin();
+  ...
+}
+```
+
+<a name="SimpleWireInterface"></a>
+### SimpleWireInterface
+
+The `SimpleWireInterface` is a software implementation of I2C that has just
+enough functionality to communicate with an HT16K33 LED controller chip. It
+currently supports just a master mode.
+
+```C++
+#include <Arduino.h>
+#include <AceWire.h>
+using ace_wire::SimpleWireInterface;
+
+const uint8_t SCL_PIN = SCL;
+const uint8_t SDA_PIN = SDA;
+const uint8_t DELAY_MICROS = 4;
+
+template <typename T_WIRE>
+class MyClass {
+  public:
+    MyClass(T_WIRE& wireInterface)
+        : mWireInterface(wireInterface)
+    { ... }
+
+  [...]
+
+  private:
+    T_WIRE mWireInterface; // reference will also work
+};
+
+using WireInterface = SimpleWireInterface;
+WireInterface wireInterface(SDA_PIN, SCL_PIN, DELAY_MICROS);
+MyClass<WireInterface> myClass(wireInterface);
+
+void setup() {
+  wireInterface.begin();
+  ...
+}
+```
+
+<a name="SimpleWireFastInterface"></a>
+### SimpleWireFastInterface
+
+The `SimpleWireFastInterface` is the same as `SimpleWireInterface` but using the
+`digitalWriteFast()` function.
+
+```C++
+#include <Arduino.h>
+#include <AceWire.h>
+#if defined(ARDUINO_ARCH_AVR)
+  #include <digitalWriteFast.h>
+  #include <ace_wire/SimpleWireFastInterface.h>
+  using ace_wire::SimpleWireFastInterface;
+#endif
+
+const uint8_t SCL_PIN = SCL;
+const uint8_t SDA_PIN = SDA;
+const uint8_t DELAY_MICROS = 4;
+
+template <typename T_WIRE>
+class MyClass {
+  public:
+    MyClass(T_WIRE& wireInterface)
+        : mWireInterface(wireInterface)
+    { ... }
+
+  [...]
+
+  private:
+    T_WIRE mWireInterface; // reference will also work
+};
+
+using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, DELAY_MICROS>;
+WireInterface wireInterface;
+MyClass<WireInterface> myClass(wireInterface);
+
+void setup() {
+  wireInterface.begin();
+  ...
+}
+```
+
 <a name="Compatibility"></a>
-### Compatibility
+### Compatibility of TwoWireInterface
 
 The following I2C libraries (both hardware and software implementations) have
 been verified to work with the `TwoWireInterface` wrapper class:
