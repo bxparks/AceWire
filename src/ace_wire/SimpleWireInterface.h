@@ -35,10 +35,23 @@ namespace ace_wire {
  * has the same API has TwoWireInterface so it can be a drop-in replacement.
  *
  * The implementation is very similar to SoftTmiInterface because the TM1637
- * protocol is very similar to I2C. To keep everything simple, so the
- * beginTransmission(), write() and endTransimision() methods are *synchronous*
- * (i.e. blocking) because interrupts are not used. This means that we can
- * eliminate the send buffer, which saves both flash and static memory.
+ * protocol is very similar to I2C. To keep everything simple, all write and
+ * read methods are *synchronous* (i.e. blocking) because interrupts are not
+ * used. This means that we can eliminate the send and receive buffers, which
+ * saves both flash and static memory.
+ *
+ * During writing, beginTransmission() sends the START condition and the I2C
+ * address (along with the 'write' bit 0x00) right away. Then each write() call
+ * sends each byte immediately. The endTransmission() sends the STOP condition.
+ * There is no buffering of the data byte passed into the write() method.
+ *
+ * During reading, the requestFrom() sends the START condition and the I2C
+ * address (along with the 'read' bit 0x01) right away. Then each call
+ * to read() returns the data byte from the slave. Before returning from read(),
+ * the master sends a NACK if total number of bytes read is not 'quantity', or
+ * an ACK if 'quantity' has just been read. After calling read() 'quantity'
+ * times, the client calls endRequest() to send the STOP condition, but only if
+ * the 'stop' flag of requestFrom() was set to be true (default).
  */
 class SimpleWireInterface {
   public:
@@ -87,7 +100,7 @@ class SimpleWireInterface {
     }
 
     /**
-     * Send start condition.
+     * Send the I2C START condition.
      * @param addr I2C address of slave device
      */
     void beginTransmission(uint8_t addr) const {
@@ -97,17 +110,9 @@ class SimpleWireInterface {
       dataLow();
       clockLow();
 
-      // Send I2C addr (7 bits) and R/W bit set to "write" (0x00).
+      // Send I2C addr (7 bits) and the R/W bit set to "write" (0x00).
       uint8_t effectiveAddr = (addr << 1) | 0x00;
       write(effectiveAddr);
-    }
-
-    /** Send stop condition. */
-    void endTransmission() const {
-      // clock will always be LOW when this is called
-      dataLow();
-      clockHigh();
-      dataHigh();
     }
 
     /**
@@ -135,6 +140,68 @@ class SimpleWireInterface {
       return readAck();
     }
 
+    /** Send the I2C STOP condition. */
+    void endTransmission() const {
+      // clock will always be LOW when this is called
+      dataLow();
+      clockHigh();
+      dataHigh();
+    }
+
+    /** Prepare to read bytes by sending I2C START condition. */
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool stop = true) {
+      mQuantity = quantity;
+      mStop = stop;
+
+      clockHigh();
+      dataHigh();
+
+      dataLow();
+      clockLow();
+
+      // Send I2C addr (7 bits) and the R/W bit set to "read" (0x01).
+      uint8_t effectiveAddr = (addr << 1) | 0x01;
+      write(effectiveAddr);
+
+      return quantity;
+    }
+
+    /**
+     * Read byte. After reading 8 bits, an ACK or NACK will be sent by the
+     * master to the slave. ACK means the slave will be asked to send more
+     * bytes so can hold control of the data line. NACK means no more bytes will
+     * be read from the slave and the slave should release the data line.
+     */
+    uint8_t read() {
+      // Read one byte
+      dataHigh();
+      uint8_t data = 0;
+      for (uint8_t i = 0; i < 8; ++i) {
+        clockHigh();
+        data <<= 1;
+        uint8_t bit = digitalRead(mDataPin);
+        data |= (bit & 0x1);
+        clockLow();
+      }
+
+      // Decrement quantity to determine if NACK or ACK should be sent.
+      mQuantity--;
+      if (mQuantity) {
+        sendAck();
+      } else {
+        sendNack();
+      }
+
+      return data;
+    }
+
+    /** End requestFrom() by sending I2C STOP condition if 'stop' is 'true'. */
+    void endRequest() {
+      if (mStop) {
+        endTransmission();
+      }
+    }
+
     // Use default copy constructor and assignment operator.
     SimpleWireInterface(const SimpleWireInterface&) = default;
     SimpleWireInterface& operator=(const SimpleWireInterface&) = default;
@@ -155,6 +222,20 @@ class SimpleWireInterface {
       return ack;
     }
 
+    /** Send ACK to slave. */
+    void sendAck() const {
+      dataLow();
+      clockHigh();
+      clockLow();
+    }
+
+    /** Send NACK to slave. */
+    void sendNack() const {
+      dataHigh();
+      clockHigh();
+      clockLow();
+    }
+
     void bitDelay() const { delayMicroseconds(mDelayMicros); }
 
     void clockHigh() const { pinMode(mClockPin, INPUT); bitDelay(); }
@@ -169,6 +250,8 @@ class SimpleWireInterface {
     uint8_t const mDataPin;
     uint8_t const mClockPin;
     uint8_t const mDelayMicros;
+    uint8_t mQuantity;
+    bool mStop;
 };
 
 }

@@ -151,13 +151,16 @@ compile-time.
 ```C++
 class XxxInterface {
   public:
-    XxxInterface(T& wire);
     void begin();
     void end();
 
     void beginTransmission(uint8_t addr);
     void write(uint8_t data);
     void endTransmission();
+
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool stop = true);
+    uint8_t read();
+    void endRequest();
 };
 ```
 
