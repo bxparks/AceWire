@@ -35,15 +35,14 @@ namespace ace_wire {
  * libraries. The biggest benefit of using digitalWriteFast is the reduction of
  * flash memory size, 500-700 bytes on AVR.
  *
- * On AVR processors, `delayMicroseconds()` is not accurate below 3
- * microseconds. Some microcontrollers may support better accuracy and may
- * work well with values as low as 1 microsecond.
+ * The `delayMicroseconds()` may not be accurate for small values on some
+ * processors (e.g. AVR) . The actual minimum value of T_DELAY_MICROS will
+ * depend on the capacitance and resistance on the DATA and CLOCK lines, and the
+ * accuracy of the `delayMicroseconds()` function.
  *
  * @tparam T_DATA_PIN SDA pin
  * @tparam T_CLOCK_PIN SCL pin
- * @tparam T_DELAY_MICROS delay after each bit transition of SDA or SCL.. Should
- *    be greater or equal to 3 microseconds on AVR processors, but may work as
- *    low as 1 microsecond on other microcontrollers.
+ * @tparam T_DELAY_MICROS delay after each bit transition of SDA or SCL
  */
 template <
     uint8_t T_DATA_PIN,
@@ -53,7 +52,7 @@ template <
 class SimpleWireFastInterface {
   public:
     /** Constructor. */
-    SimpleWireFastInterface() = default;
+    explicit SimpleWireFastInterface() = default;
 
     /**
      * Initialize the clock and data pins.

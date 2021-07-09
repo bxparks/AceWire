@@ -50,7 +50,7 @@ class TwoWireInterface {
      *    used, then T_WIRE is `TwoWire` and `wire` is the precreated `Wire`
      *    object
      */
-    TwoWireInterface(T_WIRE& wire) : mWire(wire) {}
+    explicit TwoWireInterface(T_WIRE& wire) : mWire(wire) {}
 
     /** Initial the interface. Currently does nothing. */
     void begin() {}
