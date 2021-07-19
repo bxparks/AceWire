@@ -50,7 +50,7 @@ class TwoWireInterface {
      *    used, then T_WIRE is `TwoWire` and `wire` is the precreated `Wire`
      *    object
      */
-    TwoWireInterface(T_WIRE& wire) : mWire(wire) {}
+    explicit TwoWireInterface(T_WIRE& wire) : mWire(wire) {}
 
     /** Initial the interface. Currently does nothing. */
     void begin() {}
@@ -63,18 +63,38 @@ class TwoWireInterface {
       mWire.beginTransmission(addr);
     }
 
-    /** Write data. */
+    /** Write data into the write buffer. */
     void write(uint8_t data) {
       mWire.write(data);
     }
 
-    /** End transmission. */
+    /** End building of the buffer, and actually transmit the data. */
     void endTransmission() {
       mWire.endTransmission();
     }
 
+    /** Read bytes from the slave and store in buffer owned by T_WIRE. */
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool stop = true) {
+      return mWire.requestFrom(addr, quantity, (uint8_t) stop);
+    }
+
+    /** Read byte from buffer. */
+    uint8_t read() {
+      return mWire.read();
+    }
+
+    /**
+     * End requestFrom(). Clients should always call this. This implementation
+     * does nothing, but other implementations will perform additional actions.
+     */
+    void endRequest() {}
+
+    // Use default copy constructor and assignment operator.
+    TwoWireInterface(const TwoWireInterface&) = default;
+    TwoWireInterface& operator=(const TwoWireInterface&) = default;
+
   private:
-    T_WIRE &mWire;
+    T_WIRE& mWire;
 };
 
 }

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceWire
-   &#160;<span id="projectnumber">0.1.0</span>
+   &#160;<span id="projectnumber">0.2.0</span>
    </div>
    <div id="projectbrief">Unified interface for selecting different I2C implementations on Arduino platforms</div>
   </td>
@@ -105,7 +105,7 @@ $(function() {
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T_WIRE&gt;</div>
 <div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="classace__wire_1_1TwoWireInterface.html">   45</a></span>&#160;<span class="keyword">class </span><a class="code" href="classace__wire_1_1TwoWireInterface.html">TwoWireInterface</a> {</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="classace__wire_1_1TwoWireInterface.html#a8bd43efe7644927f55afd805c854976b">   53</a></span>&#160;    <a class="code" href="classace__wire_1_1TwoWireInterface.html#a8bd43efe7644927f55afd805c854976b">TwoWireInterface</a>(T_WIRE&amp; wire) : mWire(wire) {}</div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="classace__wire_1_1TwoWireInterface.html#a8bd43efe7644927f55afd805c854976b">   53</a></span>&#160;    <span class="keyword">explicit</span> <a class="code" href="classace__wire_1_1TwoWireInterface.html#a8bd43efe7644927f55afd805c854976b">TwoWireInterface</a>(T_WIRE&amp; wire) : mWire(wire) {}</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
 <div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="classace__wire_1_1TwoWireInterface.html#a494ad44b23a2f5638ffd471fc01428c8">   56</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__wire_1_1TwoWireInterface.html#a494ad44b23a2f5638ffd471fc01428c8">begin</a>() {}</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
@@ -123,19 +123,36 @@ $(function() {
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;      mWire.endTransmission();</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    }</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    T_WIRE &amp;mWire;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;};</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;}</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno"><a class="line" href="classace__wire_1_1TwoWireInterface.html#a6fe88e9412f3b1aae0444dbb777e8f0f">   77</a></span>&#160;    uint8_t <a class="code" href="classace__wire_1_1TwoWireInterface.html#a6fe88e9412f3b1aae0444dbb777e8f0f">requestFrom</a>(uint8_t addr, uint8_t quantity, <span class="keywordtype">bool</span> stop = <span class="keyword">true</span>) {</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      <span class="keywordflow">return</span> mWire.requestFrom(addr, quantity, (uint8_t) stop);</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    }</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
+<div class="line"><a name="l00082"></a><span class="lineno"><a class="line" href="classace__wire_1_1TwoWireInterface.html#af5e95776e675f4eb865b12ddb6676df3">   82</a></span>&#160;    uint8_t <a class="code" href="classace__wire_1_1TwoWireInterface.html#af5e95776e675f4eb865b12ddb6676df3">read</a>() {</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;      <span class="keywordflow">return</span> mWire.read();</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    }</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
+<div class="line"><a name="l00090"></a><span class="lineno"><a class="line" href="classace__wire_1_1TwoWireInterface.html#a6986989357271aaed36aed4e34496854">   90</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__wire_1_1TwoWireInterface.html#a6986989357271aaed36aed4e34496854">endRequest</a>() {}</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="comment">// Use default copy constructor and assignment operator.</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <a class="code" href="classace__wire_1_1TwoWireInterface.html#a8bd43efe7644927f55afd805c854976b">TwoWireInterface</a>(<span class="keyword">const</span> <a class="code" href="classace__wire_1_1TwoWireInterface.html">TwoWireInterface</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <a class="code" href="classace__wire_1_1TwoWireInterface.html">TwoWireInterface</a>&amp; operator=(<span class="keyword">const</span> <a class="code" href="classace__wire_1_1TwoWireInterface.html">TwoWireInterface</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    T_WIRE&amp; mWire;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;};</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;}</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="aclassace__wire_1_1TwoWireInterface_html_a8bd43efe7644927f55afd805c854976b"><div class="ttname"><a href="classace__wire_1_1TwoWireInterface.html#a8bd43efe7644927f55afd805c854976b">ace_wire::TwoWireInterface::TwoWireInterface</a></div><div class="ttdeci">TwoWireInterface(T_WIRE &amp;wire)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition:</b> <a href="TwoWireInterface_8h_source.html#l00053">TwoWireInterface.h:53</a></div></div>
+<div class="ttc" id="aclassace__wire_1_1TwoWireInterface_html_a6986989357271aaed36aed4e34496854"><div class="ttname"><a href="classace__wire_1_1TwoWireInterface.html#a6986989357271aaed36aed4e34496854">ace_wire::TwoWireInterface::endRequest</a></div><div class="ttdeci">void endRequest()</div><div class="ttdoc">End requestFrom().</div><div class="ttdef"><b>Definition:</b> <a href="TwoWireInterface_8h_source.html#l00090">TwoWireInterface.h:90</a></div></div>
 <div class="ttc" id="aclassace__wire_1_1TwoWireInterface_html_a1c2e6f37f81ebff8fca3d04b60257d66"><div class="ttname"><a href="classace__wire_1_1TwoWireInterface.html#a1c2e6f37f81ebff8fca3d04b60257d66">ace_wire::TwoWireInterface::beginTransmission</a></div><div class="ttdeci">void beginTransmission(uint8_t addr)</div><div class="ttdoc">Start transmission at specified I2C addr.</div><div class="ttdef"><b>Definition:</b> <a href="TwoWireInterface_8h_source.html#l00062">TwoWireInterface.h:62</a></div></div>
+<div class="ttc" id="aclassace__wire_1_1TwoWireInterface_html_af5e95776e675f4eb865b12ddb6676df3"><div class="ttname"><a href="classace__wire_1_1TwoWireInterface.html#af5e95776e675f4eb865b12ddb6676df3">ace_wire::TwoWireInterface::read</a></div><div class="ttdeci">uint8_t read()</div><div class="ttdoc">Read byte from buffer.</div><div class="ttdef"><b>Definition:</b> <a href="TwoWireInterface_8h_source.html#l00082">TwoWireInterface.h:82</a></div></div>
 <div class="ttc" id="aclassace__wire_1_1TwoWireInterface_html_a2d5f1c8a9f0bf3bb07d2891d6781521e"><div class="ttname"><a href="classace__wire_1_1TwoWireInterface.html#a2d5f1c8a9f0bf3bb07d2891d6781521e">ace_wire::TwoWireInterface::end</a></div><div class="ttdeci">void end()</div><div class="ttdoc">End the interface.</div><div class="ttdef"><b>Definition:</b> <a href="TwoWireInterface_8h_source.html#l00059">TwoWireInterface.h:59</a></div></div>
-<div class="ttc" id="aclassace__wire_1_1TwoWireInterface_html_a07155422487f7f07e8cc978973d1cf59"><div class="ttname"><a href="classace__wire_1_1TwoWireInterface.html#a07155422487f7f07e8cc978973d1cf59">ace_wire::TwoWireInterface::endTransmission</a></div><div class="ttdeci">void endTransmission()</div><div class="ttdoc">End transmission.</div><div class="ttdef"><b>Definition:</b> <a href="TwoWireInterface_8h_source.html#l00072">TwoWireInterface.h:72</a></div></div>
-<div class="ttc" id="aclassace__wire_1_1TwoWireInterface_html_a4e28da3a3e6ae9a799ce1573da7ce6f5"><div class="ttname"><a href="classace__wire_1_1TwoWireInterface.html#a4e28da3a3e6ae9a799ce1573da7ce6f5">ace_wire::TwoWireInterface::write</a></div><div class="ttdeci">void write(uint8_t data)</div><div class="ttdoc">Write data.</div><div class="ttdef"><b>Definition:</b> <a href="TwoWireInterface_8h_source.html#l00067">TwoWireInterface.h:67</a></div></div>
+<div class="ttc" id="aclassace__wire_1_1TwoWireInterface_html_a07155422487f7f07e8cc978973d1cf59"><div class="ttname"><a href="classace__wire_1_1TwoWireInterface.html#a07155422487f7f07e8cc978973d1cf59">ace_wire::TwoWireInterface::endTransmission</a></div><div class="ttdeci">void endTransmission()</div><div class="ttdoc">End building of the buffer, and actually transmit the data.</div><div class="ttdef"><b>Definition:</b> <a href="TwoWireInterface_8h_source.html#l00072">TwoWireInterface.h:72</a></div></div>
+<div class="ttc" id="aclassace__wire_1_1TwoWireInterface_html_a4e28da3a3e6ae9a799ce1573da7ce6f5"><div class="ttname"><a href="classace__wire_1_1TwoWireInterface.html#a4e28da3a3e6ae9a799ce1573da7ce6f5">ace_wire::TwoWireInterface::write</a></div><div class="ttdeci">void write(uint8_t data)</div><div class="ttdoc">Write data into the write buffer.</div><div class="ttdef"><b>Definition:</b> <a href="TwoWireInterface_8h_source.html#l00067">TwoWireInterface.h:67</a></div></div>
+<div class="ttc" id="aclassace__wire_1_1TwoWireInterface_html_a6fe88e9412f3b1aae0444dbb777e8f0f"><div class="ttname"><a href="classace__wire_1_1TwoWireInterface.html#a6fe88e9412f3b1aae0444dbb777e8f0f">ace_wire::TwoWireInterface::requestFrom</a></div><div class="ttdeci">uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool stop=true)</div><div class="ttdoc">Read bytes from the slave and store in buffer owned by T_WIRE.</div><div class="ttdef"><b>Definition:</b> <a href="TwoWireInterface_8h_source.html#l00077">TwoWireInterface.h:77</a></div></div>
 <div class="ttc" id="aclassace__wire_1_1TwoWireInterface_html"><div class="ttname"><a href="classace__wire_1_1TwoWireInterface.html">ace_wire::TwoWireInterface</a></div><div class="ttdoc">A thin wrapper around an I2C TwoWire class and its Wire object.</div><div class="ttdef"><b>Definition:</b> <a href="TwoWireInterface_8h_source.html#l00045">TwoWireInterface.h:45</a></div></div>
 <div class="ttc" id="aclassace__wire_1_1TwoWireInterface_html_a494ad44b23a2f5638ffd471fc01428c8"><div class="ttname"><a href="classace__wire_1_1TwoWireInterface.html#a494ad44b23a2f5638ffd471fc01428c8">ace_wire::TwoWireInterface::begin</a></div><div class="ttdeci">void begin()</div><div class="ttdoc">Initial the interface.</div><div class="ttdef"><b>Definition:</b> <a href="TwoWireInterface_8h_source.html#l00056">TwoWireInterface.h:56</a></div></div>
 <!-- start footer part -->

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceWire
-   &#160;<span id="projectnumber">0.1.0</span>
+   &#160;<span id="projectnumber">0.2.0</span>
    </div>
    <div id="projectbrief">Unified interface for selecting different I2C implementations on Arduino platforms</div>
   </td>
@@ -97,12 +97,29 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="separator:a1c2e6f37f81ebff8fca3d04b60257d66"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e28da3a3e6ae9a799ce1573da7ce6f5"><td class="memItemLeft" align="right" valign="top"><a id="a4e28da3a3e6ae9a799ce1573da7ce6f5"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#a4e28da3a3e6ae9a799ce1573da7ce6f5">write</a> (uint8_t data)</td></tr>
-<tr class="memdesc:a4e28da3a3e6ae9a799ce1573da7ce6f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write data. <br /></td></tr>
+<tr class="memdesc:a4e28da3a3e6ae9a799ce1573da7ce6f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write data into the write buffer. <br /></td></tr>
 <tr class="separator:a4e28da3a3e6ae9a799ce1573da7ce6f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07155422487f7f07e8cc978973d1cf59"><td class="memItemLeft" align="right" valign="top"><a id="a07155422487f7f07e8cc978973d1cf59"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#a07155422487f7f07e8cc978973d1cf59">endTransmission</a> ()</td></tr>
-<tr class="memdesc:a07155422487f7f07e8cc978973d1cf59"><td class="mdescLeft">&#160;</td><td class="mdescRight">End transmission. <br /></td></tr>
+<tr class="memdesc:a07155422487f7f07e8cc978973d1cf59"><td class="mdescLeft">&#160;</td><td class="mdescRight">End building of the buffer, and actually transmit the data. <br /></td></tr>
 <tr class="separator:a07155422487f7f07e8cc978973d1cf59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6fe88e9412f3b1aae0444dbb777e8f0f"><td class="memItemLeft" align="right" valign="top"><a id="a6fe88e9412f3b1aae0444dbb777e8f0f"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#a6fe88e9412f3b1aae0444dbb777e8f0f">requestFrom</a> (uint8_t addr, uint8_t quantity, bool stop=true)</td></tr>
+<tr class="memdesc:a6fe88e9412f3b1aae0444dbb777e8f0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read bytes from the slave and store in buffer owned by T_WIRE. <br /></td></tr>
+<tr class="separator:a6fe88e9412f3b1aae0444dbb777e8f0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5e95776e675f4eb865b12ddb6676df3"><td class="memItemLeft" align="right" valign="top"><a id="af5e95776e675f4eb865b12ddb6676df3"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#af5e95776e675f4eb865b12ddb6676df3">read</a> ()</td></tr>
+<tr class="memdesc:af5e95776e675f4eb865b12ddb6676df3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read byte from buffer. <br /></td></tr>
+<tr class="separator:af5e95776e675f4eb865b12ddb6676df3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6986989357271aaed36aed4e34496854"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#a6986989357271aaed36aed4e34496854">endRequest</a> ()</td></tr>
+<tr class="memdesc:a6986989357271aaed36aed4e34496854"><td class="mdescLeft">&#160;</td><td class="mdescRight">End <a class="el" href="classace__wire_1_1TwoWireInterface.html#a6fe88e9412f3b1aae0444dbb777e8f0f" title="Read bytes from the slave and store in buffer owned by T_WIRE.">requestFrom()</a>.  <a href="classace__wire_1_1TwoWireInterface.html#a6986989357271aaed36aed4e34496854">More...</a><br /></td></tr>
+<tr class="separator:a6986989357271aaed36aed4e34496854"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13d282afe9157357d47590eabd1c7576"><td class="memItemLeft" align="right" valign="top"><a id="a13d282afe9157357d47590eabd1c7576"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>TwoWireInterface</b> (const <a class="el" href="classace__wire_1_1TwoWireInterface.html">TwoWireInterface</a> &amp;)=default</td></tr>
+<tr class="separator:a13d282afe9157357d47590eabd1c7576"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd6463cd376eff1f68f18d3f19e09f3e"><td class="memItemLeft" align="right" valign="top"><a id="abd6463cd376eff1f68f18d3f19e09f3e"></a>
+<a class="el" href="classace__wire_1_1TwoWireInterface.html">TwoWireInterface</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classace__wire_1_1TwoWireInterface.html">TwoWireInterface</a> &amp;)=default</td></tr>
+<tr class="separator:abd6463cd376eff1f68f18d3f19e09f3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename T_WIRE&gt;<br />
@@ -110,7 +127,7 @@ class ace_wire::TwoWireInterface&lt; T_WIRE &gt;</h3>
 
 <p>A thin wrapper around an I2C <code>TwoWire</code> class and its <code>Wire</code> object. </p>
 <p>This is a template class to avoid including the &lt;Wire.h&gt; header file, which increases flash memory on AVR by about 1000 byte even if the Wire object is never used.</p>
-<p>This wrapper can also be used with alternative implementations of I2C (software or hardware) so long as they implement some basic API of the <code>TwoWire</code> class: specifically the <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#a1c2e6f37f81ebff8fca3d04b60257d66" title="Start transmission at specified I2C addr.">beginTransmission()</a></code>, <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#a4e28da3a3e6ae9a799ce1573da7ce6f5" title="Write data.">write()</a></code> and <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#a07155422487f7f07e8cc978973d1cf59" title="End transmission.">endTransmission()</a> methods. Since</code>TwoWireInterface` is a template, the alternative implementation classes do <em>not</em> need to inherit from the <code>TwoWire</code> class. </p>
+<p>This wrapper can also be used with alternative implementations of I2C (software or hardware) so long as they implement some basic API of the <code>TwoWire</code> class: specifically the <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#a1c2e6f37f81ebff8fca3d04b60257d66" title="Start transmission at specified I2C addr.">beginTransmission()</a></code>, <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#a4e28da3a3e6ae9a799ce1573da7ce6f5" title="Write data into the write buffer.">write()</a></code> and <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#a07155422487f7f07e8cc978973d1cf59" title="End building of the buffer, and actually transmit the data.">endTransmission()</a> methods. Since</code>TwoWireInterface` is a template, the alternative implementation classes do <em>not</em> need to inherit from the <code>TwoWire</code> class. </p>
 
 <p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00045">45</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
@@ -135,7 +152,7 @@ template&lt;typename T_WIRE &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -214,6 +231,38 @@ template&lt;typename T_WIRE &gt; </div>
 <p>Currently does nothing. </p>
 
 <p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00059">59</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
+
+</div>
+</div>
+<a id="a6986989357271aaed36aed4e34496854"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6986989357271aaed36aed4e34496854">&#9670;&nbsp;</a></span>endRequest()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T_WIRE &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classace__wire_1_1TwoWireInterface.html">ace_wire::TwoWireInterface</a>&lt; T_WIRE &gt;::endRequest </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>End <a class="el" href="classace__wire_1_1TwoWireInterface.html#a6fe88e9412f3b1aae0444dbb777e8f0f" title="Read bytes from the slave and store in buffer owned by T_WIRE.">requestFrom()</a>. </p>
+<p>Clients should always call this. This implementation does nothing, but other implementations will perform additional actions. </p>
+
+<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00090">90</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 
 </div>
 </div>

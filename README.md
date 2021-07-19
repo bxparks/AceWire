@@ -2,21 +2,39 @@
 
 Unified interface for selecting different I2C implementations on Arduino
 platforms. Uses C++ templates to achieve minimal or zero-cost runtime overhead
-for the abstraction. The code was initially part of the
-[AceSegment](https://github.com/bxparks/AceSegment) library, but was extracted
-into a separate library so that it can be shared with other projects.
+for the abstraction. In more technical terms, the library provides compile-time
+polymorphism instead of runtime polymorphism to avoid the overhead of the
+`virtual` keyword.
 
-This library provides the following C++ class templates:
+The code was initially part of the
+[AceSegment](https://github.com/bxparks/AceSegment) library, but was extracted
+into a separate library so that it can be shared with other projects. It
+provides the following implementations:
 
 * `TwoWireInterface.h`
+    * Thin wrapper around the `TwoWire` class in the pre-installed `<Wire.h>`
+      library.
+    * Other hardware and software implementations are supported as long as
+      they implement a handful of methods that are syntactically compatible with
+      the `TwoWire` class. See
+      [Using Third Party I2C Libraries](#UsingThirdPartyI2CLibraries)
+      and [Third Party Compatibility](##ThirdPartyCompatibility) below for a
+      non-exhaustive list of compatible third party libraries.
 * `SimpleWireInterface.h`
+    * AceWire's own software bitbanging implementation that supports writing
+      and reading from simple I2C devices, such as an HT16K33 LED controller
+      chip and a DS3231 RTC chip.
 * `SimpleWireFastInterface.h`
+    * Same as `SimpleWireInterface.h` using one of the `<digitalWriteFast.h>`
+      libraries.
 
-**Version**: 0.1 (2021-06-25)
+**Version**: 0.2 (2021-07-19)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
-**Status**: Works, but needs documentation.
+**See Also**:
+* https://github.com/bxparks/AceSPI
+* https://github.com/bxparks/AceTMI
 
 ## Table of Contents
 
@@ -26,6 +44,15 @@ This library provides the following C++ class templates:
 * [Documentation](#Documentation)
 * [Usage](#Usage)
     * [Include Header and Namespace](#HeaderAndNamespace)
+    * [Unified Interface](#UnifiedInterface)
+    * [TwoWireInterface](#TwoWireInterface)
+    * [SimpleWireInterface](#SimpleWireInterface)
+    * [SimpleWireFastInterface](#SimpleWireFastInterface)
+    * [Storing Interface Objects](#StoringInterfaceObjects)
+    * [Using Third Party I2C Libraries](#UsingThirdPartyI2CLibraries)
+    * [ThirdPartyCompatibility](#ThirdPartyCompatibility)
+    * [Writing to I2C](#WritingToI2C)
+    * [Reading from I2C](#ReadingFromI2C)
 * [System Requirements](#SystemRequirements)
     * [Hardware](#Hardware)
     * [Tool Chain](#ToolChain)
@@ -74,6 +101,8 @@ digitalWriteFast libraries, for example:
 * this `README.md` file.
 * [Doxygen docs](https://bxparks.github.io/AceWire/html)
     * On Github pages.
+* Examples:
+    * https://github.com/bxparks/AceSegment/tree/develop/examples/Ht16k33Demo
 
 <a name="Usage"></a>
 ## Usage
@@ -117,6 +146,420 @@ To use `SimpleWireFastInterface`, use:
   using ace_wire::SoftWireFastInterface;
 #endif
 ```
+
+<a name="UnifiedInterface"></a>
+### Unified Interface
+
+The classes in this library provide the following unified interface for handling
+I2C communication. Downstream classes can code against this unified interface
+using C++ templates so that different implementations can be selected at
+compile-time. The interface looks like this (where `Xxx` is `TwoWire`,
+`SimpleWire` or `SimpleWireFast`):
+
+```C++
+class XxxInterface {
+  public:
+    void begin();
+    void end();
+
+    void beginTransmission(uint8_t addr);
+    void write(uint8_t data);
+    void endTransmission();
+
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool stop = true);
+    uint8_t read();
+    void endRequest();
+};
+```
+
+Notice that the classes in this library do *not* inherit from a common interface
+with virtual functions. This saves several hundred bytes of flash memory on
+8-bit AVR processors by avoiding the dynamic dispatch. Often the
+compiler is able to optimize away the overhead of calling the methods in this
+library so that the function call is made directly to the underlying
+implementation. The reduction of flash memory consumption is especially large
+for classes that use the digitalWriteFast libraries which use compile-time
+constants for pin numbers. The disadvantage is that this library is harder to
+use because these classes require the downstream classes to be implemented using
+C++ templates.
+
+<a name="TwoWireInterface"></a>
+### TwoWireInterface
+
+The `TwoWireInterface` is a thin wrapper around the pre-installed `TwoWire`
+class provided by the `<Wire.h>` library. In addition, it is flexible enough to
+become a wrapper around any I2C implementation class (hardware or software) that
+implements and API similar enough to the `TwoWire` class (see
+[Using Third Party I2C Libraries](#UsingThirdPartyI2CLibraries) below).
+
+```C++
+#include <Arduino.h>
+#include <Wire.h>
+#include <AceWire.h>
+using ace_wire::TwoWireInterface;
+
+const uint8_t SCL_PIN = SCL;
+const uint8_t SDA_PIN = SDA;
+
+template <typename T_WIRE>
+class MyClass {
+  public:
+    MyClass(T_WIRE& wireInterface)
+        : mWireInterface(wireInterface)
+    { ... }
+
+    [...]
+
+  private:
+    T_WIRE mWireInterface; // reference will also work
+};
+
+using WireInterface = TwoWireInterface<TwoWire>;
+WireInterface wireInterface(Wire);
+MyClass<WireInterface> myClass(wireInterface);
+
+void setup() {
+  Wire.begin();
+  wireInterface.begin();
+  ...
+}
+```
+
+The `using` statement is the C++11 version of a `typedef` that defines
+`WireInterface`. It is not strictly necessary here, but it allows the same
+pattern to be used for the more complicated examples below.
+
+The `T_WIRE` template parameter contains a `T_` prefix to avoid name collisions
+with too many `#define` macros defined in the global namespace on Arduino
+platforms.
+
+<a name="SimpleWireInterface"></a>
+### SimpleWireInterface
+
+The `SimpleWireInterface` is a software implementation of I2C that has just
+enough functionality to read from and write to some simple I2C devices, such as
+an HT16K33 LED controller chip, or a DS3231 RTC chip. It currently supports just
+a master mode, with no clock stretching.
+
+```C++
+#include <Arduino.h>
+#include <AceWire.h>
+using ace_wire::SimpleWireInterface;
+
+const uint8_t SCL_PIN = SCL;
+const uint8_t SDA_PIN = SDA;
+const uint8_t DELAY_MICROS = 4;
+
+template <typename T_WIRE>
+class MyClass {
+  public:
+    MyClass(T_WIRE& wireInterface)
+        : mWireInterface(wireInterface)
+    { ... }
+
+    [...]
+
+  private:
+    T_WIRE mWireInterface; // copied by value
+};
+
+using WireInterface = SimpleWireInterface;
+WireInterface wireInterface(SDA_PIN, SCL_PIN, DELAY_MICROS);
+MyClass<WireInterface> myClass(wireInterface);
+
+void setup() {
+  wireInterface.begin();
+  ...
+}
+```
+
+The `DELAY_MICROS` parameter is the number of microseconds to wait between
+transitions of the SCL and SDA signals. The smallest value of this parameter
+depends on the capacitance and resistance of the SCL and SDA lines, and the
+capabilities of the target device, with smaller values requiring lower
+capacitance and lower resistance. The largest value of this parameter depends
+mostly on the capabilities of the target device.
+
+The actual delay between the transitions of the SCL and SDA signal may be
+significantly different from the `DELAY_MICROS` parameter for several reasons:
+
+* The accuracy of the `delayMicroseconds()` function on AVR processors is
+  signficantly degraded for values less than about 10 seconds.
+* The duration of the `digitalWrite()` function may be greater than the
+  value of `DELAY_MICROS`.
+
+Trial and error may be required to determine an appropriate value of
+`DELAY_MICROS`.
+
+**Important**: The `SimpleWireInterface` class does not need the `<Wire.h>`
+library. You should *not* add an `#include <Wire.h>` statement in your program
+if nothing else in your program needs it. Adding that single include line
+increases the flash memory consumption on AVR processors by about 1140 bytes and
+increases static ram consumption by 113 bytes, even if the `Wire` object is
+never used.
+
+<a name="SimpleWireFastInterface"></a>
+### SimpleWireFastInterface
+
+The `SimpleWireFastInterface` is the same as `SimpleWireInterface` but using the
+`digitalWriteFast()` function.
+
+```C++
+#include <Arduino.h>
+#include <AceWire.h>
+#if defined(ARDUINO_ARCH_AVR)
+  #include <digitalWriteFast.h>
+  #include <ace_wire/SimpleWireFastInterface.h>
+  using ace_wire::SimpleWireFastInterface;
+#endif
+
+const uint8_t SCL_PIN = SCL;
+const uint8_t SDA_PIN = SDA;
+const uint8_t DELAY_MICROS = 4;
+
+template <typename T_WIRE>
+class MyClass {
+  public:
+    MyClass(T_WIRE& wireInterface)
+        : mWireInterface(wireInterface)
+    { ... }
+
+    [...]
+
+  private:
+    T_WIRE mWireInterface; // copied by value
+};
+
+using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, DELAY_MICROS>;
+WireInterface wireInterface;
+MyClass<WireInterface> myClass(wireInterface);
+
+void setup() {
+  wireInterface.begin();
+  ...
+}
+```
+
+**Important**: The `SimpleWireFastInterface` class does not need the `<Wire.h>`
+library. You should *not* add an `#include <Wire.h>` statement in your program
+if nothing else in your program needs it. Adding that single include line
+increases the flash memory consumption on AVR processors by about 1140 bytes and
+increases static ram consumption by 113 bytes, even if the `Wire` object is
+never used.
+
+<a name="StoringInterfaceObjects"></a>
+### Storing Interface Objects
+
+In the above examples, the `MyClass` object holds the `T_WIRE` interface object
+by **value**. In other words, the interface object is copied into the `MyClass`
+object. This is efficient because interface objects are very small in size, and
+copying them by-value avoids an extra level of indirection. The compiler will
+generate code that is equivalent to calling the underlying `Wire` methods
+through the `TwoWire` pointer.
+
+The alternative is to store a reference to `T_WIRE` object like this:
+
+```C++
+template <typename T_WIRE>
+class MyClass {
+  public:
+    MyClass(T_WIRE& wireInterface)
+        : mWireInterface(wireInterface)
+    { ... }
+
+    [...]
+
+  private:
+    T_WIRE& mWireInterface; // copied by reference
+};
+```
+
+The internal size of the `TwoWireInterface` object is just a single reference to
+the `T_Wire` object, so there is no difference in the static memory size.
+However, storing the `mWireInterface` as a reference causes an extra
+layer of unnecessary indirection every time the `mWireInterface` object is
+called. In almost every case, I recommend storing the `XxxInterface` object by
+value into the `MyClass` object.
+
+<a name="UsingThirdPartyI2CLibraries"></a>
+### Using Third Party I2C Libraries
+
+The usefulness of the `TwoWireInterface` class is that it is not restricted to
+just the pre-installed `<Wire.h>` library. It can be actually be used with any
+third party I2C library that implements an API similar to the `TwoWire` class
+from the `<Wire.h>` library. This is useful because the `TwoWire` class does not
+support polymorphism and cannot be subclassed.
+
+Here is an example of using `TwoWireInterface` with
+[SoftwareWire](https://github.com/Testato/SoftwareWire). As of v1.6.0, the
+`SoftwareWire` class no longer inherits from the `TwoWire` class (see
+https://github.com/Testato/SoftwareWire/pull/32 for details on why it is not
+possible for `SoftwareWire` to inherit from `TwoWire`). But the `SoftwareWire`
+class implements an API which is almost identical to `TwoWire`. Since
+`TwoWireInterface` is a template class, it does not use inheritance, so it can
+be used with `SoftwareWire` as shown below:
+
+```C++
+#include <Arduino.h>
+#include <SoftwareWire.h>
+#include <AceWire.h>
+using ace_wire::TwoWireInterface;
+
+const uint8_t SCL_PIN = SCL;
+const uint8_t SDA_PIN = SDA;
+
+template <typename T_WIRE>
+class MyClass {
+  public:
+    MyClass(T_WIRE& wireInterface)
+        : mWireInterface(wireInterface)
+    { ... }
+
+    [...]
+
+  private:
+    T_WIRE mWireInterface; // copied by value
+};
+
+SoftwareWire softwareWire(SDA_PIN, SCL_PIN);
+using WireInterface = TwoWireInterface<SoftwareWire>;
+WireInterface wireInterface(softwareWire);
+MyClass<WireInterface> myClass(wireInterface);
+
+void setup() {
+  softwareWire.begin();
+  wireInterface.begin();
+  ...
+}
+```
+
+This code is almost identical to the code using `TwoWireInterface<TwoWire>`. The
+important point to note is that `MyClass<T_WIRE>` remains unchanged.
+
+<a name="ThirdPartyCompatibility"></a>
+### Third Party Compatibility
+
+The following third party I2C libraries (both hardware and software
+implementations) have been verified to work with the `TwoWireInterface` wrapper
+class:
+
+* https://github.com/Testato/SoftwareWire
+* https://github.com/RaemondBW/SWire
+* https://github.com/felias-fogg/SlowSoftWire
+* https://github.com/thexeno/HardWire-Arduino-Library
+* https://github.com/Seeed-Studio/Arduino_Software_I2C
+
+I could not get the following to work:
+
+* https://github.com/stevemarple/SoftWire
+
+See https://github.com/bxparks/AceSegment/tree/develop/examples/Ht16k33Demo
+for the configuration of each library.
+
+For other third party I2C libraries which do not implement the API structure of
+`TwoWire`, it is possible to create a customized version of `TwoWireInterface`.
+Each third party library would need to be handled on a case-by-case basis. In
+return for this additional work of going through the AceWire library, we gain
+the ability to use different I2C libraries with only a minimal amount of
+configuration changes, while paying only a small or even zero runtime overhead
+by taking advantage of C++ templates.
+
+<a name="WritingToI2C"></a>
+### Writing to I2C
+
+Once the `T_WIRE mWireInstnace` is created in the `MyClass<T_WIRE>` class,
+writing to the I2C device is basically the same as using the `Wire` object
+directly:
+
+```C++
+template <typename T_WIRE>
+class MyClass {
+  private:
+    static const uint8_t ADDRESS = ...;
+    ...
+
+  public:
+    void writeToDevice() {
+      mWireInterface.beginTransmission(ADDRESS);
+      mWireInterface.write(data1);
+      mWireInterface.write(data2);
+      ...
+      mWireInterface.endTransmission();
+    }
+
+  private:
+    T_WIRE mWireInterface; // reference will also work
+};
+```
+
+Some I2C implementations (e.g. `Wire`, `SoftwareWire`) follow the `TwoWire`
+class from `<Wire.h>`, and use an internal buffer (often 32 bytes on 8-bit
+platforms) to store the data. The `write(uint8_t)` method does not actually
+write data to the bus, rather it writes into the buffer. The actual transmission
+of the data does not occur until `endTransmission()` is called. Even if the
+implementation uses hardware interrupts, the `endTransmission()` method will be
+a blocking call that does not return until all the bytes in the write buffer are
+sent.
+
+Some I2C implementation do not use a write buffer (e.g. `SimpleWireInterface`,
+`SimpleWireFastInterface`, and `SlowSoftWire` below.). Instead, the
+`beginTransmission()`, `write()`, and `endTransmission()` methods directly write
+the necessary data to the I2C bus.
+
+For compatibility with both types of implementations, the code that uses AceWire
+classes should assume that the write buffer does *not* exist. The calling code
+should assume that the `beginTransmission()`, `write()`, and `endTransmission()`
+are all blocking calls which send out the data to the I2C immediately.
+
+<a name="ReadingFromI2C"></a>
+### Reading from I2C
+
+Reading from the I2C bus is similar to writing. Once the `mWireInterface` object
+is available in the `MyClass` object, we can read bytes from the I2C like this:
+
+```C++
+template <typename T_WIRE>
+class MyClass {
+  private:
+    static const uint8_t ADDRESS = ...;
+    static const uint8_t NUM_BYTES = ...;
+    static const bool SEND_STOP = true;
+    ...
+
+  public:
+    void writeToDevice() {
+      mWireInterface.requestFrom(ADDRESS, NUM_BYTES, SEND_STOP);
+      uint8_t data1 = mWireInterface.read();
+      uint8_t data2 = mWireInterface.read();
+      ...
+      mWireInterface.endRequest();
+    }
+
+  private:
+    T_WIRE mWireInterface; // reference will also work
+};
+```
+
+The `requestFrom()` and `read()` methods should look familiar to those who have
+used the `TwoWire` class from `<Wire.h>`. The `endRequest()` method is new. It
+is an null function for `TwoWireInterface` because the underlying
+implementations use a receive buffer, so all the work was already done in the
+`requestFrom()` method. However, for `SimpleWireInterface` and
+`SimpleWireFastInterface`, the `endRequest()` method is required to send the I2C
+"stop" condition to the device.
+
+To be compatible with both types of implementations (ones with a receive buffer
+and ones without), each call to `requestFrom()` should be paired with a call to
+`endRequest()` at the end of the transaction.
+
+The `SEND_STOP` boolean flag indicates whether the I2C master will send a "stop"
+condition after reading the required number of bytes. Usually it is a good idea
+to send a "stop" condition, because not all slave devices nor all I2C libraries
+support the "repeated start" feature of the I2C bus.
+
+**Important**: For all implementations, the number of calls to the `read()`
+method must be *exactly* equal to `NUM_BYTES`. Otherwise, unpredictable things
+may happen, including a crash of the system.
 
 <a name="SystemRequirements"></a>
 ## System Requirements

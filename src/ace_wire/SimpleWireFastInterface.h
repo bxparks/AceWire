@@ -25,10 +25,6 @@ SOFTWARE.
 #ifndef ACE_WIRE_SIMPLE_WIRE_FAST_INTERFACE_H
 #define ACE_WIRE_SIMPLE_WIRE_FAST_INTERFACE_H
 
-// This header file requires the digitalWriteFast library on AVR, or the
-// EpoxyMockDigitalWriteFast library on EpoxyDuino.
-#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-
 #include <stdint.h>
 #include <Arduino.h> // delayMicroseconds()
 
@@ -39,15 +35,14 @@ namespace ace_wire {
  * libraries. The biggest benefit of using digitalWriteFast is the reduction of
  * flash memory size, 500-700 bytes on AVR.
  *
- * On AVR processors, `delayMicroseconds()` is not accurate below 3
- * microseconds. Some microcontrollers may support better accuracy and may
- * work well with values as low as 1 microsecond.
+ * The `delayMicroseconds()` may not be accurate for small values on some
+ * processors (e.g. AVR) . The actual minimum value of T_DELAY_MICROS will
+ * depend on the capacitance and resistance on the DATA and CLOCK lines, and the
+ * accuracy of the `delayMicroseconds()` function.
  *
  * @tparam T_DATA_PIN SDA pin
  * @tparam T_CLOCK_PIN SCL pin
- * @tparam T_DELAY_MICROS delay after each bit transition of SDA or SCL.. Should
- *    be greater or equal to 3 microseconds on AVR processors, but may work as
- *    low as 1 microsecond on other microcontrollers.
+ * @tparam T_DELAY_MICROS delay after each bit transition of SDA or SCL
  */
 template <
     uint8_t T_DATA_PIN,
@@ -57,7 +52,7 @@ template <
 class SimpleWireFastInterface {
   public:
     /** Constructor. */
-    SimpleWireFastInterface() = default;
+    explicit SimpleWireFastInterface() = default;
 
     /**
      * Initialize the clock and data pins.
@@ -84,7 +79,7 @@ class SimpleWireFastInterface {
     }
 
     /**
-     * Send start condition.
+     * Send I2C START condition.
      * @param addr I2C address of slave device
      */
     void beginTransmission(uint8_t addr) const {
@@ -94,17 +89,9 @@ class SimpleWireFastInterface {
       dataLow();
       clockLow();
 
-      // Send I2C addr (7 bits) and R/W bit set to "write" (0x00).
+      // Send I2C addr (7 bits) and the R/W bit set to "write" (0x00).
       uint8_t effectiveAddr = (addr << 1) | 0x00;
       write(effectiveAddr);
-    }
-
-    /** Send stop condition. */
-    void endTransmission() const {
-      // clock will always be LOW when this is called
-      dataLow();
-      clockHigh();
-      dataHigh();
     }
 
     /**
@@ -132,12 +119,79 @@ class SimpleWireFastInterface {
       return readAck();
     }
 
+    /** Send I2C STOP condition. */
+    void endTransmission() const {
+      // clock will always be LOW when this is called
+      dataLow();
+      clockHigh();
+      dataHigh();
+    }
+
+    /** Prepare to read bytes by sending I2C START condition. */
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool stop = true) {
+      mQuantity = quantity;
+      mStop = stop;
+
+      clockHigh();
+      dataHigh();
+
+      dataLow();
+      clockLow();
+
+      // Send I2C addr (7 bits) and the R/W bit set to "read" (0x01).
+      uint8_t effectiveAddr = (addr << 1) | 0x01;
+      write(effectiveAddr);
+
+      return quantity;
+    }
+
+    /**
+     * Read byte. After reading 8 bits, an ACK or NACK will be sent by the
+     * master to the slave. ACK means the slave will be asked to send more
+     * bytes so can hold control of the data line. NACK means no more bytes will
+     * be read from the slave and the slave should release the data line.
+     */
+    uint8_t read() {
+      // Read one byte
+      dataHigh();
+      uint8_t data = 0;
+      for (uint8_t i = 0; i < 8; ++i) {
+        clockHigh();
+        data <<= 1;
+        uint8_t bit = digitalReadFast(T_DATA_PIN);
+        data |= (bit & 0x1);
+        clockLow();
+      }
+
+      // Decrement quantity to determine if NACK or ACK should be sent.
+      mQuantity--;
+      if (mQuantity) {
+        sendAck();
+      } else {
+        sendNack();
+      }
+
+      return data;
+    }
+
+    /** End requestFrom() by sending I2C STOP condition if 'stop' is 'true'. */
+    void endRequest() {
+      if (mStop) {
+        endTransmission();
+      }
+    }
+
+    // Use default copy constructor and assignment operator.
+    SimpleWireFastInterface(const SimpleWireFastInterface&) = default;
+    SimpleWireFastInterface& operator=(const SimpleWireFastInterface&) =
+        default;
+
   private:
     /**
      * Read the ACK/NACK bit from the device upon the falling edge of the 8th
      * CLK, which happens in the write() loop above.
      */
-    uint8_t readAck() const {
+    static uint8_t readAck() {
       // Go into INPUT mode, reusing dataHigh(), saving 10 flash bytes on AVR.
       dataHigh();
       uint8_t ack = digitalReadFast(T_DATA_PIN);
@@ -148,23 +202,35 @@ class SimpleWireFastInterface {
       return ack;
     }
 
-    // The following methods use compile-time constants from the template
-    // parameters. The compiler will optimize away the 'this' pointer so that
-    // these methods become identical to calling static functions.
+    /** Send ACK to slave. */
+    static void sendAck() {
+      dataLow();
+      clockHigh();
+      clockLow();
+    }
 
-    void bitDelay() const { delayMicroseconds(T_DELAY_MICROS); }
+    /** Send NACK to slave. */
+    static void sendNack() {
+      dataHigh();
+      clockHigh();
+      clockLow();
+    }
 
-    void clockHigh() const { pinModeFast(T_CLOCK_PIN, INPUT); bitDelay(); }
+    static void bitDelay() { delayMicroseconds(T_DELAY_MICROS); }
 
-    void clockLow() const { pinModeFast(T_CLOCK_PIN, OUTPUT); bitDelay(); }
+    static void clockHigh() { pinModeFast(T_CLOCK_PIN, INPUT); bitDelay(); }
 
-    void dataHigh() const { pinModeFast(T_DATA_PIN, INPUT); bitDelay(); }
+    static void clockLow() { pinModeFast(T_CLOCK_PIN, OUTPUT); bitDelay(); }
 
-    void dataLow() const { pinModeFast(T_DATA_PIN, OUTPUT); bitDelay(); }
+    static void dataHigh() { pinModeFast(T_DATA_PIN, INPUT); bitDelay(); }
+
+    static void dataLow() { pinModeFast(T_DATA_PIN, OUTPUT); bitDelay(); }
+
+  private:
+    bool mStop;
+    uint8_t mQuantity;
 };
 
 }
-
-#endif // defined(ARDUINO_ARCH_AVR)
 
 #endif
