@@ -495,23 +495,21 @@ class MyClass {
 Some I2C implementations (e.g. `Wire`, `SoftwareWire`) follow the `TwoWire`
 class from `<Wire.h>`, and use an internal buffer (often 32 bytes on 8-bit
 platforms) to store the data. The `write(uint8_t)` method does not actually
-write data to the bus, rather it writes into the buffer buffer. The actual
-transmission of the data does not occur until `endTransmission()` is called.
-Even if the implementation uses hardware interrupts, the `endTransmission()`
-method will be a blocking call that does not return until all the bytes in the
-write buffer are sent.
+write data to the bus, rather it writes into the buffer. The actual transmission
+of the data does not occur until `endTransmission()` is called. Even if the
+implementation uses hardware interrupts, the `endTransmission()` method will be
+a blocking call that does not return until all the bytes in the write buffer are
+sent.
 
 Some I2C implementation do not use a write buffer (e.g. `SimpleWireInterface`,
 `SimpleWireFastInterface`, and `SlowSoftWire` below.). Instead, the
-`beginTransmission()`, `write()`, and `endTransmission()` methods actual write
+`beginTransmission()`, `write()`, and `endTransmission()` methods directly write
 the necessary data to the I2C bus.
 
 For compatibility with both types of implementations, the code that uses AceWire
-classes should assume that the write buffer does not exist. The calling code
+classes should assume that the write buffer does *not* exist. The calling code
 should assume that the `beginTransmission()`, `write()`, and `endTransmission()`
-are all blocking calls which send out the data to the I2C immediately. If a
-buffer is used by the underlying implementation, there is no harm in assuming
-that no such buffer exists.
+are all blocking calls which send out the data to the I2C immediately.
 
 <a name="ReadingFromI2C"></a>
 ### Reading from I2C
@@ -547,8 +545,8 @@ used the `TwoWire` class from `<Wire.h>`. The `endRequest()` method is new. It
 is an null function for `TwoWireInterface` because the underlying
 implementations use a receive buffer, so all the work was already done in the
 `requestFrom()` method. However, for `SimpleWireInterface` and
-`SimpleWireFastInterface`, the `endRequest()` method is required to to send the
-I2C "stop" condition to the device.
+`SimpleWireFastInterface`, the `endRequest()` method is required to send the I2C
+"stop" condition to the device.
 
 To be compatible with both types of implementations (ones with a receive buffer
 and ones without), each call to `requestFrom()` should be paired with a call to
