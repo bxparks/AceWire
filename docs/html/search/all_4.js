@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['twowireinterface_6',['TwoWireInterface',['../classace__wire_1_1TwoWireInterface.html',1,'ace_wire::TwoWireInterface&lt; T_WIRE &gt;'],['../classace__wire_1_1TwoWireInterface.html#a8bd43efe7644927f55afd805c854976b',1,'ace_wire::TwoWireInterface::TwoWireInterface()']]]
+  ['simplewirefastinterface_8',['SimpleWireFastInterface',['../classace__wire_1_1SimpleWireFastInterface.html',1,'ace_wire::SimpleWireFastInterface&lt; T_DATA_PIN, T_CLOCK_PIN, T_DELAY_MICROS &gt;'],['../classace__wire_1_1SimpleWireFastInterface.html#accd53bbb3bc2c03c22fb78b026748f07',1,'ace_wire::SimpleWireFastInterface::SimpleWireFastInterface()']]],
+  ['simplewireinterface_9',['SimpleWireInterface',['../classace__wire_1_1SimpleWireInterface.html',1,'ace_wire::SimpleWireInterface'],['../classace__wire_1_1SimpleWireInterface.html#a59dcb827cd546ad319bfdc3d12eb30dd',1,'ace_wire::SimpleWireInterface::SimpleWireInterface()']]]
 ];
