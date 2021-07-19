@@ -16,11 +16,14 @@ provides the following implementations:
       library.
     * Other hardware and software implementations are supported as long as
       they implement a handful of methods that are syntactically compatible with
-      the `TwoWire` class. See [Compatibility](#Compatibility) below for a
-      non-exhaustive list of compatible 3rd party libraries.
+      the `TwoWire` class. See
+      [Using Third Party I2C Libraries](#UsingThirdPartyI2CLibraries)
+      and [Third Party Compatibility](##ThirdPartyCompatibility) below for a
+      non-exhaustive list of compatible third party libraries.
 * `SimpleWireInterface.h`
-    * AceWire's own software bitbanging implementation that supports just
-      enough I2C to communicate with the HT16K33 controller chip.
+    * AceWire's own software bitbanging implementation that supports writing
+      and reading from simple I2C devices, such as an HT16K33 LED controller
+      chip and a DS3231 RTC chip.
 * `SimpleWireFastInterface.h`
     * Same as `SimpleWireInterface.h` using one of the `<digitalWriteFast.h>`
       libraries.
@@ -46,10 +49,10 @@ provides the following implementations:
     * [SimpleWireInterface](#SimpleWireInterface)
     * [SimpleWireFastInterface](#SimpleWireFastInterface)
     * [Storing Interface Objects](#StoringInterfaceObjects)
-    * [Using Third Party Wire Libraries](#UsingThirdPartyI2CLibraries)
+    * [Using Third Party I2C Libraries](#UsingThirdPartyI2CLibraries)
+    * [ThirdPartyCompatibility](#ThirdPartyCompatibility)
     * [Writing to I2C](#WritingToI2C)
     * [Reading from I2C](#ReadingFromI2C)
-    * [ThirdPartyCompatibility](#ThirdPartyCompatibility)
 * [System Requirements](#SystemRequirements)
     * [Hardware](#Hardware)
     * [Tool Chain](#ToolChain)
@@ -185,9 +188,9 @@ C++ templates.
 
 The `TwoWireInterface` is a thin wrapper around the pre-installed `TwoWire`
 class provided by the `<Wire.h>` library. In addition, it is flexible enough to
-become a wrapper around any I2C implementation class (hardware or software) as
-long as it is "similar enough" to the `TwoWire` class (see
-[Compatibility](#Compatibility) below).
+become a wrapper around any I2C implementation class (hardware or software) that
+implements and API similar enough to the `TwoWire` class (see
+[Using Third Party I2C Libraries](#UsingThirdPartyI2CLibraries) below).
 
 ```C++
 #include <Arduino.h>
@@ -234,8 +237,9 @@ platforms.
 ### SimpleWireInterface
 
 The `SimpleWireInterface` is a software implementation of I2C that has just
-enough functionality to communicate with an HT16K33 LED controller chip. It
-currently supports just a master mode.
+enough functionality to read from and write to some simple I2C devices, such as
+an HT16K33 LED controller chip, or a DS3231 RTC chip. It currently supports just
+a master mode, with no clock stretching.
 
 ```C++
 #include <Arduino.h>
@@ -268,6 +272,24 @@ void setup() {
   ...
 }
 ```
+
+The `DELAY_MICROS` parameter is the number of microseconds to wait between
+transitions of the SCL and SDA signals. The smallest value of this parameter
+depends on the capacitance and resistance of the SCL and SDA lines, and the
+capabilities of the target device, with smaller values requiring lower
+capacitance and lower resistance. The largest value of this parameter depends
+mostly on the capabilities of the target device.
+
+The actual delay between the transitions of the SCL and SDA signal may be
+significantly different from the `DELAY_MICROS` parameter for several reasons:
+
+* The accuracy of the `delayMicroseconds()` function on AVR processors is
+  signficantly degraded for values less than about 10 seconds.
+* The duration of the `digitalWrite()` function may be greater than the
+  value of `DELAY_MICROS`.
+
+Trial and error may be required to determine an appropriate value of
+`DELAY_MICROS`.
 
 **Important**: The `SimpleWireInterface` class does not need the `<Wire.h>`
 library. You should *not* add an `#include <Wire.h>` statement in your program
@@ -359,8 +381,8 @@ layer of unnecessary indirection every time the `mWireInterface` object is
 called. In almost every case, I recommend storing the `XxxInterface` object by
 value into the `MyClass` object.
 
-<a name="ThirdPartyI2CLibraries"></a>
-### Third Party I2C Libraries
+<a name="UsingThirdPartyI2CLibraries"></a>
+### Using Third Party I2C Libraries
 
 The usefulness of the `TwoWireInterface` class is that it is not restricted to
 just the pre-installed `<Wire.h>` library. It can be actually be used with any
@@ -413,6 +435,34 @@ void setup() {
 
 This code is almost identical to the code using `TwoWireInterface<TwoWire>`. The
 important point to note is that `MyClass<T_WIRE>` remains unchanged.
+
+<a name="ThirdPartyCompatibility"></a>
+### Third Party Compatibility
+
+The following third party I2C libraries (both hardware and software
+implementations) have been verified to work with the `TwoWireInterface` wrapper
+class:
+
+* https://github.com/Testato/SoftwareWire
+* https://github.com/RaemondBW/SWire
+* https://github.com/felias-fogg/SlowSoftWire
+* https://github.com/thexeno/HardWire-Arduino-Library
+* https://github.com/Seeed-Studio/Arduino_Software_I2C
+
+I could not get the following to work:
+
+* https://github.com/stevemarple/SoftWire
+
+See https://github.com/bxparks/AceSegment/tree/develop/examples/Ht16k33Demo
+for the configuration of each library.
+
+For other third party I2C libraries which do not implement the API structure of
+`TwoWire`, it is possible to create a customized version of `TwoWireInterface`.
+Each third party library would need to be handled on a case-by-case basis. In
+return for this additional work of going through the AceWire library, we gain
+the ability to use different I2C libraries with only a minimal amount of
+configuration changes, while paying only a small or even zero runtime overhead
+by taking advantage of C++ templates.
 
 <a name="WritingToI2C"></a>
 ### Writing to I2C
@@ -512,32 +562,6 @@ support the "repeated start" feature of the I2C bus.
 **Important**: For all implementations, the number of calls to the `read()`
 method must be *exactly* equal to `NUM_BYTES`. Otherwise, unpredictable things
 may happen, including a crash of the system.
-
-<a name="ThirdPartyCompatibility"></a>
-### Third Party Compatibility
-
-The following third party I2C libraries (both hardware and software
-implementations) have been verified to work with the `TwoWireInterface` wrapper
-class:
-
-* https://github.com/Testato/SoftwareWire
-* https://github.com/RaemondBW/SWire
-* https://github.com/felias-fogg/SlowSoftWire
-* https://github.com/thexeno/HardWire-Arduino-Library
-* https://github.com/Seeed-Studio/Arduino_Software_I2C
-
-I could not get the following to work:
-
-* https://github.com/stevemarple/SoftWire
-
-See https://github.com/bxparks/AceSegment/tree/develop/examples/Ht16k33Demo
-for the configuration of each library.
-
-For other third party I2C libraries which do not implement the API structure of
-`TwoWire`, it is possible to create a customized version of `TwoWireInterface`.
-Each third party library would need to be handled on a case-by-case basis. We
-gain the flexibility of being able to choose different I2C libraries, paying
-only a tiny or even zero runtime overhead through the use of C++ templates.
 
 <a name="SystemRequirements"></a>
 ## System Requirements
