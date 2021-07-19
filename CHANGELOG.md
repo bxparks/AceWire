@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+* 0.2 (2021-07-19)
     * Add ability to read from I2C device using `requestFrom()`, `read(),
       and `endRequest()`.
     * Finish most of the Usage Guide in README.md

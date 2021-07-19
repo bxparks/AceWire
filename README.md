@@ -28,7 +28,7 @@ provides the following implementations:
     * Same as `SimpleWireInterface.h` using one of the `<digitalWriteFast.h>`
       libraries.
 
-**Version**: 0.1 (2021-06-25)
+**Version**: 0.2 (2021-07-19)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
