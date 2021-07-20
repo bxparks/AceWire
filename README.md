@@ -198,9 +198,6 @@ implements and API similar enough to the `TwoWire` class (see
 #include <AceWire.h>
 using ace_wire::TwoWireInterface;
 
-const uint8_t SCL_PIN = SCL;
-const uint8_t SDA_PIN = SDA;
-
 template <typename T_WIRE>
 class MyClass {
   private:
@@ -262,9 +259,9 @@ sections below for documentation about the `beginTransmission()`,
 ### SimpleWireInterface
 
 The `SimpleWireInterface` is a software implementation of I2C that has just
-enough functionality to read from and write to some simple I2C devices, such as
-an HT16K33 LED controller chip, or a DS3231 RTC chip. It currently supports just
-a master mode, with no clock stretching.
+enough functionality to communicate with some simple I2C devices, such as an
+HT16K33 LED controller chip, or a DS3231 RTC chip. It currently supports just a
+master mode, with no clock stretching.
 
 ```C++
 #include <Arduino.h>
@@ -301,9 +298,9 @@ The actual delay between the transitions of the SCL and SDA signal may be
 significantly different from the `DELAY_MICROS` parameter for several reasons:
 
 * The accuracy of the `delayMicroseconds()` function on AVR processors is
-  signficantly degraded for values less than about 10 seconds.
-* The duration of the `digitalWrite()` function may be greater than the
-  value of `DELAY_MICROS`.
+  signficantly degraded for values less than about 10 microseconds.
+* The speed of the `digitalWrite()` function is known to be particularly slow
+  on AVR processors, and it may take more time than the value of `DELAY_MICROS`.
 
 Trial and error may be required to determine an appropriate value of
 `DELAY_MICROS`.
@@ -387,10 +384,10 @@ class MyClass {
 
 The internal size of the `TwoWireInterface` object is just a single reference to
 the `T_Wire` object, so there is no difference in the static memory size.
-However, storing the `mWireInterface` as a reference causes an extra
-layer of unnecessary indirection every time the `mWireInterface` object is
-called. In almost every case, I recommend storing the `XxxInterface` object by
-value into the `MyClass` object.
+However, storing the `mWireInterface` as a reference causes an unnecessary extra
+layer of indirection every time the `mWireInterface` object is called. In almost
+every case, I recommend storing the `XxxInterface` object by value into the
+`MyClass` object.
 
 <a name="UsingThirdPartyI2CLibraries"></a>
 ### Using Third Party I2C Libraries
