@@ -203,15 +203,36 @@ const uint8_t SDA_PIN = SDA;
 
 template <typename T_WIRE>
 class MyClass {
+  private:
+    static const uint8_t ADDRESS = ...;
+    static const uint8_t NUM_BYTES = ...;
+    static const bool SEND_STOP = true;
+
   public:
     MyClass(T_WIRE& wireInterface)
         : mWireInterface(wireInterface)
-    { ... }
+    {
+      ...
+    }
 
-    [...]
+    void writeToDevice() {
+      mWireInterface.beginTransmission(ADDRESS);
+      mWireInterface.write(data1);
+      mWireInterface.write(data2);
+      ...
+      mWireInterface.endTransmission();
+    }
+
+    void readFromDevice() {
+      mWireInterface.requestFrom(ADDRESS, NUM_BYTES, SEND_STOP);
+      uint8_t data1 = mWireInterface.read();
+      uint8_t data2 = mWireInterface.read();
+      ...
+      mWireInterface.endRequest();
+    }
 
   private:
-    T_WIRE mWireInterface; // reference will also work
+    T_WIRE mWireInterface; // copied by value
 };
 
 using WireInterface = TwoWireInterface<TwoWire>;
@@ -233,6 +254,10 @@ The `T_WIRE` template parameter contains a `T_` prefix to avoid name collisions
 with too many `#define` macros defined in the global namespace on Arduino
 platforms.
 
+See the [Writing to I2C](#WritingToI2C) and [Reading from I2C](#ReadingFromI2C)
+sections below for documentation about the `beginTransmission()`,
+`endTransmission()`, `requestFrom()`, and `endRequest()` methods.
+
 <a name="SimpleWireInterface"></a>
 ### SimpleWireInterface
 
@@ -252,15 +277,7 @@ const uint8_t DELAY_MICROS = 4;
 
 template <typename T_WIRE>
 class MyClass {
-  public:
-    MyClass(T_WIRE& wireInterface)
-        : mWireInterface(wireInterface)
-    { ... }
-
-    [...]
-
-  private:
-    T_WIRE mWireInterface; // copied by value
+  // Exactly the same as above.
 };
 
 using WireInterface = SimpleWireInterface;
@@ -319,15 +336,7 @@ const uint8_t DELAY_MICROS = 4;
 
 template <typename T_WIRE>
 class MyClass {
-  public:
-    MyClass(T_WIRE& wireInterface)
-        : mWireInterface(wireInterface)
-    { ... }
-
-    [...]
-
-  private:
-    T_WIRE mWireInterface; // copied by value
+  // Exactly the same as above.
 };
 
 using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, DELAY_MICROS>;
@@ -351,11 +360,11 @@ never used.
 ### Storing Interface Objects
 
 In the above examples, the `MyClass` object holds the `T_WIRE` interface object
-by **value**. In other words, the interface object is copied into the `MyClass`
+**by value**. In other words, the interface object is copied into the `MyClass`
 object. This is efficient because interface objects are very small in size, and
-copying them by-value avoids an extra level of indirection. The compiler will
-generate code that is equivalent to calling the underlying `Wire` methods
-through the `TwoWire` pointer.
+copying them by-value avoids an extra level of indirection when they are used
+inside the `MyClass` object. The compiler will generate code that is equivalent
+to calling the underlying `Wire` methods through the `TwoWire` pointer.
 
 The alternative is to store a reference to `T_WIRE` object like this:
 
@@ -365,7 +374,9 @@ class MyClass {
   public:
     MyClass(T_WIRE& wireInterface)
         : mWireInterface(wireInterface)
-    { ... }
+    {
+      ...
+    }
 
     [...]
 
@@ -385,16 +396,16 @@ value into the `MyClass` object.
 ### Using Third Party I2C Libraries
 
 The usefulness of the `TwoWireInterface` class is that it is not restricted to
-just the pre-installed `<Wire.h>` library. It can be actually be used with any
-third party I2C library that implements an API similar to the `TwoWire` class
-from the `<Wire.h>` library. This is useful because the `TwoWire` class does not
-support polymorphism and cannot be subclassed.
+just the `TwoWire` class from the `<Wire.h>` library. It can be actually be used
+with any third party I2C library that implements an API similar enough to the
+`TwoWire` class from the `<Wire.h>` library. This is useful because the
+`TwoWire` class does not support polymorphism and cannot be subclassed (see
+the discussions in
+[Testato/SoftwareWire#32](https://github.com/Testato/SoftwareWire/pull/32) and
+[Testato/SoftwareWire#28](https://github.com/Testato/SoftwareWire/issues/28).)
 
 Here is an example of using `TwoWireInterface` with
-[SoftwareWire](https://github.com/Testato/SoftwareWire). As of v1.6.0, the
-`SoftwareWire` class no longer inherits from the `TwoWire` class (see
-https://github.com/Testato/SoftwareWire/pull/32 for details on why it is not
-possible for `SoftwareWire` to inherit from `TwoWire`). But the `SoftwareWire`
+[SoftwareWire](https://github.com/Testato/SoftwareWire). The `SoftwareWire`
 class implements an API which is almost identical to `TwoWire`. Since
 `TwoWireInterface` is a template class, it does not use inheritance, so it can
 be used with `SoftwareWire` as shown below:
@@ -410,15 +421,7 @@ const uint8_t SDA_PIN = SDA;
 
 template <typename T_WIRE>
 class MyClass {
-  public:
-    MyClass(T_WIRE& wireInterface)
-        : mWireInterface(wireInterface)
-    { ... }
-
-    [...]
-
-  private:
-    T_WIRE mWireInterface; // copied by value
+  // Exactly same as above.
 };
 
 SoftwareWire softwareWire(SDA_PIN, SCL_PIN);
@@ -433,8 +436,8 @@ void setup() {
 }
 ```
 
-This code is almost identical to the code using `TwoWireInterface<TwoWire>`. The
-important point to note is that `MyClass<T_WIRE>` remains unchanged.
+The critical point is that `MyClass<T_WIRE>` remains unchanged from the previous
+example, and everything should just work.
 
 <a name="ThirdPartyCompatibility"></a>
 ### Third Party Compatibility
@@ -488,7 +491,7 @@ class MyClass {
     }
 
   private:
-    T_WIRE mWireInterface; // reference will also work
+    T_WIRE mWireInterface; // copied by value
 };
 ```
 
@@ -506,10 +509,12 @@ Some I2C implementation do not use a write buffer (e.g. `SimpleWireInterface`,
 `beginTransmission()`, `write()`, and `endTransmission()` methods directly write
 the necessary data to the I2C bus.
 
-For compatibility with both types of implementations, the code that uses AceWire
-classes should assume that the write buffer does *not* exist. The calling code
-should assume that the `beginTransmission()`, `write()`, and `endTransmission()`
-are all blocking calls which send out the data to the I2C immediately.
+For compatibility with both types of implementations, the code in `MyClass` that
+uses AceWire classes should assume that the write buffer does *not* exist. The
+calling code should assume that the `beginTransmission()`, `write()`, and
+`endTransmission()` are all blocking calls which send out the data to the I2C
+immediately. Therefore, the `write()` method should be called as quickly as
+possible.
 
 <a name="ReadingFromI2C"></a>
 ### Reading from I2C
@@ -527,7 +532,7 @@ class MyClass {
     ...
 
   public:
-    void writeToDevice() {
+    void readFromDevice() {
       mWireInterface.requestFrom(ADDRESS, NUM_BYTES, SEND_STOP);
       uint8_t data1 = mWireInterface.read();
       uint8_t data2 = mWireInterface.read();
@@ -541,16 +546,20 @@ class MyClass {
 ```
 
 The `requestFrom()` and `read()` methods should look familiar to those who have
-used the `TwoWire` class from `<Wire.h>`. The `endRequest()` method is new. It
-is an null function for `TwoWireInterface` because the underlying
-implementations use a receive buffer, so all the work was already done in the
-`requestFrom()` method. However, for `SimpleWireInterface` and
-`SimpleWireFastInterface`, the `endRequest()` method is required to send the I2C
-"stop" condition to the device.
+used the `TwoWire` class from `<Wire.h>`.
+
+The `endRequest()` method is new. It is an null function for `TwoWireInterface`
+because it assumes that the underlying implementations use a receive buffer, so
+all the work was already done in the `requestFrom()` method. However, the
+`SimpleWireInterface` and `SimpleWireFastInterface` implementations do not use a
+buffer. They extract the data stream directly from the I2C bus using
+`digitalRead()` or `digitalReadFast()` methods. So the `endRequest()` method
+must be called by the `MyClass` calling class, so that the I2C "stop" condition
+can be sent to the device according to the I2C specification.
 
 To be compatible with both types of implementations (ones with a receive buffer
-and ones without), each call to `requestFrom()` should be paired with a call to
-`endRequest()` at the end of the transaction.
+and ones without), the calling code must pair each `requestFrom()` call with a
+matching call to `endRequest()` at the end of the transaction.
 
 The `SEND_STOP` boolean flag indicates whether the I2C master will send a "stop"
 condition after reading the required number of bytes. Usually it is a good idea
