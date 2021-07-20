@@ -187,10 +187,32 @@ C++ templates.
 ### TwoWireInterface
 
 The `TwoWireInterface` is a thin wrapper around the `TwoWire` class provided by
-the pre-installed `<Wire.h>` library. In addition, it is flexible enough to
-become a wrapper around any I2C implementation class (hardware or software) that
-implements an API similar enough to the `TwoWire` class (see [Using Third Party
-I2C Libraries](#UsingThirdPartyI2CLibraries) below).
+the pre-installed `<Wire.h>` library. It looks like this:
+
+```C++
+template <typename T_WIRE>
+class TwoWireInterface {
+  public:
+    explicit TwoWireInterface(T_WIRE& wire) : mWire(wire) {}
+
+    void begin() {...}
+    void end() {...}
+
+    void beginTransmission(uint8_t addr) {...}
+    void write(uint8_t data) {...}
+    void endTransmission() {...}
+
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool stop = true) {...}
+    uint8_t read() {...}
+    void endRequest() {...}
+};
+```
+
+It is flexible enough to become a wrapper around any I2C implementation class
+(hardware or software) that implements an API similar enough to the `TwoWire`
+class See [Using Third Party I2C Libraries](#UsingThirdPartyI2CLibraries) below.
+
+It is configured and used by the calling code `MyClass` like this:
 
 ```C++
 #include <Arduino.h>
@@ -261,21 +283,46 @@ sections below for documentation about the `beginTransmission()`,
 The `SimpleWireInterface` is a software implementation of I2C that has just
 enough functionality to communicate with some simple I2C devices, such as an
 HT16K33 LED controller chip, or a DS3231 RTC chip. It currently supports just a
-master mode, with no clock stretching.
+master mode, with no clock stretching. It looks like this:
+
+```C++
+class SimpleWireInterface {
+  public:
+    explicit SimpleWireInterface(
+        uint8_t dataPin, uint8_t clockPin, uint8_t delayMicros
+    ) :
+        mDataPin(dataPin),
+        mClockPin(clockPin),
+        mDelayMicros(delayMicros)
+    {}
+
+    void begin() {...}
+    void end() {...}
+
+    void beginTransmission(uint8_t addr) {...}
+    void write(uint8_t data) {...}
+    void endTransmission() {...}
+
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool stop = true) {...}
+    uint8_t read() {...}
+    void endRequest() {...}
+};
+```
+It is configured and used by the calling code `MyClass` like this:
 
 ```C++
 #include <Arduino.h>
 #include <AceWire.h>
 using ace_wire::SimpleWireInterface;
 
-const uint8_t SCL_PIN = SCL;
-const uint8_t SDA_PIN = SDA;
-const uint8_t DELAY_MICROS = 4;
-
 template <typename T_WIRE>
 class MyClass {
   // Exactly the same as above.
 };
+
+const uint8_t SCL_PIN = SCL;
+const uint8_t SDA_PIN = SDA;
+const uint8_t DELAY_MICROS = 4;
 
 using WireInterface = SimpleWireInterface;
 WireInterface wireInterface(SDA_PIN, SCL_PIN, DELAY_MICROS);
@@ -316,7 +363,32 @@ never used.
 ### SimpleWireFastInterface
 
 The `SimpleWireFastInterface` is the same as `SimpleWireInterface` but using the
-`digitalWriteFast()` function.
+`digitalWriteFast()` function. It looks like this:
+
+```C++
+template <
+    uint8_t T_DATA_PIN,
+    uint8_t T_CLOCK_PIN,
+    uint8_t T_DELAY_MICROS
+>
+class SimpleWireFastInterface {
+  public:
+    explicit SimpleWireFastInterface() = default;
+
+    void begin() {...}
+    void end() {...}
+
+    void beginTransmission(uint8_t addr) {...}
+    void write(uint8_t data) {...}
+    void endTransmission() {...}
+
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool stop = true) {...}
+    uint8_t read() {...}
+    void endRequest() {...}
+};
+```
+
+It is configured and used by the calling code `MyClass` like this:
 
 ```C++
 #include <Arduino.h>
@@ -327,14 +399,14 @@ The `SimpleWireFastInterface` is the same as `SimpleWireInterface` but using the
   using ace_wire::SimpleWireFastInterface;
 #endif
 
-const uint8_t SCL_PIN = SCL;
-const uint8_t SDA_PIN = SDA;
-const uint8_t DELAY_MICROS = 4;
-
 template <typename T_WIRE>
 class MyClass {
   // Exactly the same as above.
 };
+
+const uint8_t SCL_PIN = SCL;
+const uint8_t SDA_PIN = SDA;
+const uint8_t DELAY_MICROS = 4;
 
 using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, DELAY_MICROS>;
 WireInterface wireInterface;
@@ -383,7 +455,7 @@ class MyClass {
 ```
 
 The internal size of the `TwoWireInterface` object is just a single reference to
-the `T_Wire` object, so there is no difference in the static memory size.
+the `T_WIRE` object, so there is no difference in the static memory size.
 However, storing the `mWireInterface` as a reference causes an unnecessary extra
 layer of indirection every time the `mWireInterface` object is called. In almost
 every case, I recommend storing the `XxxInterface` object by value into the
@@ -413,13 +485,13 @@ be used with `SoftwareWire` as shown below:
 #include <AceWire.h>
 using ace_wire::TwoWireInterface;
 
-const uint8_t SCL_PIN = SCL;
-const uint8_t SDA_PIN = SDA;
-
 template <typename T_WIRE>
 class MyClass {
   // Exactly same as above.
 };
+
+const uint8_t SCL_PIN = SCL;
+const uint8_t SDA_PIN = SDA;
 
 SoftwareWire softwareWire(SDA_PIN, SCL_PIN);
 using WireInterface = TwoWireInterface<SoftwareWire>;
