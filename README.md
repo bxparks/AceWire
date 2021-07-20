@@ -538,7 +538,7 @@ class MyClass {
     }
 
   private:
-    T_WIRE mWireInterface; // reference will also work
+    T_WIRE mWireInterface; // copied by value
 };
 ```
 
