@@ -186,11 +186,11 @@ C++ templates.
 <a name="TwoWireInterface"></a>
 ### TwoWireInterface
 
-The `TwoWireInterface` is a thin wrapper around the pre-installed `TwoWire`
-class provided by the `<Wire.h>` library. In addition, it is flexible enough to
+The `TwoWireInterface` is a thin wrapper around the `TwoWire` class provided by
+the pre-installed `<Wire.h>` library. In addition, it is flexible enough to
 become a wrapper around any I2C implementation class (hardware or software) that
-implements and API similar enough to the `TwoWire` class (see
-[Using Third Party I2C Libraries](#UsingThirdPartyI2CLibraries) below).
+implements an API similar enough to the `TwoWire` class (see [Using Third Party
+I2C Libraries](#UsingThirdPartyI2CLibraries) below).
 
 ```C++
 #include <Arduino.h>
@@ -225,7 +225,7 @@ class MyClass {
       uint8_t data1 = mWireInterface.read();
       uint8_t data2 = mWireInterface.read();
       ...
-      mWireInterface.endRequest();
+      mWireInterface.endRequest(); // this is important!
     }
 
   private:
@@ -245,7 +245,7 @@ void setup() {
 
 The `using` statement is the C++11 version of a `typedef` that defines
 `WireInterface`. It is not strictly necessary here, but it allows the same
-pattern to be used for the more complicated examples below.
+code structure to be used for the more complicated examples below.
 
 The `T_WIRE` template parameter contains a `T_` prefix to avoid name collisions
 with too many `#define` macros defined in the global namespace on Arduino
@@ -363,7 +363,7 @@ copying them by-value avoids an extra level of indirection when they are used
 inside the `MyClass` object. The compiler will generate code that is equivalent
 to calling the underlying `Wire` methods through the `TwoWire` pointer.
 
-The alternative is to store a reference to `T_WIRE` object like this:
+The alternative is to save the `T_WIRE` object **by reference** like this:
 
 ```C++
 template <typename T_WIRE>
@@ -545,7 +545,7 @@ class MyClass {
 The `requestFrom()` and `read()` methods should look familiar to those who have
 used the `TwoWire` class from `<Wire.h>`.
 
-The `endRequest()` method is new. It is an null function for `TwoWireInterface`
+The `endRequest()` method is new. It is a no-op function for `TwoWireInterface`
 because it assumes that the underlying implementations use a receive buffer, so
 all the work was already done in the `requestFrom()` method. However, the
 `SimpleWireInterface` and `SimpleWireFastInterface` implementations do not use a
