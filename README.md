@@ -1,25 +1,56 @@
 # AceWire
 
-Unified interface for selecting different I2C implementations on Arduino
-platforms. Uses C++ templates to achieve minimal or zero-cost runtime overhead
-for the abstraction. In more technical terms, the library provides compile-time
-polymorphism instead of runtime polymorphism to avoid the overhead of the
-`virtual` keyword.
-
-The code was initially part of the
+Wrapper classes that provide a unified interface for different I2C
+implementations on Arduino platforms. The code was initially part of the
 [AceSegment](https://github.com/bxparks/AceSegment) library, but was extracted
-into a separate library so that it can be shared with other projects. It
-provides the following implementations:
+into a separate library. It has 3 primary purposes:
+
+1 Allow client applications to easily select alternate I2C libraries instead of
+  being locked into the pre-installed `<Wire.h>` library. Alternative libraries
+  may be desirable for various reasons:
+    * To use different GPIO pins, instead of `SDA` and `SCL`.
+    * To reduce flash and static memory consumption compared to `<Wire.h>`.
+    * To use packet sizes larger than the default 32-bytes provided by AVR
+      `<Wire.h>`.
+2 Prevent unnecessary flash memory consumption by preventing `AceSegment`
+  from being forced to include `<Wire.h>` when it is not necessary.
+    * Simply including the `<Wire.h>` header file causes memory consumption of
+      the application to increase by 1140 bytes of flash and 113 bytes of static
+      memory. This happens even if the application never uses anything defined
+      by the `<Wire.h>` library.
+    * The `AceSegment` library provides classes which use the SPI interface, and
+      other classes which use the I2C interface. If it referenced the `<SPI.h>`
+      and `<Wire.h>` header files directly, then client applications which used
+      only the SPI interface would waste 1140 bytes of flash and 113 bytes of
+      ram.
+    * By going through an intermediary library like `AceWire` (and `AceSPI` and
+      `AceTMI`), client applications do not suffer from unnecessary memory
+      bloat.
+3 Allow all libraries to share a common framework for selection a common I2C
+  implementation within a given application.
+    * Otherwise, some parts of the app would use `<Wire.h>`, and other parts of
+      the app would use a different I2C implementation.
+
+The `TwoWire` class in `<Wire.h>` cannot be used polymorphically. In other
+words, subclasses cannot be used through a pointer (or reference) to the base
+`TwoWire` class. To get around this problem, this library uses C++ templates to
+provide compile-time polymorphism instead of runtime polymorphism. This also
+means that the calling application code pays only a minimal or zero-cost runtime
+overhead for the abstraction, by avoiding the `virtual` dispatch.
+
+The library provides an I2C wrapper class (`TwoWireInterface1) around other
+third party I2C implementations, as well as 2 of its own software I2C
+implementations (`SimpleWireInterface`, `SimpleWireFastInterface`):
 
 * `TwoWireInterface.h`
     * Thin wrapper around the `TwoWire` class in the pre-installed `<Wire.h>`
       library.
     * Other hardware and software implementations are supported as long as
       they implement a handful of methods that are syntactically compatible with
-      the `TwoWire` class. See
-      [Using Third Party I2C Libraries](#UsingThirdPartyI2CLibraries)
-      and [Third Party Compatibility](##ThirdPartyCompatibility) below for a
-      non-exhaustive list of compatible third party libraries.
+      the `TwoWire` class. At least 5 different third party libraries have
+      been verified to work with `TwoWireInterface`:
+        * [Using Third Party I2C Libraries](#UsingThirdPartyI2CLibraries)
+        * [Third Party Compatibility](##ThirdPartyCompatibility)
 * `SimpleWireInterface.h`
     * AceWire's own software bitbanging implementation that supports writing
       and reading from simple I2C devices, such as an HT16K33 LED controller
@@ -27,6 +58,15 @@ provides the following implementations:
 * `SimpleWireFastInterface.h`
     * Same as `SimpleWireInterface.h` using one of the `<digitalWriteFast.h>`
       libraries.
+
+The library currently supports only a limited set of I2C functionality:
+
+* master mode only, no slave
+* no clock stretching
+* no explicit validation of ACK/NACK from slave
+* able to use any GPIO pin
+* tested AVR, SAMD21, STM32, ESP8266, ESP32, and Teensy 3.2
+* repeated start may or may not work (untested)
 
 **Version**: 0.2 (2021-07-19)
 
@@ -89,7 +129,7 @@ The source files are organized as follows:
 
 The main `AceWire.h` does not depend any external libraries.
 
-The `SoftWireFastInterface.h` implementation depends on one of the
+The `SimpleWireFastInterface.h` implementation depends on one of the
 digitalWriteFast libraries, for example:
 
 * https://github.com/watterott/Arduino-Libs/tree/master/digitalWriteFast
@@ -142,8 +182,8 @@ To use `SimpleWireFastInterface`, use:
 #include <AceWire.h>
 #if defined(ARDUINO_ARCH_AVR)
   #include <digitalWriteFast.h>
-  #include <ace_wire/SoftWireFastInterface.h>
-  using ace_wire::SoftWireFastInterface;
+  #include <ace_wire/SimpleWireFastInterface.h>
+  using ace_wire::SimpleWireFastInterface;
 #endif
 ```
 
