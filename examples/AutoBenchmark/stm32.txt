@@ -1,0 +1,8 @@
+SIZEOF
+sizeof(TwoWireInterface): 4
+sizeof(SimpleWireInterface): 5
+BENCHMARKS
+TwoWireInterface<TwoWire>,100kHz 1113 1113 1114 20
+TwoWireInterface<TwoWire>,400kHz 333 333 334 20
+SimpleWireInterface,1us 2569 2572 2575 20
+END
