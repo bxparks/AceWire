@@ -228,11 +228,9 @@ class MyClass {
     static const bool SEND_STOP = true;
 
   public:
-    MyClass(T_WIRE& wireInterface)
+    explicit MyClass(T_WIRE& wireInterface)
         : mWireInterface(wireInterface)
-    {
-      ...
-    }
+    {...}
 
     void writeToDevice() {
       mWireInterface.beginTransmission(ADDRESS);
@@ -441,11 +439,9 @@ The alternative is to save the `T_WIRE` object **by reference** like this:
 template <typename T_WIRE>
 class MyClass {
   public:
-    MyClass(T_WIRE& wireInterface)
+    explicit MyClass(T_WIRE& wireInterface)
         : mWireInterface(wireInterface)
-    {
-      ...
-    }
+    {...}
 
     [...]
 
