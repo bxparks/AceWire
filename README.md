@@ -520,6 +520,11 @@ class:
 I could not get the following to work:
 
 * https://github.com/stevemarple/SoftWire
+    * Nothing happens.
+* https://github.com/felias-fogg/SoftI2CMaster, using its `SoftWire.h`
+    * On a SparkFun Pro Micro, nothing happens.
+    * On an Arduino Nano, the assembler fails with a fatal error:
+      "Error: number must be positive and less than 8".
 
 See https://github.com/bxparks/AceSegment/tree/develop/examples/Ht16k33Demo
 for the configuration of each library.
