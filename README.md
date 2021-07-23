@@ -95,7 +95,9 @@ The library currently supports only a limited set of I2C functionality:
     * [ThirdPartyCompatibility](#ThirdPartyCompatibility)
     * [Writing to I2C](#WritingToI2C)
     * [Reading from I2C](#ReadingFromI2C)
-* [Performance](#Performance)
+* [Resource Consumption](#ResourceConsumption)
+    * [Flash And Static Memory](#FlashAndStaticMemory)
+    * [CPU Cycles](#CpuCycles)
 * [System Requirements](#SystemRequirements)
     * [Hardware](#Hardware)
     * [Tool Chain](#ToolChain)
@@ -209,7 +211,8 @@ class XxxInterface {
     void write(uint8_t data);
     void endTransmission(bool sendStop = true);
 
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true);
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop);
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity);
     uint8_t read();
     void endRequest();
 };
@@ -689,12 +692,52 @@ support the "repeated start" feature of the I2C bus.
 method must be *exactly* equal to `NUM_BYTES`. Otherwise, unpredictable things
 may happen, including a crash of the system.
 
-<a name="Performance"></a>
-## Performance
+<a name="ResourceConsumption"></a>
+## Resource Consumption
 
-The [AutoBenchmark](examples/AutoBenchmark) program was used to calculate the
-effective bandwidth of various configurations. Here are 2 samples of that
-result:
+<a name="FlashAndStaticMemory"></a>
+### Flash And Static Memory
+
+The Memory benchmark numbers can be seen in
+[examples/MemoryBenchmark](examples/MemoryBenchmark). Here are 2 samples:
+
+**Arduino Nano**
+
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| baseline                        |    456/   11 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>       |   2914/  229 |  2458/  218 |
+| SimpleWireInterface             |   1306/   16 |   850/    5 |
+| SimpleWireFastInterface         |    714/   13 |   258/    2 |
+| TwoWireInterface<SoftwareWire>  |   2442/   72 |  1986/   61 |
+| TwoWireInterface<SWire>         |   1686/  157 |  1230/  146 |
+| TwoWireInterface<SlowSoftWire>  |   1912/   83 |  1456/   72 |
++--------------------------------------------------------------+
+```
+
+**ESP8266**
+
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| baseline                        | 256700/26784 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>       | 261372/27268 |  4672/  484 |
+| SimpleWireInterface             | 257732/26796 |  1032/   12 |
+| TwoWireInterface<SWire>         | 258376/26944 |  1676/  160 |
+| TwoWireInterface<SlowSoftWire>  | 259828/26876 |  3128/   92 |
++--------------------------------------------------------------+
+```
+
+<a name="CpuCycles"></a>
+### CPU Cycles
+
+The CPU benchmark numbers can be seen in
+[examples/AutoBenchmark](examples/AutoBenchmark). Here are 2 samples:
 
 **Arduino Nano**
 
