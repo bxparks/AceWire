@@ -120,17 +120,19 @@ class SimpleWireFastInterface {
     }
 
     /** Send I2C STOP condition. */
-    void endTransmission() const {
+    void endTransmission(bool sendStop = true) const {
       // clock will always be LOW when this is called
-      dataLow();
-      clockHigh();
-      dataHigh();
+      if (sendStop) {
+        dataLow();
+        clockHigh();
+        dataHigh();
+      }
     }
 
     /** Prepare to read bytes by sending I2C START condition. */
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool stop = true) {
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true) {
       mQuantity = quantity;
-      mStop = stop;
+      mSendStop = sendStop;
 
       clockHigh();
       dataHigh();
@@ -174,11 +176,11 @@ class SimpleWireFastInterface {
       return data;
     }
 
-    /** End requestFrom() by sending I2C STOP condition if 'stop' is 'true'. */
+    /**
+     * End requestFrom() by sending I2C STOP condition if 'sendStop' is 'true'.
+     */
     void endRequest() {
-      if (mStop) {
-        endTransmission();
-      }
+      endTransmission(mSendStop);
     }
 
     // Use default copy constructor and assignment operator.
@@ -227,7 +229,7 @@ class SimpleWireFastInterface {
     static void dataLow() { pinModeFast(T_DATA_PIN, OUTPUT); bitDelay(); }
 
   private:
-    bool mStop;
+    bool mSendStop;
     uint8_t mQuantity;
 };
 

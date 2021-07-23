@@ -207,9 +207,9 @@ class XxxInterface {
 
     void beginTransmission(uint8_t addr);
     void write(uint8_t data);
-    void endTransmission();
+    void endTransmission(bool sendStop = true);
 
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool stop = true);
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true);
     uint8_t read();
     void endRequest();
 };
@@ -243,9 +243,11 @@ class TwoWireInterface {
 
     void beginTransmission(uint8_t addr) {...}
     void write(uint8_t data) {...}
-    void endTransmission() {...}
+    void endTransmission(bool sendStop = true) {...}
 
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool stop = true) {...}
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true) {
+      ...
+    }
     uint8_t read() {...}
     void endRequest() {...}
 };
@@ -342,9 +344,11 @@ class SimpleWireInterface {
 
     void beginTransmission(uint8_t addr) {...}
     void write(uint8_t data) {...}
-    void endTransmission() {...}
+    void endTransmission(bool sendStop = true) {...}
 
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool stop = true) {...}
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true) {
+      ...
+    }
     uint8_t read() {...}
     void endRequest() {...}
 };
@@ -421,9 +425,11 @@ class SimpleWireFastInterface {
 
     void beginTransmission(uint8_t addr) {...}
     void write(uint8_t data) {...}
-    void endTransmission() {...}
+    void endTransmission(bool sendStop = true) {...}
 
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool stop = true) {...}
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true) {
+      ...
+    }
     uint8_t read() {...}
     void endRequest() {...}
 };

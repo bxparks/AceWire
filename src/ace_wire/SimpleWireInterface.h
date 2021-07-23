@@ -51,7 +51,7 @@ namespace ace_wire {
  * the master sends a NACK if total number of bytes read is not 'quantity', or
  * an ACK if 'quantity' has just been read. After calling read() 'quantity'
  * times, the client calls endRequest() to send the STOP condition, but only if
- * the 'stop' flag of requestFrom() was set to be true (default).
+ * the 'sendStop' flag of requestFrom() was set to be true (default).
  */
 class SimpleWireInterface {
   public:
@@ -141,17 +141,19 @@ class SimpleWireInterface {
     }
 
     /** Send the I2C STOP condition. */
-    void endTransmission() const {
+    void endTransmission(bool sendStop = true) const {
       // clock will always be LOW when this is called
-      dataLow();
-      clockHigh();
-      dataHigh();
+      if (sendStop) {
+        dataLow();
+        clockHigh();
+        dataHigh();
+      }
     }
 
     /** Prepare to read bytes by sending I2C START condition. */
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool stop = true) {
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true) {
       mQuantity = quantity;
-      mStop = stop;
+      mSendStop = sendStop;
 
       clockHigh();
       dataHigh();
@@ -195,11 +197,11 @@ class SimpleWireInterface {
       return data;
     }
 
-    /** End requestFrom() by sending I2C STOP condition if 'stop' is 'true'. */
+    /**
+     * End requestFrom() by sending I2C STOP condition if 'sendStop' is 'true'.
+     */
     void endRequest() {
-      if (mStop) {
-        endTransmission();
-      }
+      endTransmission(mSendStop);
     }
 
     // Use default copy constructor and assignment operator.
@@ -251,7 +253,7 @@ class SimpleWireInterface {
     uint8_t const mClockPin;
     uint8_t const mDelayMicros;
     uint8_t mQuantity;
-    bool mStop;
+    bool mSendStop;
 };
 
 }

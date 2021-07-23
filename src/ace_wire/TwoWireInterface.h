@@ -69,13 +69,13 @@ class TwoWireInterface {
     }
 
     /** End building of the buffer, and actually transmit the data. */
-    void endTransmission() {
-      mWire.endTransmission();
+    void endTransmission(bool sendStop = true) {
+      mWire.endTransmission(sendStop);
     }
 
     /** Read bytes from the slave and store in buffer owned by T_WIRE. */
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool stop = true) {
-      return mWire.requestFrom(addr, quantity, (uint8_t) stop);
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true) {
+      return mWire.requestFrom(addr, quantity, (uint8_t) sendStop);
     }
 
     /** Read byte from buffer. */
