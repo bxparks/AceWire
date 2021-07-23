@@ -96,6 +96,13 @@ I2C implementations:
 * `TwoWireInterface<TwoWire>`: The hardware `<Wire.h>` library.
 * `SimpleWireInterface`: Software I2C using `digitalWrite()`.
 * `SimpleWireFastInterface`: Software I2C using a `digitalWriteFast()` library.
+  (AVR only.)
+* `TwoWireInterface<SoftwareWire>`: Software I2C using
+  https://github.com/Testato/SoftwareWire. (AVR only.)
+* `TwoWireInterface<SWire>`: Software I2C using
+  https://github.com/RaemondBW/SWire
+* `TwoWireInterface<SlowSoftWire>`: Software I2C using
+  https://github.com/felias-fogg/SlowSoftWire
 
 ### ATtiny85
 

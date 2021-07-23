@@ -10,6 +10,9 @@ BEGIN {
   labels[1] = "TwoWireInterface<TwoWire>";
   labels[2] = "SimpleWireInterface";
   labels[3] = "SimpleWireFastInterface";
+  labels[4] = "TwoWireInterface<SoftwareWire>";
+  labels[5] = "TwoWireInterface<SWire>";
+  labels[6] = "TwoWireInterface<SlowSoftWire>";
   record_index = 0
 }
 {
@@ -41,7 +44,7 @@ END {
   for (i = 1 ; i < NUM_ENTRIES; i++) {
     if (u[i]["flash"] == "-1") continue
 
-    if (labels[i] ~ /^TwoWireInterface/) {
+    if (labels[i] ~ /^TwoWireInterface<TwoWire>/) {
       printf(\
         "|---------------------------------+--------------+-------------|\n")
     }

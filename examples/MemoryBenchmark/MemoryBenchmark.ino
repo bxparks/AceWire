@@ -1,7 +1,7 @@
 /*
- * A program which compiles various LedModule and Writer objects with different
- * LED configurations to determine the flash and static memory sizes from the
- * output of the compiler. See the generated README.md for details.
+ * A program which compiles various AceWire implementations to determine the
+ * flash and static memory sizes from the output of the compiler. See the
+ * generated README.md for details.
  */
 
 #include <Arduino.h>
@@ -19,6 +19,9 @@
 #define FEATURE_TWO_WIRE 1
 #define FEATURE_SIMPLE_WIRE 2
 #define FEATURE_SIMPLE_WIRE_FAST 3
+#define FEATURE_SOFTWARE_WIRE 4
+#define FEATURE_SWIRE 5
+#define FEATURE_SLOW_SOFT_WIRE 6
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -55,6 +58,29 @@ volatile int disableCompilerOptimization = 0;
     using WireInterface = SimpleWireFastInterface<
         SDA_PIN, SCL_PIN, DELAY_MICROS>;
     WireInterface wireInterface;
+
+  #elif FEATURE == FEATURE_SOFTWARE_WIRE
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
+      #error Unsupported FEATURE on this platform
+    #endif
+
+    #include <SoftwareWire.h>
+    SoftwareWire softwareWire(SDA_PIN, SCL_PIN);
+    using WireInterface = TwoWireInterface<SoftwareWire>;
+    WireInterface wireInterface(softwareWire);
+
+  #elif FEATURE == FEATURE_SWIRE
+    #include <SWire.h>
+    SoftWire swire;
+    using WireInterface = TwoWireInterface<SoftWire>;
+    WireInterface wireInterface(swire);
+
+  #elif FEATURE == FEATURE_SLOW_SOFT_WIRE
+    #include <SlowSoftWire.h>
+    SlowSoftWire slowSoftWire(SDA_PIN, SCL_PIN);
+    using WireInterface = TwoWireInterface<SlowSoftWire>;
+    WireInterface wireInterface(slowSoftWire);
+
   #else
     #error Unknown FEATURE
 
@@ -96,6 +122,14 @@ void setup() {
 #elif FEATURE == FEATURE_SIMPLE_WIRE_FAST
   wireInterface.begin();
 
+#elif FEATURE == FEATURE_SOFTWARE_WIRE
+  softwareWire.begin();
+  wireInterface.begin();
+
+#elif FEATURE == FEATURE_SWIRE
+  swire.begin(SDA_PIN, SCL_PIN);
+  wireInterface.begin();
+
 #endif
 }
 
@@ -107,25 +141,12 @@ void loop() {
 #if FEATURE == FEATURE_BASELINE
   // do nothing
 
-#elif FEATURE == FEATURE_TWO_WIRE
-  wireInterface.beginTransmission(DS3231_I2C_ADDRESS);
-  wireInterface.write(0x00);
-  wireInterface.endTransmission();
-
-  wireInterface.requestFrom(DS3231_I2C_ADDRESS, 1);
-  wireInterface.read();
-  wireInterface.endRequest();
-
-#elif FEATURE == FEATURE_SIMPLE_WIRE
-  wireInterface.beginTransmission(DS3231_I2C_ADDRESS);
-  wireInterface.write(0x00);
-  wireInterface.endTransmission();
-
-  wireInterface.requestFrom(DS3231_I2C_ADDRESS, 1);
-  wireInterface.read();
-  wireInterface.endRequest();
-
-#elif FEATURE == FEATURE_SIMPLE_WIRE_FAST
+#elif FEATURE == FEATURE_TWO_WIRE \
+    || FEATURE == FEATURE_SIMPLE_WIRE \
+    || FEATURE == FEATURE_SIMPLE_WIRE_FAST \
+    || FEATURE == FEATURE_SOFTWARE_WIRE \
+    || FEATURE == FEATURE_SWIRE \
+    || FEATURE == FEATURE_SLOW_SOFT_WIRE
   wireInterface.beginTransmission(DS3231_I2C_ADDRESS);
   wireInterface.write(0x00);
   wireInterface.endTransmission();
