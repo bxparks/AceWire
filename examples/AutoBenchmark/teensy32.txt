@@ -2,7 +2,8 @@ SIZEOF
 sizeof(TwoWireInterface): 4
 sizeof(SimpleWireInterface): 5
 BENCHMARKS
-TwoWireInterface<TwoWire>,100kHz 1013 1017 1019 20
+TwoWireInterface<TwoWire>,100kHz 1015 1017 1018 20
 TwoWireInterface<TwoWire>,400kHz 279 279 280 20
-SimpleWireInterface,1us 467 468 475 20
+SimpleWireInterface,1us 459 461 464 20
+TwoWireInterface<SlowSoftWire> 660 661 668 20
 END

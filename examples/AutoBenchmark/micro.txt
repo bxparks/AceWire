@@ -3,8 +3,12 @@ sizeof(TwoWireInterface): 2
 sizeof(SimpleWireInterface): 5
 sizeof(SimpleWireFastInterface<2, 3, 10>): 2
 BENCHMARKS
-TwoWireInterface<TwoWire>,100kHz 1124 1132 1140 20
-TwoWireInterface<TwoWire>,400kHz 372 374 380 20
-SimpleWireInterface,1us 1976 1981 1984 20
+TwoWireInterface<TwoWire>,100kHz 1124 1130 1144 20
+TwoWireInterface<TwoWire>,400kHz 372 375 380 20
+SimpleWireInterface,1us 2012 2016 2020 20
 SimpleWireFastInterface,1us 168 170 176 20
+TwoWireInterface<SoftwareWire>,100kHz 1676 1684 1692 20
+TwoWireInterface<SoftwareWire>,400kHz 1208 1213 1224 20
+TwoWireInterface<SWire> 3292 3294 3304 20
+TwoWireInterface<SlowSoftWire> 2268 2271 2288 20
 END

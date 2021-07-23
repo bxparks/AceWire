@@ -94,9 +94,13 @@ CPU:
 | Functionality                           |   min/  avg/  max | eff kHz |
 |-----------------------------------------+-------------------+---------|
 | TwoWireInterface<TwoWire>,100kHz        |  1128/ 1135/ 1160 |    87.2 |
-| TwoWireInterface<TwoWire>,400kHz        |   372/  379/  392 |   261.2 |
-| SimpleWireInterface,1us                 |  1964/ 1984/ 2176 |    49.9 |
-| SimpleWireFastInterface,1us             |   168/  180/  192 |   550.0 |
+| TwoWireInterface<TwoWire>,400kHz        |   372/  379/  388 |   261.2 |
+| SimpleWireInterface,1us                 |  2004/ 2020/ 2212 |    49.0 |
+| SimpleWireFastInterface,1us             |   168/  179/  192 |   553.1 |
+| TwoWireInterface<SoftwareWire>,100kHz   |  1668/ 1678/ 1740 |    59.0 |
+| TwoWireInterface<SoftwareWire>,400kHz   |  1204/ 1214/ 1336 |    81.5 |
+| TwoWireInterface<SWire>                 |  3064/ 3084/ 3388 |    32.1 |
+| TwoWireInterface<SlowSoftWire>          |  2256/ 2271/ 2500 |    43.6 |
 +-----------------------------------------+-------------------+---------+
 
 ```
@@ -118,10 +122,14 @@ CPU:
 +-----------------------------------------+-------------------+---------+
 | Functionality                           |   min/  avg/  max | eff kHz |
 |-----------------------------------------+-------------------+---------|
-| TwoWireInterface<TwoWire>,100kHz        |  1124/ 1132/ 1140 |    87.5 |
-| TwoWireInterface<TwoWire>,400kHz        |   372/  374/  380 |   264.7 |
-| SimpleWireInterface,1us                 |  1976/ 1981/ 1984 |    50.0 |
+| TwoWireInterface<TwoWire>,100kHz        |  1124/ 1130/ 1144 |    87.6 |
+| TwoWireInterface<TwoWire>,400kHz        |   372/  375/  380 |   264.0 |
+| SimpleWireInterface,1us                 |  2012/ 2016/ 2020 |    49.1 |
 | SimpleWireFastInterface,1us             |   168/  170/  176 |   582.4 |
+| TwoWireInterface<SoftwareWire>,100kHz   |  1676/ 1684/ 1692 |    58.8 |
+| TwoWireInterface<SoftwareWire>,400kHz   |  1208/ 1213/ 1224 |    81.6 |
+| TwoWireInterface<SWire>                 |  3292/ 3294/ 3304 |    30.1 |
+| TwoWireInterface<SlowSoftWire>          |  2268/ 2271/ 2288 |    43.6 |
 +-----------------------------------------+-------------------+---------+
 
 ```
@@ -141,9 +149,10 @@ CPU:
 +-----------------------------------------+-------------------+---------+
 | Functionality                           |   min/  avg/  max | eff kHz |
 |-----------------------------------------+-------------------+---------|
-| TwoWireInterface<TwoWire>,100kHz        |  1041/ 1041/ 1045 |    95.1 |
-| TwoWireInterface<TwoWire>,400kHz        |   292/  293/  295 |   337.9 |
-| SimpleWireInterface,1us                 |  1642/ 1644/ 1647 |    60.2 |
+| TwoWireInterface<TwoWire>,100kHz        |  1041/ 1041/ 1046 |    95.1 |
+| TwoWireInterface<TwoWire>,400kHz        |   293/  293/  297 |   337.9 |
+| SimpleWireInterface,1us                 |  1647/ 1650/ 1653 |    60.0 |
+| TwoWireInterface<SlowSoftWire>          |  1240/ 1242/ 1251 |    79.7 |
 +-----------------------------------------+-------------------+---------+
 
 ```
@@ -163,9 +172,10 @@ CPU:
 +-----------------------------------------+-------------------+---------+
 | Functionality                           |   min/  avg/  max | eff kHz |
 |-----------------------------------------+-------------------+---------|
-| TwoWireInterface<TwoWire>,100kHz        |  1021/ 1021/ 1025 |    97.0 |
-| TwoWireInterface<TwoWire>,400kHz        |   305/  306/  310 |   323.5 |
-| SimpleWireInterface,1us                 |  2356/ 2358/ 2362 |    42.0 |
+| TwoWireInterface<TwoWire>,100kHz        |  1018/ 1019/ 1031 |    97.2 |
+| TwoWireInterface<TwoWire>,400kHz        |   303/  304/  307 |   325.7 |
+| SimpleWireInterface,1us                 |  2275/ 2277/ 2284 |    43.5 |
+| TwoWireInterface<SlowSoftWire>          |  2338/ 2342/ 2350 |    42.3 |
 +-----------------------------------------+-------------------+---------+
 
 ```
@@ -185,9 +195,10 @@ CPU:
 +-----------------------------------------+-------------------+---------+
 | Functionality                           |   min/  avg/  max | eff kHz |
 |-----------------------------------------+-------------------+---------|
-| TwoWireInterface<TwoWire>,100kHz        |  1031/ 1039/ 1197 |    95.3 |
+| TwoWireInterface<TwoWire>,100kHz        |  1031/ 1039/ 1204 |    95.3 |
 | TwoWireInterface<TwoWire>,400kHz        |   270/  270/  273 |   366.7 |
-| SimpleWireInterface,1us                 |  1038/ 1041/ 1082 |    95.1 |
+| SimpleWireInterface,1us                 |  1037/ 1040/ 1095 |    95.2 |
+| TwoWireInterface<SlowSoftWire>          |  1051/ 1056/ 1147 |    93.8 |
 +-----------------------------------------+-------------------+---------+
 
 ```
@@ -207,9 +218,10 @@ CPU:
 +-----------------------------------------+-------------------+---------+
 | Functionality                           |   min/  avg/  max | eff kHz |
 |-----------------------------------------+-------------------+---------|
-| TwoWireInterface<TwoWire>,100kHz        |  1080/ 1087/ 1215 |    91.1 |
+| TwoWireInterface<TwoWire>,100kHz        |  1080/ 1087/ 1211 |    91.1 |
 | TwoWireInterface<TwoWire>,400kHz        |   330/  335/  390 |   295.5 |
-| SimpleWireInterface,1us                 |   639/  645/  656 |   153.5 |
+| SimpleWireInterface,1us                 |   638/  645/  654 |   153.5 |
+| TwoWireInterface<SlowSoftWire>          |   633/  642/  674 |   154.2 |
 +-----------------------------------------+-------------------+---------+
 
 ```
@@ -230,9 +242,10 @@ CPU:
 +-----------------------------------------+-------------------+---------+
 | Functionality                           |   min/  avg/  max | eff kHz |
 |-----------------------------------------+-------------------+---------|
-| TwoWireInterface<TwoWire>,100kHz        |  1013/ 1017/ 1019 |    97.3 |
+| TwoWireInterface<TwoWire>,100kHz        |  1015/ 1017/ 1018 |    97.3 |
 | TwoWireInterface<TwoWire>,400kHz        |   279/  279/  280 |   354.8 |
-| SimpleWireInterface,1us                 |   467/  468/  475 |   211.5 |
+| SimpleWireInterface,1us                 |   459/  461/  464 |   214.8 |
+| TwoWireInterface<SlowSoftWire>          |   660/  661/  668 |   149.8 |
 +-----------------------------------------+-------------------+---------+
 
 ```

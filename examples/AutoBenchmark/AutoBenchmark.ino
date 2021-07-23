@@ -33,9 +33,21 @@ SOFTWARE.
 #include <AceCommon.h> // TimingStats
 #include <AceWire.h>
 
+// These work only for AVR.
+#if defined(ARDUINO_ARCH_AVR)
+  #include <SoftwareWire.h> // https://github.com/Testato/SoftwareWire
+  #include <SWire.h> // https://github.com/RaemondBW/SWire
+#endif
+
+// This works for all architectures, but I don't want the extra maintenance
+// under EpoxyDuino.
+#if ! defined(EPOXY_DUINO)
+#include <SlowSoftWire.h> // https://github.com/felias-fogg/SlowSoftWire
+#endif
+
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-#include <digitalWriteFast.h>
-#include <ace_wire/SimpleWireFastInterface.h>
+  #include <digitalWriteFast.h>
+  #include <ace_wire/SimpleWireFastInterface.h>
 #endif
 
 using ace_wire::TwoWireInterface;
@@ -118,6 +130,7 @@ void runBenchmark(
   printStats(name, timingStats, numSamples);
 }
 
+// Use built-in <Wire.h> at 100 kHz
 void runTwoWire100() {
   using WireInterface = TwoWireInterface<TwoWire>;
   WireInterface wireInterface(Wire);
@@ -135,6 +148,7 @@ void runTwoWire100() {
 #endif
 }
 
+// Use built-in <Wire.h> at 400 kHz
 void runTwoWire400() {
   using WireInterface = TwoWireInterface<TwoWire>;
   WireInterface wireInterface(Wire);
@@ -152,10 +166,10 @@ void runTwoWire400() {
 #endif
 }
 
+// Use AceWire/SimpleWireInterface
 void runSimpleWire() {
   using WireInterface = SimpleWireInterface;
-  WireInterface wireInterface(
-      SDA_PIN, SCL_PIN, DELAY_MICROS);
+  WireInterface wireInterface(SDA_PIN, SCL_PIN, DELAY_MICROS);
 
   wireInterface.begin();
   runBenchmark(F("SimpleWireInterface,1us"), wireInterface);
@@ -163,6 +177,7 @@ void runSimpleWire() {
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+// Use AceWire/SimpleWireFastInterface
 void runSimpleWireFast() {
   using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, DELAY_MICROS>;
   WireInterface wireInterface;
@@ -173,6 +188,64 @@ void runSimpleWireFast() {
 }
 #endif
 
+#if defined(ARDUINO_ARCH_AVR)
+// Use https://github.com/Testato/SoftwareWire at 100 kHz
+void runSoftwareWire100() {
+  SoftwareWire softwareWire(SDA_PIN, SCL_PIN);
+  using WireInterface = TwoWireInterface<SoftwareWire>;
+  WireInterface wireInterface(softwareWire);
+
+  softwareWire.begin();
+  softwareWire.setClock(100000L);
+  wireInterface.begin();
+  runBenchmark(F("TwoWireInterface<SoftwareWire>,100kHz"), wireInterface);
+  wireInterface.end();
+  softwareWire.end();
+}
+
+// Use https://github.com/Testato/SoftwareWire at 400 kHz
+void runSoftwareWire400() {
+  SoftwareWire softwareWire(SDA_PIN, SCL_PIN);
+  using WireInterface = TwoWireInterface<SoftwareWire>;
+  WireInterface wireInterface(softwareWire);
+
+  softwareWire.begin();
+  softwareWire.setClock(400000L);
+  wireInterface.begin();
+  runBenchmark(F("TwoWireInterface<SoftwareWire>,400kHz"), wireInterface);
+  wireInterface.end();
+  softwareWire.end();
+}
+
+// Use https://github.com/RaemondBW/SWire
+void runSWire() {
+  SoftWire swire;
+  using WireInterface = TwoWireInterface<SoftWire>;
+  WireInterface wireInterface(swire);
+
+  swire.begin(SDA_PIN, SCL_PIN);
+  wireInterface.begin();
+  runBenchmark(F("TwoWireInterface<SWire>"), wireInterface);
+  wireInterface.end();
+  // no swire.end() defined
+}
+
+#endif
+
+#if ! defined(EPOXY_DUINO)
+// Use https://github.com/felias-fogg/SlowSoftWire
+void runSlowSoftWire() {
+  SlowSoftWire slowSoftWire(SDA_PIN, SCL_PIN);
+  using WireInterface = TwoWireInterface<SlowSoftWire>;
+  WireInterface wireInterface(slowSoftWire);
+
+  wireInterface.begin();
+  runBenchmark(F("TwoWireInterface<SlowSoftWire>"), wireInterface);
+  wireInterface.end();
+  // no slowSoftWire.end() (but is declared in header file)
+}
+#endif
+
 //-----------------------------------------------------------------------------
 // runBenchmarks()
 //-----------------------------------------------------------------------------
@@ -180,9 +253,21 @@ void runSimpleWireFast() {
 void runBenchmarks() {
   runTwoWire100();
   runTwoWire400();
+
   runSimpleWire();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runSimpleWireFast();
+#endif
+
+#if defined(ARDUINO_ARCH_AVR)
+  runSoftwareWire100();
+  runSoftwareWire400();
+
+  runSWire();
+#endif
+
+#if ! defined(EPOXY_DUINO)
+  runSlowSoftWire();
 #endif
 }
 
