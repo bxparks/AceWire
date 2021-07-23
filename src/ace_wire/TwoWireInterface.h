@@ -74,8 +74,18 @@ class TwoWireInterface {
     }
 
     /** Read bytes from the slave and store in buffer owned by T_WIRE. */
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true) {
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop) {
       return mWire.requestFrom(addr, quantity, (uint8_t) sendStop);
+    }
+
+    /**
+     * Read bytes from the slave and store in buffer owned by T_WIRE.
+     * Some I2C implementations do not provide a 3-argument version of
+     * requestFrom(), so we need to provide an explicit 2-argument versions
+     * instead of using a default argument of `sendStop = true`.
+     */
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity) {
+      return mWire.requestFrom(addr, quantity);
     }
 
     /** Read byte from buffer. */
