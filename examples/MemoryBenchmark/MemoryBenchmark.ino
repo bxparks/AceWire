@@ -1,0 +1,141 @@
+/*
+ * A program which compiles various LedModule and Writer objects with different
+ * LED configurations to determine the flash and static memory sizes from the
+ * output of the compiler. See the generated README.md for details.
+ */
+
+#include <Arduino.h>
+
+// DO NOT MODIFY THIS LINE. This will be overwritten by collect.sh on each
+// iteration, incrementing from 0 to N. The Arduino IDE will compile the
+// program, then the script will extract the flash and static memory usage
+// numbers printed out by the Arduino compiler. The numbers will be printed on
+// the STDOUT, which then can be saved to a file specific for a particular
+// hardware platform, e.g. "nano.txt" or "esp8266.txt".
+#define FEATURE 0
+
+// List of features of AceWire that we want to gather memory usage numbers.
+#define FEATURE_BASELINE 0
+#define FEATURE_TWO_WIRE 1
+#define FEATURE_SIMPLE_WIRE 2
+#define FEATURE_SIMPLE_WIRE_FAST 3
+
+// A volatile integer to prevent the compiler from optimizing away the entire
+// program.
+volatile int disableCompilerOptimization = 0;
+
+#if FEATURE > FEATURE_BASELINE
+  #include <AceWire.h>
+  #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+    #include <digitalWriteFast.h>
+  #endif
+  using namespace ace_wire;
+
+  const uint8_t SDA_PIN = 2;
+  const uint8_t SCL_PIN = 3;
+  const uint8_t DELAY_MICROS = 4;
+  const uint8_t DS3231_I2C_ADDRESS = 0x68;
+
+  #if FEATURE == FEATURE_TWO_WIRE
+    #include <Wire.h>
+    using WireInterface = TwoWireInterface<TwoWire>;
+    WireInterface wireInterface(Wire);
+
+  #elif FEATURE == FEATURE_SIMPLE_WIRE
+    using WireInterface = SimpleWireInterface;
+    WireInterface wireInterface(SDA_PIN, SCL_PIN, DELAY_MICROS);
+
+  #elif FEATURE == FEATURE_SIMPLE_WIRE_FAST
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
+      #error Unsupported FEATURE on this platform
+    #endif
+
+    #include <digitalWriteFast.h>
+    #include <ace_wire/SimpleWireFastInterface.h>
+    using WireInterface = SimpleWireFastInterface<
+        SDA_PIN, SCL_PIN, DELAY_MICROS>;
+    WireInterface wireInterface;
+  #else
+    #error Unknown FEATURE
+
+  #endif
+#endif
+
+// TeensyDuino seems to pull in malloc() and free() when a class with virtual
+// functions is used polymorphically. This causes the memory consumption of
+// FEATURE_BASELINE (which normally has no classes defined, so does not include
+// malloc() and free()) to be artificially small which throws off the memory
+// consumption calculations for all subsequent features. Let's define a
+// throw-away class and call its method for all FEATURES, including BASELINE.
+#if defined(TEENSYDUINO)
+  class FooClass {
+    public:
+      virtual void doit() {
+        disableCompilerOptimization = 0;
+      }
+  };
+
+  FooClass* foo;
+#endif
+
+void setup() {
+#if defined(TEENSYDUINO)
+  foo = new FooClass();
+#endif
+
+#if FEATURE == FEATURE_BASELINE
+  disableCompilerOptimization = 3;
+
+#elif FEATURE == FEATURE_TWO_WIRE
+  Wire.begin();
+  wireInterface.begin();
+
+#elif FEATURE == FEATURE_SIMPLE_WIRE
+  wireInterface.begin();
+
+#elif FEATURE == FEATURE_SIMPLE_WIRE_FAST
+  wireInterface.begin();
+
+#endif
+}
+
+void loop() {
+#if defined(TEENSYDUINO)
+  foo->doit();
+#endif
+
+#if FEATURE == FEATURE_BASELINE
+  // do nothing
+
+#elif FEATURE == FEATURE_TWO_WIRE
+  wireInterface.beginTransmission(DS3231_I2C_ADDRESS);
+  wireInterface.write(0x00);
+  wireInterface.endTransmission();
+
+  wireInterface.requestFrom(DS3231_I2C_ADDRESS, 1);
+  wireInterface.read();
+  wireInterface.endRequest();
+
+#elif FEATURE == FEATURE_SIMPLE_WIRE
+  wireInterface.beginTransmission(DS3231_I2C_ADDRESS);
+  wireInterface.write(0x00);
+  wireInterface.endTransmission();
+
+  wireInterface.requestFrom(DS3231_I2C_ADDRESS, 1);
+  wireInterface.read();
+  wireInterface.endRequest();
+
+#elif FEATURE == FEATURE_SIMPLE_WIRE_FAST
+  wireInterface.beginTransmission(DS3231_I2C_ADDRESS);
+  wireInterface.write(0x00);
+  wireInterface.endTransmission();
+
+  wireInterface.requestFrom(DS3231_I2C_ADDRESS, 1);
+  wireInterface.read();
+  wireInterface.endRequest();
+
+#else
+  #error Unknown FEATURE
+
+#endif
+}
