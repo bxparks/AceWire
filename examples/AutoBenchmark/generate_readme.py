@@ -26,9 +26,8 @@ print(f"""\
 
 This program determines the speed of various I2C implementations supported by
 the AceWire library. To obtain accurate results, an actual I2C device must exist
-on the bus. In this particular example, an HT16K33 LED module was used because
-AceWire was developed in coordination with AceSegment where the HT16K33 was
-supported.
+on the bus. Currently, I use a DS3231 RTC chip because it is relatively small
+and inexpensive and I can install one on each of my development boards.
 
 **Version**: AceWire v0.2+
 
@@ -89,9 +88,9 @@ number of `TimingStats::update()` calls that were made.
 
 ## Results
 
-The following tables show the number of microseconds taken for sending 12 bytes
-to the HT16K33 LED module. Each byte sends 8 bits, plus an extra response bit
-from the slave device is read, for a total of 9 bits.
+The following tables show the number of microseconds taken for sending 11 bytes
+to the DS3231 RTC chip. Each byte sends 8 bits, plus an extra response bit from
+the slave device is read, for a total of 9 bits.
 
 On AVR processors, the "fast" options are available using one of the
 digitalWriteFast libraries whose `digitalWriteFast()` functions can be up to 50X

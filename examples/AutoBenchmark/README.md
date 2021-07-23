@@ -2,9 +2,8 @@
 
 This program determines the speed of various I2C implementations supported by
 the AceWire library. To obtain accurate results, an actual I2C device must exist
-on the bus. In this particular example, an HT16K33 LED module was used because
-AceWire was developed in coordination with AceSegment where the HT16K33 was
-supported.
+on the bus. Currently, I use a DS3231 RTC chip because it is relatively small
+and inexpensive and I can install one on each of my development boards.
 
 **Version**: AceWire v0.2+
 
@@ -65,9 +64,9 @@ number of `TimingStats::update()` calls that were made.
 
 ## Results
 
-The following tables show the number of microseconds taken for sending 12 bytes
-to the HT16K33 LED module. Each byte sends 8 bits, plus an extra response bit
-from the slave device is read, for a total of 9 bits.
+The following tables show the number of microseconds taken for sending 11 bytes
+to the DS3231 RTC chip. Each byte sends 8 bits, plus an extra response bit from
+the slave device is read, for a total of 9 bits.
 
 On AVR processors, the "fast" options are available using one of the
 digitalWriteFast libraries whose `digitalWriteFast()` functions can be up to 50X
@@ -94,10 +93,10 @@ CPU:
 +-----------------------------------------+-------------------+---------+
 | Functionality                           |   min/  avg/  max | eff kHz |
 |-----------------------------------------+-------------------+---------|
-| TwoWireInterface<TwoWire>,100kHz        |  1236/ 1242/ 1268 |    87.0 |
-| TwoWireInterface<TwoWire>,400kHz        |   408/  417/  444 |   259.0 |
-| SimpleWireInterface,1us                 |  2144/ 2159/ 2360 |    50.0 |
-| SimpleWireFastInterface,1us             |   276/  290/  316 |   372.4 |
+| TwoWireInterface<TwoWire>,100kHz        |  1128/ 1135/ 1160 |    87.2 |
+| TwoWireInterface<TwoWire>,400kHz        |   372/  379/  392 |   261.2 |
+| SimpleWireInterface,1us                 |  1964/ 1984/ 2176 |    49.9 |
+| SimpleWireFastInterface,1us             |   168/  180/  192 |   550.0 |
 +-----------------------------------------+-------------------+---------+
 
 ```
@@ -119,10 +118,10 @@ CPU:
 +-----------------------------------------+-------------------+---------+
 | Functionality                           |   min/  avg/  max | eff kHz |
 |-----------------------------------------+-------------------+---------|
-| TwoWireInterface<TwoWire>,100kHz        |  1232/ 1236/ 1240 |    87.4 |
-| TwoWireInterface<TwoWire>,400kHz        |   408/  412/  416 |   262.1 |
-| SimpleWireInterface,1us                 |  2156/ 2161/ 2172 |    50.0 |
-| SimpleWireFastInterface,1us             |   276/  281/  292 |   384.3 |
+| TwoWireInterface<TwoWire>,100kHz        |  1124/ 1132/ 1140 |    87.5 |
+| TwoWireInterface<TwoWire>,400kHz        |   372/  374/  380 |   264.7 |
+| SimpleWireInterface,1us                 |  1976/ 1981/ 1984 |    50.0 |
+| SimpleWireFastInterface,1us             |   168/  170/  176 |   582.4 |
 +-----------------------------------------+-------------------+---------+
 
 ```
@@ -142,9 +141,9 @@ CPU:
 +-----------------------------------------+-------------------+---------+
 | Functionality                           |   min/  avg/  max | eff kHz |
 |-----------------------------------------+-------------------+---------|
-| TwoWireInterface<TwoWire>,100kHz        |  1136/ 1136/ 1138 |    95.1 |
-| TwoWireInterface<TwoWire>,400kHz        |   320/  320/  324 |   337.5 |
-| SimpleWireInterface,1us                 |  1794/ 1798/ 1800 |    60.1 |
+| TwoWireInterface<TwoWire>,100kHz        |  1041/ 1041/ 1045 |    95.1 |
+| TwoWireInterface<TwoWire>,400kHz        |   292/  293/  295 |   337.9 |
+| SimpleWireInterface,1us                 |  1642/ 1644/ 1647 |    60.2 |
 +-----------------------------------------+-------------------+---------+
 
 ```
@@ -164,9 +163,9 @@ CPU:
 +-----------------------------------------+-------------------+---------+
 | Functionality                           |   min/  avg/  max | eff kHz |
 |-----------------------------------------+-------------------+---------|
-| TwoWireInterface<TwoWire>,100kHz        |  1113/ 1113/ 1114 |    97.0 |
-| TwoWireInterface<TwoWire>,400kHz        |   333/  333/  334 |   324.3 |
-| SimpleWireInterface,1us                 |  2569/ 2572/ 2575 |    42.0 |
+| TwoWireInterface<TwoWire>,100kHz        |  1021/ 1021/ 1025 |    97.0 |
+| TwoWireInterface<TwoWire>,400kHz        |   305/  306/  310 |   323.5 |
+| SimpleWireInterface,1us                 |  2356/ 2358/ 2362 |    42.0 |
 +-----------------------------------------+-------------------+---------+
 
 ```
@@ -186,9 +185,9 @@ CPU:
 +-----------------------------------------+-------------------+---------+
 | Functionality                           |   min/  avg/  max | eff kHz |
 |-----------------------------------------+-------------------+---------|
-| TwoWireInterface<TwoWire>,100kHz        |  1124/ 1124/ 1136 |    96.1 |
-| TwoWireInterface<TwoWire>,400kHz        |   295/  295/  296 |   366.1 |
-| SimpleWireInterface,1us                 |  1131/ 1132/ 1146 |    95.4 |
+| TwoWireInterface<TwoWire>,100kHz        |  1031/ 1039/ 1197 |    95.3 |
+| TwoWireInterface<TwoWire>,400kHz        |   270/  270/  273 |   366.7 |
+| SimpleWireInterface,1us                 |  1038/ 1041/ 1082 |    95.1 |
 +-----------------------------------------+-------------------+---------+
 
 ```
@@ -208,9 +207,9 @@ CPU:
 +-----------------------------------------+-------------------+---------+
 | Functionality                           |   min/  avg/  max | eff kHz |
 |-----------------------------------------+-------------------+---------|
-| TwoWireInterface<TwoWire>,100kHz        |  1174/ 1175/ 1183 |    91.9 |
-| TwoWireInterface<TwoWire>,400kHz        |   357/  357/  362 |   302.5 |
-| SimpleWireInterface,1us                 |   697/  702/  709 |   153.8 |
+| TwoWireInterface<TwoWire>,100kHz        |  1080/ 1087/ 1215 |    91.1 |
+| TwoWireInterface<TwoWire>,400kHz        |   330/  335/  390 |   295.5 |
+| SimpleWireInterface,1us                 |   639/  645/  656 |   153.5 |
 +-----------------------------------------+-------------------+---------+
 
 ```
@@ -231,9 +230,9 @@ CPU:
 +-----------------------------------------+-------------------+---------+
 | Functionality                           |   min/  avg/  max | eff kHz |
 |-----------------------------------------+-------------------+---------|
-| TwoWireInterface<TwoWire>,100kHz        |  1108/ 1108/ 1113 |    97.5 |
-| TwoWireInterface<TwoWire>,400kHz        |   304/  304/  306 |   355.3 |
-| SimpleWireInterface,1us                 |   495/  496/  502 |   217.7 |
+| TwoWireInterface<TwoWire>,100kHz        |  1013/ 1017/ 1019 |    97.3 |
+| TwoWireInterface<TwoWire>,400kHz        |   279/  279/  280 |   354.8 |
+| SimpleWireInterface,1us                 |   467/  468/  475 |   211.5 |
 +-----------------------------------------+-------------------+---------+
 
 ```

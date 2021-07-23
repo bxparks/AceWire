@@ -51,14 +51,13 @@ using ace_common::TimingStats;
 #endif
 
 //------------------------------------------------------------------
-// Setup I2C communcation with an HT16K33 LED module as a concrete device.
+// I2C communication configs.
 //------------------------------------------------------------------
 
-// HT16K33
 const uint8_t SDA_PIN = SDA;
 const uint8_t SCL_PIN = SCL;
 const uint8_t DELAY_MICROS = 1;
-const uint8_t HT16K33_I2C_ADDRESS = 0x70;
+const uint8_t DS3231_I2C_ADDRESS = 0x68;
 
 //------------------------------------------------------------------
 // Run benchmarks.
@@ -82,42 +81,31 @@ static void printStats(
 
 TimingStats timingStats;
 
-// HT16K33 commands
-static uint8_t const kSystemOff  = 0x20;
-static uint8_t const kSystemOn   = 0x21;
-static uint8_t const kDisplayOff = 0x80;
-static uint8_t const kDisplayOn  = 0x81;
-static uint8_t const kBrightness = 0xE0;
-
-const uint8_t PATTERNS[] = { 0x13, 0x37, 0x02, 0x7F, 0xFF };
-const uint8_t NUM_PATTERNS = sizeof(PATTERNS) / sizeof(PATTERNS[0]);
-
-template <typename T_WIRE>
-void writeCommand(T_WIRE& wireInterface, uint8_t command) {
-  wireInterface.beginTransmission(HT16K33_I2C_ADDRESS);
-  wireInterface.write(command);
-  wireInterface.endTransmission();
-}
-
-// Send data over I2C
+// Send data to DS3231 over I2C. Set alarm1 and alarm2 registers to avoid
+// changing the date and time. Total bytes sent: 11 bytes.
 template <typename T_WIRE>
 void sendData(T_WIRE& wireInterface) {
-  wireInterface.beginTransmission(HT16K33_I2C_ADDRESS);
-  wireInterface.write(0x00); // start at position 0
-  // Loop over the 5 physical digit lines of this module.
-  for (uint8_t chipPos = 0; chipPos < NUM_PATTERNS; ++chipPos) {
-    wireInterface.write(PATTERNS[chipPos]); // ROW0-ROW7
-    wireInterface.write(0); // ROW8-ROW15 unused
-  }
+  wireInterface.beginTransmission(DS3231_I2C_ADDRESS); // one byte
+  wireInterface.write(0x07); // start at position 7, one byte
+  // Send 9 bytes to the alarm registers to preserve the
+  // date and time stored on the DS3231.
+  wireInterface.write(0x01); // alarm1 seconds
+  wireInterface.write(0x02); // alarm1 minutes
+  wireInterface.write(0x03); // alarm1 hours
+  wireInterface.write(0x04); // alarm1 day
+  wireInterface.write(0x05); // alarm1 date
+  wireInterface.write(0x01); // alarm2 minutes
+  wireInterface.write(0x02); // alarm2 hours
+  wireInterface.write(0x03); // alarm2 day
+  wireInterface.write(0x04); // alarm2 date
   wireInterface.endTransmission();
+  // Total bytes: 11
 }
 
 template <typename T_WIRE>
 void runBenchmark(
     const __FlashStringHelper* name, T_WIRE& wireInterface) {
   timingStats.reset();
-  writeCommand(wireInterface, kSystemOn);
-  writeCommand(wireInterface, kDisplayOn);
   const uint16_t numSamples = 20;
   for (uint16_t i = 0; i < numSamples; ++i) {
     uint16_t startMicros = micros();
@@ -126,8 +114,6 @@ void runBenchmark(
     timingStats.update(endMicros - startMicros);
     yield();
   }
-  writeCommand(wireInterface, kDisplayOff);
-  writeCommand(wireInterface, kSystemOff);
 
   printStats(name, timingStats, numSamples);
 }

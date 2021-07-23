@@ -23,9 +23,9 @@ benchmarks: $(TARGETS)
 #
 # When benchmarking the speed of Hardware I2C of the TwoWireInterface class
 # which uses the <Wire.h> library using hardware I2C, a real I2C device (e.g.
-# HT16K33) must exist on the bus so that the proper ACK comes back from the
-# device. Otherwise, the <Wire.h> library seems to terminate the transfer which
-# results in an abnormally small durations.
+# DS3231 RTC chip) must exist on the bus so that the proper ACK comes back from
+# the device. Otherwise, the <Wire.h> library seems to terminate the transfer
+# which results in an abnormally small durations.
 
 nano.txt:
 	$(AUNITER_DIR)/auniter.sh upmon -o $@ --eof END nano:USB0
