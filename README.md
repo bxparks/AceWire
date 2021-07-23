@@ -1,19 +1,19 @@
 # AceWire
 
-Wrapper classes that provide a unified interface for different I2C
+Wrapper classes that provide a simple, unified interface for different I2C
 implementations on Arduino platforms. The code was initially part of the
 [AceSegment](https://github.com/bxparks/AceSegment) library, but was extracted
 into a separate library. It has 3 primary purposes:
 
-1 Allow client applications to easily select alternate I2C libraries instead of
-  being locked into the pre-installed `<Wire.h>` library. Alternative libraries
-  may be desirable for various reasons:
-    * To use different GPIO pins, instead of `SDA` and `SCL`.
+1. Allow client applications to easily select alternate I2C libraries instead of
+   being locked into the pre-installed `<Wire.h>` library. Alternative libraries
+   may be desirable for various reasons:
+    * To use different GPIO pins, instead of the hardware `SDA` and `SCL`.
     * To reduce flash and static memory consumption compared to `<Wire.h>`.
     * To use packet sizes larger than the default 32-bytes provided by AVR
       `<Wire.h>`.
-2 Prevent unnecessary flash memory consumption by preventing `AceSegment`
-  from being forced to include `<Wire.h>` when it is not necessary.
+2. Prevent unnecessary flash memory consumption by preventing `AceSegment`
+   from being forced to include `<Wire.h>` when it is not necessary.
     * Simply including the `<Wire.h>` header file causes memory consumption of
       the application to increase by 1140 bytes of flash and 113 bytes of static
       memory. This happens even if the application never uses anything defined
@@ -26,8 +26,8 @@ into a separate library. It has 3 primary purposes:
     * By going through an intermediary library like `AceWire` (and `AceSPI` and
       `AceTMI`), client applications do not suffer from unnecessary memory
       bloat.
-3 Allow all libraries to share a common framework for selection a common I2C
-  implementation within a given application.
+3. Allow all libraries to share a common framework for selection a common I2C
+   implementation within a given application.
     * Otherwise, some parts of the app would use `<Wire.h>`, and other parts of
       the app would use a different I2C implementation.
 
@@ -43,12 +43,13 @@ third party I2C implementations, as well as 2 of its own software I2C
 implementations (`SimpleWireInterface`, `SimpleWireFastInterface`):
 
 * `TwoWireInterface.h`
-    * Thin wrapper around the `TwoWire` class in the pre-installed `<Wire.h>`
+    * Thin wrapper around an actual I2C implementation library.
+    * Compatible with the `TwoWire` class in the pre-installed `<Wire.h>`
       library.
-    * Other hardware and software implementations are supported as long as
-      they implement a handful of methods that are syntactically compatible with
-      the `TwoWire` class. At least 5 different third party libraries have
-      been verified to work with `TwoWireInterface`:
+    * Compatible with other hardware and software implementations are supported
+      as long as they implement a handful of methods that are syntactically
+      compatible with the `TwoWire` class. At least 5 different third party
+      libraries have been verified to work with `TwoWireInterface`:
         * [Using Third Party I2C Libraries](#UsingThirdPartyI2CLibraries)
         * [Third Party Compatibility](##ThirdPartyCompatibility)
 * `SimpleWireInterface.h`
@@ -58,6 +59,7 @@ implementations (`SimpleWireInterface`, `SimpleWireFastInterface`):
 * `SimpleWireFastInterface.h`
     * Same as `SimpleWireInterface.h` using one of the `<digitalWriteFast.h>`
       libraries.
+    * Can be up to 4X faster than `SimpleWireInterface` on AVR processors.
 
 The library currently supports only a limited set of I2C functionality:
 
@@ -68,7 +70,7 @@ The library currently supports only a limited set of I2C functionality:
 * tested AVR, SAMD21, STM32, ESP8266, ESP32, and Teensy 3.2
 * repeated start may or may not work (untested)
 
-**Version**: 0.2 (2021-07-19)
+**Version**: 0.2+ (2021-07-19)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -93,6 +95,7 @@ The library currently supports only a limited set of I2C functionality:
     * [ThirdPartyCompatibility](#ThirdPartyCompatibility)
     * [Writing to I2C](#WritingToI2C)
     * [Reading from I2C](#ReadingFromI2C)
+* [Performance](#Performance)
 * [System Requirements](#SystemRequirements)
     * [Hardware](#Hardware)
     * [Tool Chain](#ToolChain)
@@ -679,6 +682,43 @@ support the "repeated start" feature of the I2C bus.
 **Important**: For all implementations, the number of calls to the `read()`
 method must be *exactly* equal to `NUM_BYTES`. Otherwise, unpredictable things
 may happen, including a crash of the system.
+
+<a name="Performance"></a>
+## Performance
+
+The [AutoBenchmark](examples/AutoBenchmark) program was used to calculate the
+effective bandwidth of various configurations. Here are 2 samples of that
+result:
+
+**Arduino Nano**
+
+```
++-----------------------------------------+-------------------+---------+
+| Functionality                           |   min/  avg/  max | eff kHz |
+|-----------------------------------------+-------------------+---------|
+| TwoWireInterface<TwoWire>,100kHz        |  1128/ 1135/ 1160 |    87.2 |
+| TwoWireInterface<TwoWire>,400kHz        |   372/  379/  388 |   261.2 |
+| SimpleWireInterface,1us                 |  2004/ 2020/ 2212 |    49.0 |
+| SimpleWireFastInterface,1us             |   168/  179/  192 |   553.1 |
+| TwoWireInterface<SoftwareWire>,100kHz   |  1668/ 1678/ 1740 |    59.0 |
+| TwoWireInterface<SoftwareWire>,400kHz   |  1204/ 1214/ 1336 |    81.5 |
+| TwoWireInterface<SWire>                 |  3064/ 3084/ 3388 |    32.1 |
+| TwoWireInterface<SlowSoftWire>          |  2256/ 2271/ 2500 |    43.6 |
++-----------------------------------------+-------------------+---------+
+```
+
+**ESP8266**
+
+```
++-----------------------------------------+-------------------+---------+
+| Functionality                           |   min/  avg/  max | eff kHz |
+|-----------------------------------------+-------------------+---------|
+| TwoWireInterface<TwoWire>,100kHz        |  1031/ 1039/ 1204 |    95.3 |
+| TwoWireInterface<TwoWire>,400kHz        |   270/  270/  273 |   366.7 |
+| SimpleWireInterface,1us                 |  1037/ 1040/ 1095 |    95.2 |
+| TwoWireInterface<SlowSoftWire>          |  1051/ 1056/ 1147 |    93.8 |
++-----------------------------------------+-------------------+---------+
+```
 
 <a name="SystemRequirements"></a>
 ## System Requirements
