@@ -112,6 +112,11 @@ class SimpleWireFastInterface {
           dataLow();
         }
         clockHigh();
+        // An extra bitDelay() here would make the HIGH and LOW states symmetric
+        // in duration (if digitalWriteFast() is assumed to be infinitely fast).
+        // But actual devices that I have tested seem to support the absence of
+        // that extra delay. So let's ignore it to make the transfer speed
+        // faster.
         clockLow();
         data <<= 1;
       }
