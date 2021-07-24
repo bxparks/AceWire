@@ -93,6 +93,7 @@ I2C implementations:
 | TwoWireInterface<TwoWire>       |   1014/   55 |   754/   44 |
 | SimpleWireInterface             |    996/   16 |   736/    5 |
 | SimpleWireFastInterface         |    452/   13 |   192/    2 |
+|---------------------------------+--------------+-------------|
 | TwoWireInterface<SoftwareWire>  |   1962/   72 |  1702/   61 |
 | TwoWireInterface<SWire>         |   1354/  157 |  1094/  146 |
 | TwoWireInterface<SlowSoftWire>  |   1570/   81 |  1310/   70 |
@@ -115,6 +116,7 @@ I2C implementations:
 | TwoWireInterface<TwoWire>       |   2914/  229 |  2458/  218 |
 | SimpleWireInterface             |   1308/   16 |   852/    5 |
 | SimpleWireFastInterface         |    718/   13 |   262/    2 |
+|---------------------------------+--------------+-------------|
 | TwoWireInterface<SoftwareWire>  |   2442/   72 |  1986/   61 |
 | TwoWireInterface<SWire>         |   1686/  157 |  1230/  146 |
 | TwoWireInterface<SlowSoftWire>  |   1912/   83 |  1456/   72 |
@@ -137,6 +139,7 @@ I2C implementations:
 | TwoWireInterface<TwoWire>       |   5898/  369 |  2426/  218 |
 | SimpleWireInterface             |   4400/  156 |   928/    5 |
 | SimpleWireFastInterface         |   3732/  153 |   260/    2 |
+|---------------------------------+--------------+-------------|
 | TwoWireInterface<SoftwareWire>  |   5376/  212 |  1904/   61 |
 | TwoWireInterface<SWire>         |   4778/  297 |  1306/  146 |
 | TwoWireInterface<SlowSoftWire>  |   4974/  223 |  1502/   72 |
@@ -158,6 +161,7 @@ I2C implementations:
 |---------------------------------+--------------+-------------|
 | TwoWireInterface<TwoWire>       |  11452/    0 |  1512/    0 |
 | SimpleWireInterface             |  10444/    0 |   504/    0 |
+|---------------------------------+--------------+-------------|
 | TwoWireInterface<SWire>         |  10872/    0 |   932/    0 |
 | TwoWireInterface<SlowSoftWire>  |  11000/    0 |  1060/    0 |
 +--------------------------------------------------------------+
@@ -178,6 +182,7 @@ I2C implementations:
 |---------------------------------+--------------+-------------|
 | TwoWireInterface<TwoWire>       |  28872/ 3740 |  7452/  204 |
 | SimpleWireInterface             |  24144/ 3560 |  2724/   24 |
+|---------------------------------+--------------+-------------|
 | TwoWireInterface<SWire>         |  24564/ 3700 |  3144/  164 |
 | TwoWireInterface<SlowSoftWire>  |  24940/ 3612 |  3520/   76 |
 +--------------------------------------------------------------+
@@ -198,6 +203,7 @@ I2C implementations:
 |---------------------------------+--------------+-------------|
 | TwoWireInterface<TwoWire>       | 261372/27268 |  4672/  484 |
 | SimpleWireInterface             | 257748/26796 |  1048/   12 |
+|---------------------------------+--------------+-------------|
 | TwoWireInterface<SWire>         | 258376/26944 |  1676/  160 |
 | TwoWireInterface<SlowSoftWire>  | 259828/26876 |  3128/   92 |
 +--------------------------------------------------------------+
@@ -218,6 +224,7 @@ I2C implementations:
 |---------------------------------+--------------+-------------|
 | TwoWireInterface<TwoWire>       | 208734/13992 | 10986/  908 |
 | SimpleWireInterface             | 199354/13256 |  1606/  172 |
+|---------------------------------+--------------+-------------|
 | TwoWireInterface<SWire>         | 200270/13408 |  2522/  324 |
 | TwoWireInterface<SlowSoftWire>  | 201474/13336 |  3726/  252 |
 +--------------------------------------------------------------+
@@ -239,6 +246,7 @@ I2C implementations:
 |---------------------------------+--------------+-------------|
 | TwoWireInterface<TwoWire>       |  14764/ 4824 |  3884/  672 |
 | SimpleWireInterface             |  12332/ 4160 |  1452/    8 |
+|---------------------------------+--------------+-------------|
 | TwoWireInterface<SWire>         |  12492/ 4300 |  1612/  148 |
 | TwoWireInterface<SlowSoftWire>  |  12476/ 4212 |  1596/   60 |
 +--------------------------------------------------------------+
