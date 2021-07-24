@@ -88,17 +88,18 @@ number of `TimingStats::update()` calls that were made.
 
 ## Results
 
-The following tables show the number of microseconds taken for sending 11 bytes
-to the DS3231 RTC chip. Each byte sends 8 bits, plus an extra response bit from
-the slave device is read, for a total of 9 bits.
+The following tables show the number of microseconds taken to send 11 bytes to
+the DS3231 RTC chip. Each byte sends 8 bits, and reads a response bit from the
+slave device, for a total of 9 bits.
+
+The "eff kbps" is the transfer speed in bits per second, which includes the
+overhead of the START and STOP conditions.
 
 On AVR processors, the "fast" options are available using one of the
 digitalWriteFast libraries whose `digitalWriteFast()` functions can be up to 50X
 faster if the `pin` number and `value` parameters are compile-time constants. In
 addition, the `digitalWriteFast` functions reduce flash memory consumption by
-600-700 bytes for `SoftTmiFastInterface`, `SoftSpiFastInterface`,
-`HardSpiFastInterface`, and `SimpleWireFastInterface` compared to their non-fast
-equivalents.
+600-700 bytes compared to their non-fast equivalents.
 
 ### Arduino Nano
 

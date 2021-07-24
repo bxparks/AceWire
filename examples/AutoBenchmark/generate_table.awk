@@ -46,6 +46,7 @@ BEGIN {
 END {
   TOTAL_BENCHMARKS = benchmark_index
   TOTAL_SIZEOF = sizeof_index
+  NUM_TRANSFER_BYTES = 11
 
   printf("Sizes of Objects:\n")
   for (i = 0; i < TOTAL_SIZEOF; i++) {
@@ -55,19 +56,25 @@ END {
   print ""
   print "CPU:"
 
-  printf("+-----------------------------------------+-------------------+---------+\n")
-  printf("| Functionality                           |   min/  avg/  max | eff kHz |\n")
+  printf("+-----------------------------------------+-------------------+----------+\n")
+  printf("| Functionality                           |   min/  avg/  max | eff kbps |\n")
   for (i = 0; i < TOTAL_BENCHMARKS; i++) {
     name = u[i]["name"]
-    if (name ~ /^TwoWireInterface<TwoWire>,100kHz/ \
-    ) {
-      printf("|-----------------------------------------+-------------------+---------|\n")
+    if (name ~ /^TwoWireInterface<TwoWire>,100kHz/) {
+      printf("|-----------------------------------------+-------------------+----------|\n")
+    # Insert a divider between AceWire and 3rd party implementations.
+    } else if (name ~ /^TwoWireInterface</ \
+        && ! (name ~ /^TwoWireInterface<TwoWire/) \
+        && dividerPrinted == 0) {
+      printf("|-----------------------------------------+-------------------+----------|\n")
+      dividerPrinted = 1
     }
 
-    # 11 bytes, 9 bits/byte
-    printf("| %-39s | %5d/%5d/%5d |   %5.1f |\n",
-      u[i]["name"], u[i]["min"], u[i]["avg"], u[i]["max"],
-      1000.0 * 11 * 9 / u[i]["avg"])
+    # 9 bits/byte (8 bits + ACK/NACK)
+    speed = 1000.0 * NUM_TRANSFER_BYTES * 9 / u[i]["avg"]
+    printf("| %-39s | %5d/%5d/%5d |   %6.1f |\n",
+      u[i]["name"], u[i]["min"], u[i]["avg"], u[i]["max"], speed)
+
   }
-  printf("+-----------------------------------------+-------------------+---------+\n")
+  printf("+-----------------------------------------+-------------------+----------+\n")
 }
