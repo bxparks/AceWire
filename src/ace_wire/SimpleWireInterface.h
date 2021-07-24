@@ -123,7 +123,7 @@ class SimpleWireInterface {
      * does not seem to cause any problems with the LED modules that I have
      * tested.
      *
-     * @return 0 means ACK, 1 means NACK.
+     * @return 1 if device responded with ACK, 0 for NACK.
      */
     uint8_t write(uint8_t data) const {
       for (uint8_t i = 0;  i < 8; ++i) {
@@ -137,20 +137,34 @@ class SimpleWireInterface {
         data <<= 1;
       }
 
-      return readAck();
+      uint8_t ack = readAck();
+      return ack ^ 0x1; // invert the 0 and 1
     }
 
-    /** Send the I2C STOP condition. */
-    void endTransmission(bool sendStop = true) const {
+    /**
+     * Send the I2C STOP condition.
+     *
+     * @return always returns 0 to indicate success
+     */
+    uint8_t endTransmission(bool sendStop = true) const {
       // clock will always be LOW when this is called
       if (sendStop) {
         dataLow();
         clockHigh();
         dataHigh();
       }
+
+      return 0;
     }
 
-    /** Prepare to read bytes by sending I2C START condition. */
+    /**
+     * Prepare to read bytes by sending I2C START condition. If `sendStop` is
+     * true, then a STOP condition will be sent when endRequest() is called at
+     * the end of the transaction.
+     *
+     * @return always returns 'quantity' (Perhaps it should return 0 if the addr
+     * is not successfully written).
+     */
     uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true) {
       mQuantity = quantity;
       mSendStop = sendStop;
@@ -212,6 +226,8 @@ class SimpleWireInterface {
     /**
      * Read the ACK/NACK bit from the device upon the falling edge of the 8th
      * CLK, which happens in the write() loop above.
+     *
+     * @return 0 for ACK (active LOW), 1 or NACK (passive HIGH).
      */
     uint8_t readAck() const {
       // Go into INPUT mode, reusing dataHigh(), saving 10 flash bytes on AVR.
@@ -224,14 +240,14 @@ class SimpleWireInterface {
       return ack;
     }
 
-    /** Send ACK to slave. */
+    /** Send ACK (active LOW) to slave. */
     void sendAck() const {
       dataLow();
       clockHigh();
       clockLow();
     }
 
-    /** Send NACK to slave. */
+    /** Send NACK (passive HIGH) to slave. */
     void sendNack() const {
       dataHigh();
       clockHigh();

@@ -95,6 +95,7 @@ The library currently supports only a limited set of I2C functionality:
     * [ThirdPartyCompatibility](#ThirdPartyCompatibility)
     * [Writing to I2C](#WritingToI2C)
     * [Reading from I2C](#ReadingFromI2C)
+    * [Error Handling](#ErrorHandling)
 * [Resource Consumption](#ResourceConsumption)
     * [Flash And Static Memory](#FlashAndStaticMemory)
     * [CPU Cycles](#CpuCycles)
@@ -208,11 +209,10 @@ class XxxInterface {
     void end();
 
     void beginTransmission(uint8_t addr);
-    void write(uint8_t data);
-    void endTransmission(bool sendStop = true);
+    uint8_t write(uint8_t data);
+    uint8_t endTransmission(bool sendStop = true);
 
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop);
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity);
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true);
     uint8_t read();
     void endRequest();
 };
@@ -245,12 +245,11 @@ class TwoWireInterface {
     void end() {...}
 
     void beginTransmission(uint8_t addr) {...}
-    void write(uint8_t data) {...}
-    void endTransmission(bool sendStop = true) {...}
+    uint8_t write(uint8_t data) {...}
+    uint8_t endTransmission(bool sendStop = true) {...}
 
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true) {
-      ...
-    }
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop) {...}
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity) {...}
     uint8_t read() {...}
     void endRequest() {...}
 };
@@ -346,8 +345,8 @@ class SimpleWireInterface {
     void end() {...}
 
     void beginTransmission(uint8_t addr) {...}
-    void write(uint8_t data) {...}
-    void endTransmission(bool sendStop = true) {...}
+    uint8_t write(uint8_t data) {...}
+    uint8_t endTransmission(bool sendStop = true) {...}
 
     uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true) {
       ...
@@ -427,8 +426,8 @@ class SimpleWireFastInterface {
     void end() {...}
 
     void beginTransmission(uint8_t addr) {...}
-    void write(uint8_t data) {...}
-    void endTransmission(bool sendStop = true) {...}
+    uint8_t write(uint8_t data) {...}
+    uint8_t endTransmission(bool sendStop = true) {...}
 
     uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true) {
       ...
@@ -691,6 +690,28 @@ support the "repeated start" feature of the I2C bus.
 **Important**: For all implementations, the number of calls to the `read()`
 method must be *exactly* equal to `NUM_BYTES`. Otherwise, unpredictable things
 may happen, including a crash of the system.
+
+<a name="ErrorHandling"></a>
+### Error Handling
+
+Performing proper error handling for the various I2C libraries is difficult.
+Different I2C implementations handle errors in slightly different ways. For
+non-critical applications with simple hardware configurations, with only a few
+I2C devices on the bus, it may be practical to just ignore all reported errors
+from the underlying library.
+
+The software I2C implementations provided in this library (`SimpleWireInterface`
+and `SimpleWireFastInterface`) do not implement clock stretching, and they do
+not check to see if another I2C master is controlling the bus. Therefore, cannot
+become wedged into an infinite loop, so they do not provide a timeout parameter.
+
+The hardware `<Wire.h>` has the potential for becoming wedged. Recently, some
+work was been done to allow the library to time out after a certain amount of
+time. (I am not too familiar with those latest feature additions.)
+
+Other third party libaries (accessed through the `TwoWireInterface` wrapper
+class) may handle errors in different ways. Usually, the error handling behavior
+of the code is not documented so you probably need to dive into the code.
 
 <a name="ResourceConsumption"></a>
 ## Resource Consumption

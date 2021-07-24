@@ -63,26 +63,54 @@ class TwoWireInterface {
       mWire.beginTransmission(addr);
     }
 
-    /** Write data into the write buffer. */
-    void write(uint8_t data) {
-      mWire.write(data);
+    /**
+     * Write data into the write buffer. Returns the value returned by the
+     * underlying I2C T_WIRE::write() method. Usually, a 1 is returned if the
+     * data was written successfully, 0 otherwise.
+     */
+    uint8_t write(uint8_t data) {
+      return mWire.write(data);
     }
 
-    /** End building of the buffer, and actually transmit the data. */
-    void endTransmission(bool sendStop = true) {
-      mWire.endTransmission(sendStop);
+    /**
+     * End building of the buffer, and actually transmit the data. Returns the
+     * value returned by the underlying T_WIRE::endTransmission() method. For
+     * the preinstalled Wire library, the status value definitions are buried in
+     * the twi_writeTo() function:
+     *
+     *  * 0: success
+     *  * 1: length to long for buffer
+     *  * 2: address send, NACK received
+     *  * 3: data send, NACK received
+     *  * 4: other twi error (lost bus arbitration, bus error, ..)
+     */
+    uint8_t endTransmission(bool sendStop = true) {
+      return mWire.endTransmission(sendStop);
     }
 
-    /** Read bytes from the slave and store in buffer owned by T_WIRE. */
+    /**
+     * Read bytes from the slave and store in buffer owned by T_WIRE and
+     * send a STOP condition if `sendStop` is true.
+     *
+     * @return the value returned by the underlying T_WIRE::requestFrom()
+     * method, which will normally be 'quantity'.
+     */
     uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop) {
       return mWire.requestFrom(addr, quantity, (uint8_t) sendStop);
     }
 
     /**
-     * Read bytes from the slave and store in buffer owned by T_WIRE.
+     * Read bytes from the slave and store in buffer owned by T_WIRE, and always
+     * send a STOP condition.
+     *
      * Some I2C implementations do not provide a 3-argument version of
      * requestFrom(), so we need to provide an explicit 2-argument versions
      * instead of using a default argument of `sendStop = true`.
+     *
+     * @return the value returned by the underlying T_WIRE::requestFrom()
+     * method, which will normally be 'quantity' or 0 if an error is
+     * encountered. Different T_WIRE implementations may handle error conditions
+     * differently.
      */
     uint8_t requestFrom(uint8_t addr, uint8_t quantity) {
       return mWire.requestFrom(addr, quantity);
