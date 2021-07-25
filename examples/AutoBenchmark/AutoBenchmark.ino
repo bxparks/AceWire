@@ -27,7 +27,6 @@ SOFTWARE.
  * an I2C transaction using different implementations.
  */
 
-#include <stdio.h>
 #include <Arduino.h>
 #include <Wire.h> // TwoWire
 #include <AceCommon.h> // TimingStats

@@ -73,7 +73,7 @@ END {
     # 9 bits/byte (8 bits + ACK/NACK)
     speed = 1000.0 * NUM_TRANSFER_BYTES * 9 / u[i]["avg"]
     printf("| %-39s | %5d/%5d/%5d |   %6.1f |\n",
-      u[i]["name"], u[i]["min"], u[i]["avg"], u[i]["max"], speed)
+      name, u[i]["min"], u[i]["avg"], u[i]["max"], speed)
 
   }
   printf("+-----------------------------------------+-------------------+----------+\n")

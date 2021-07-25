@@ -733,6 +733,7 @@ The Memory benchmark numbers can be seen in
 | TwoWireInterface<TwoWire>       |   2914/  229 |  2458/  218 |
 | SimpleWireInterface             |   1306/   16 |   850/    5 |
 | SimpleWireFastInterface         |    714/   13 |   258/    2 |
+|---------------------------------+--------------+-------------|
 | TwoWireInterface<SoftwareWire>  |   2442/   72 |  1986/   61 |
 | TwoWireInterface<SWire>         |   1686/  157 |  1230/  146 |
 | TwoWireInterface<SlowSoftWire>  |   1912/   83 |  1456/   72 |
@@ -749,6 +750,7 @@ The Memory benchmark numbers can be seen in
 |---------------------------------+--------------+-------------|
 | TwoWireInterface<TwoWire>       | 261372/27268 |  4672/  484 |
 | SimpleWireInterface             | 257732/26796 |  1032/   12 |
+|---------------------------------+--------------+-------------|
 | TwoWireInterface<SWire>         | 258376/26944 |  1676/  160 |
 | TwoWireInterface<SlowSoftWire>  | 259828/26876 |  3128/   92 |
 +--------------------------------------------------------------+
@@ -763,31 +765,33 @@ The CPU benchmark numbers can be seen in
 **Arduino Nano**
 
 ```
-+-----------------------------------------+-------------------+---------+
-| Functionality                           |   min/  avg/  max | eff kHz |
-|-----------------------------------------+-------------------+---------|
-| TwoWireInterface<TwoWire>,100kHz        |  1128/ 1135/ 1160 |    87.2 |
-| TwoWireInterface<TwoWire>,400kHz        |   372/  379/  388 |   261.2 |
-| SimpleWireInterface,1us                 |  2004/ 2020/ 2212 |    49.0 |
-| SimpleWireFastInterface,1us             |   168/  179/  192 |   553.1 |
-| TwoWireInterface<SoftwareWire>,100kHz   |  1668/ 1678/ 1740 |    59.0 |
-| TwoWireInterface<SoftwareWire>,400kHz   |  1204/ 1214/ 1336 |    81.5 |
-| TwoWireInterface<SWire>                 |  3064/ 3084/ 3388 |    32.1 |
-| TwoWireInterface<SlowSoftWire>          |  2256/ 2271/ 2500 |    43.6 |
-+-----------------------------------------+-------------------+---------+
++-----------------------------------------+-------------------+----------+
+| Functionality                           |   min/  avg/  max | eff kbps |
+|-----------------------------------------+-------------------+----------|
+| TwoWireInterface<TwoWire>,100kHz        |  1128/ 1135/ 1160 |     87.2 |
+| TwoWireInterface<TwoWire>,400kHz        |   372/  379/  388 |    261.2 |
+| SimpleWireInterface,1us                 |  2004/ 2020/ 2212 |     49.0 |
+| SimpleWireFastInterface,1us             |   168/  179/  192 |    553.1 |
+|-----------------------------------------+-------------------+----------|
+| TwoWireInterface<SoftwareWire>,100kHz   |  1668/ 1678/ 1740 |     59.0 |
+| TwoWireInterface<SoftwareWire>,400kHz   |  1204/ 1214/ 1336 |     81.5 |
+| TwoWireInterface<SWire>                 |  3064/ 3084/ 3388 |     32.1 |
+| TwoWireInterface<SlowSoftWire>          |  2256/ 2271/ 2500 |     43.6 |
++-----------------------------------------+-------------------+----------+
 ```
 
 **ESP8266**
 
 ```
-+-----------------------------------------+-------------------+---------+
-| Functionality                           |   min/  avg/  max | eff kHz |
-|-----------------------------------------+-------------------+---------|
-| TwoWireInterface<TwoWire>,100kHz        |  1031/ 1039/ 1204 |    95.3 |
-| TwoWireInterface<TwoWire>,400kHz        |   270/  270/  273 |   366.7 |
-| SimpleWireInterface,1us                 |  1037/ 1040/ 1095 |    95.2 |
-| TwoWireInterface<SlowSoftWire>          |  1051/ 1056/ 1147 |    93.8 |
-+-----------------------------------------+-------------------+---------+
++-----------------------------------------+-------------------+----------+
+| Functionality                           |   min/  avg/  max | eff kbps |
+|-----------------------------------------+-------------------+----------|
+| TwoWireInterface<TwoWire>,100kHz        |  1031/ 1039/ 1204 |     95.3 |
+| TwoWireInterface<TwoWire>,400kHz        |   270/  270/  273 |    366.7 |
+| SimpleWireInterface,1us                 |  1037/ 1040/ 1095 |     95.2 |
+|-----------------------------------------+-------------------+----------|
+| TwoWireInterface<SlowSoftWire>          |  1051/ 1056/ 1147 |     93.8 |
++-----------------------------------------+-------------------+----------+
 ```
 
 <a name="SystemRequirements"></a>
