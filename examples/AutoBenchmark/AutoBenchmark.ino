@@ -103,20 +103,30 @@ TimingStats timingStats;
 // changing the date and time. Total bytes sent: 11 bytes.
 template <typename T_WIRE>
 void sendData(T_WIRE& wireInterface) {
-  wireInterface.beginTransmission(DS3231_I2C_ADDRESS); // one byte
-  wireInterface.write(0x07); // start at position 7, one byte
+  // Send I2C address: 1 byte
+  uint8_t res = wireInterface.beginTransmission(DS3231_I2C_ADDRESS);
+  if (res) SERIAL_PORT_MONITOR.println(F("Error: beginTransmission()"));
+
+  // Send start at position 7: 1 byte
+  res = wireInterface.write(0x07);
+  if (res == 0) SERIAL_PORT_MONITOR.println(F("Error: write(command)"));
+
   // Send 9 bytes to the alarm registers to preserve the
   // date and time stored on the DS3231.
-  wireInterface.write(0x01); // alarm1 seconds
-  wireInterface.write(0x02); // alarm1 minutes
-  wireInterface.write(0x03); // alarm1 hours
-  wireInterface.write(0x04); // alarm1 day
-  wireInterface.write(0x05); // alarm1 date
-  wireInterface.write(0x01); // alarm2 minutes
-  wireInterface.write(0x02); // alarm2 hours
-  wireInterface.write(0x03); // alarm2 day
-  wireInterface.write(0x04); // alarm2 date
-  wireInterface.endTransmission();
+  res = wireInterface.write(0x01); // alarm1 seconds
+  res = wireInterface.write(0x02); // alarm1 minutes
+  res = wireInterface.write(0x03); // alarm1 hours
+  res = wireInterface.write(0x04); // alarm1 day
+  res = wireInterface.write(0x05); // alarm1 date
+  res = wireInterface.write(0x01); // alarm2 minutes
+  res = wireInterface.write(0x02); // alarm2 hours
+  res = wireInterface.write(0x03); // alarm2 day
+  res = wireInterface.write(0x04); // alarm2 date
+
+  // Send the buffer, for buffered implementations: 9 bytes
+  res = wireInterface.endTransmission();
+  if (res) SERIAL_PORT_MONITOR.println(F("Error: endTransmission()"));
+
   // Total bytes: 11
 }
 
@@ -138,37 +148,45 @@ void runBenchmark(
 
 // Use built-in <Wire.h> at 100 kHz
 void runTwoWire100() {
-  using WireInterface = TwoWireInterface<TwoWire>;
-  WireInterface wireInterface(Wire);
+#if defined(ESP32)
+  TwoWire wire(0);
+#else
+  TwoWire& wire = Wire;
+#endif
 
-  Wire.begin();
-  Wire.setClock(100000L);
+  using WireInterface = TwoWireInterface<TwoWire>;
+  WireInterface wireInterface(wire);
+
+  wire.begin();
+  wire.setClock(100000L);
   wireInterface.begin();
   runBenchmark(F("TwoWireInterface<TwoWire>,100kHz"), wireInterface);
   wireInterface.end();
-#if defined(ARDUINO_ARCH_AVR) \
-    || defined(ARDUINO_ARCH_SAMD) \
-    || defined(ARDUINO_ARCH_STM32) \
-    || defined(TEENSYDUINO)
-  Wire.end();
+
+#if ! defined(ESP32) && ! defined(ESP8266)
+  wire.end();
 #endif
 }
 
 // Use built-in <Wire.h> at 400 kHz
 void runTwoWire400() {
-  using WireInterface = TwoWireInterface<TwoWire>;
-  WireInterface wireInterface(Wire);
+#if defined(ESP32)
+  TwoWire wire(0);
+#else
+  TwoWire& wire = Wire;
+#endif
 
-  Wire.begin();
-  Wire.setClock(400000L);
+  using WireInterface = TwoWireInterface<TwoWire>;
+  WireInterface wireInterface(wire);
+
+  wire.begin();
+  wire.setClock(400000L);
   wireInterface.begin();
   runBenchmark(F("TwoWireInterface<TwoWire>,400kHz"), wireInterface);
   wireInterface.end();
-#if defined(ARDUINO_ARCH_AVR) \
-    || defined(ARDUINO_ARCH_SAMD) \
-    || defined(ARDUINO_ARCH_STM32) \
-    || defined(TEENSYDUINO)
-  Wire.end();
+
+#if ! defined(ESP32) && ! defined(ESP8266)
+  wire.end();
 #endif
 }
 
@@ -245,6 +263,7 @@ void runSlowSoftWire() {
   using WireInterface = TwoWireInterface<SlowSoftWire>;
   WireInterface wireInterface(slowSoftWire);
 
+  slowSoftWire.begin();
   wireInterface.begin();
   runBenchmark(F("TwoWireInterface<SlowSoftWire>"), wireInterface);
   wireInterface.end();

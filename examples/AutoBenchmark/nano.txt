@@ -4,12 +4,12 @@ sizeof(SimpleWireInterface): 5
 sizeof(SimpleWireFastInterface<2, 3, 10>): 2
 BENCHMARKS
 TwoWireInterface<TwoWire>,100kHz 1132 1137 1160 20
-TwoWireInterface<TwoWire>,400kHz 376 380 388 20
-SimpleWireInterface,1us 2004 2020 2208 20
-SimpleWireFastInterface,1us 168 180 192 20
-TwoWireInterface<SoftwareWire>,100kHz 1664 1670 1740 20
-TwoWireInterface<SoftwareWire>,400kHz 1196 1205 1324 20
-TwoWireInterface<SWire> 3068 3084 3380 20
-TwoWireInterface<SlowSoftWire> 2260 2273 2508 20
-TwoWireInterface<SeeedSoftwareI2C> 2336 2352 2576 20
+TwoWireInterface<TwoWire>,400kHz 376 380 392 20
+SimpleWireInterface,1us 2004 2021 2212 20
+SimpleWireFastInterface,1us 168 181 192 20
+TwoWireInterface<SoftwareWire>,100kHz 1660 1670 1740 20
+TwoWireInterface<SoftwareWire>,400kHz 1196 1206 1328 20
+TwoWireInterface<SWire> 3068 3085 3380 20
+TwoWireInterface<SlowSoftWire> 2260 2274 2500 20
+TwoWireInterface<SeeedSoftwareI2C> 1784 1804 1972 20
 END
