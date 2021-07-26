@@ -64,11 +64,12 @@ implementations (`SimpleWireInterface`, `SimpleWireFastInterface`):
 The library currently supports only a limited set of I2C functionality:
 
 * master mode only, no slave
+* no multi-master negotiation
 * no clock stretching
-* no explicit validation of ACK/NACK from slave
 * able to use any GPIO pin
 * tested AVR, SAMD21, STM32, ESP8266, ESP32, and Teensy 3.2
 * repeated start seems to work
+* only 7-bit addresses are supported, 10-bit addresses are not supported
 
 **Version**: 0.2+ (2021-07-19)
 
@@ -283,6 +284,20 @@ for classes that use the digitalWriteFast libraries which use compile-time
 constants for pin numbers. The disadvantage is that this library is harder to
 use because these classes require the downstream classes to be implemented using
 C++ templates.
+
+Also note that unlike many I2C libraries, including `<Wire.h>`, AceWire does
+**not** provide an `available()` method. This is because the functionality of
+that method cannot be implemented within the I2C specification. When the master
+is reading from the slave, it is the master that sends the ACK/NACK bit to the
+slave. There is no mechanism for the slave to tell the master when no more
+bytes are available. If the slave happens to stop sending early, then the
+SDA line will passively pull to HIGH, and the master will read `0xFF`. In all
+I2C implementations that happen to provide it, the `available()` method will
+simply return the number of bytes requested by the master, i.e. `quantity`.
+Users are advised to just ignore the `available()` method and always read
+`quantity` number of bytes. For additional information, see
+[ArduinoCore-avr#384](https://github.com/arduino/ArduinoCore-avr/issues/384) and
+[ArduinoCore-avr#171](https://github.com/arduino/ArduinoCore-avr/issues/171).
 
 <a name="TwoWireInterface"></a>
 ### TwoWireInterface
