@@ -16,12 +16,27 @@
 
 // List of features of AceWire that we want to gather memory usage numbers.
 #define FEATURE_BASELINE 0
+
+// TwoWireInterface w/ <Wire.h>
 #define FEATURE_TWO_WIRE 1
+
+// SimpleWireInterface
 #define FEATURE_SIMPLE_WIRE 2
+
+// SimpleWireFastInterface (AVR only)
 #define FEATURE_SIMPLE_WIRE_FAST 3
+
+// https://github.com/Testato/SoftwareWire (AVR only)
 #define FEATURE_SOFTWARE_WIRE 4
+
+// https://github.com/RaemondBW/SWire
 #define FEATURE_SWIRE 5
+
+// https://github.com/felias-fogg/SlowSoftWire
 #define FEATURE_SLOW_SOFT_WIRE 6
+
+// https://github.com/Seeed-Studio/Arduino_Software_I2C
+#define FEATURE_SEEED_SOFTWARE_I2C 7
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -36,7 +51,7 @@ volatile int disableCompilerOptimization = 0;
 
   const uint8_t SDA_PIN = 2;
   const uint8_t SCL_PIN = 3;
-  const uint8_t DELAY_MICROS = 4;
+  const uint8_t DELAY_MICROS = 1;
   const uint8_t DS3231_I2C_ADDRESS = 0x68;
 
   #if FEATURE == FEATURE_TWO_WIRE
@@ -81,6 +96,12 @@ volatile int disableCompilerOptimization = 0;
     using WireInterface = TwoWireInterface<SlowSoftWire>;
     WireInterface wireInterface(slowSoftWire);
 
+  #elif FEATURE == FEATURE_SEEED_SOFTWARE_I2C
+    #include <SoftwareI2C.h>
+    SoftwareI2C seeedWire;
+    using WireInterface = TwoWireInterface<SoftwareI2C>;
+    WireInterface wireInterface(seeedWire);
+
   #else
     #error Unknown FEATURE
 
@@ -106,11 +127,15 @@ volatile int disableCompilerOptimization = 0;
 
 void setup() {
 #if defined(TEENSYDUINO)
+  // Force Teensy to bring in malloc(), free() and other things for virtual
+  // dispatch.
   foo = new FooClass();
 #endif
 
+disableCompilerOptimization = 3;
+
 #if FEATURE == FEATURE_BASELINE
-  disableCompilerOptimization = 3;
+  // Do nothing
 
 #elif FEATURE == FEATURE_TWO_WIRE
   Wire.begin();
@@ -130,6 +155,17 @@ void setup() {
   swire.begin(SDA_PIN, SCL_PIN);
   wireInterface.begin();
 
+#elif FEATURE == FEATURE_SLOW_SOFT_WIRE
+  slowSoftWire.begin();
+  wireInterface.begin();
+
+#elif FEATURE == FEATURE_SEEED_SOFTWARE_I2C
+  seeedWire.begin(SDA_PIN, SCL_PIN);
+  wireInterface.begin();
+
+#else
+  #error Unknown FEATURE
+
 #endif
 }
 
@@ -146,7 +182,8 @@ void loop() {
     || FEATURE == FEATURE_SIMPLE_WIRE_FAST \
     || FEATURE == FEATURE_SOFTWARE_WIRE \
     || FEATURE == FEATURE_SWIRE \
-    || FEATURE == FEATURE_SLOW_SOFT_WIRE
+    || FEATURE == FEATURE_SLOW_SOFT_WIRE \
+    || FEATURE == FEATURE_SEEED_SOFTWARE_I2C
   wireInterface.beginTransmission(DS3231_I2C_ADDRESS);
   wireInterface.write(0x00);
   wireInterface.endTransmission();

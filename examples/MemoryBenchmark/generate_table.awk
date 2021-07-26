@@ -13,6 +13,7 @@ BEGIN {
   labels[4] = "TwoWireInterface<SoftwareWire>";
   labels[5] = "TwoWireInterface<SWire>";
   labels[6] = "TwoWireInterface<SlowSoftWire>";
+  labels[7] = "TwoWireInterface<SeeedSoftwareI2C>";
   record_index = 0
 }
 {
@@ -36,10 +37,10 @@ END {
     }
   }
 
-  printf("+--------------------------------------------------------------+\n")
-  printf("| functionality                   |  flash/  ram |       delta |\n")
-  printf("|---------------------------------+--------------+-------------|\n")
-  printf("| %-31s | %6d/%5d | %5d/%5d |\n",
+  printf("+------------------------------------------------------------------+\n")
+  printf("| functionality                       |  flash/  ram |       delta |\n")
+  printf("|-------------------------------------+--------------+-------------|\n")
+  printf("| %-35s | %6d/%5d | %5d/%5d |\n",
     labels[0], u[0]["flash"], u[0]["ram"], u[0]["d_flash"], u[0]["d_ram"])
 
   for (i = 1 ; i < NUM_ENTRIES; i++) {
@@ -48,18 +49,18 @@ END {
 
     if (name ~ /^TwoWireInterface<TwoWire>/) {
       printf(\
-        "|---------------------------------+--------------+-------------|\n")
+        "|-------------------------------------+--------------+-------------|\n")
     # Insert a divider between AceWire and 3rd party implementations.
     } else if (name ~ /^TwoWireInterface</ \
         && ! (name ~ /^TwoWireInterface<TwoWire/) \
         && dividerPrinted == 0) {
       printf(\
-        "|---------------------------------+--------------+-------------|\n")
+        "|-------------------------------------+--------------+-------------|\n")
       dividerPrinted = 1
     }
 
-    printf("| %-31s | %6d/%5d | %5d/%5d |\n",
+    printf("| %-35s | %6d/%5d | %5d/%5d |\n",
         name, u[i]["flash"], u[i]["ram"], u[i]["d_flash"], u[i]["d_ram"])
   }
-  printf("+--------------------------------------------------------------+\n")
+  printf("+------------------------------------------------------------------+\n")
 }

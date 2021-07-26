@@ -58,25 +58,36 @@ class TwoWireInterface {
     /** End the interface. Currently does nothing. */
     void end() {}
 
-    /** Start transmission at specified I2C addr. */
+    /**
+     * For buffered implementations, prepare the write buffer to accept a
+     * sequence of data, and save the addr for transmission when
+     * `endTransmission()` is called. For unbuffered implementations,
+     * immediately send the address byte on the I2C bus with the Write bit set.
+     */
     void beginTransmission(uint8_t addr) {
       mWire.beginTransmission(addr);
     }
 
     /**
-     * Write data into the write buffer. Returns the value returned by the
-     * underlying I2C T_WIRE::write() method. Usually, a 1 is returned if the
-     * data was written successfully, 0 otherwise.
+     * For buffered implementations, Write data into the write buffer. For
+     * unbuffered implementations, actually send the byte to the I2C device.
+     *
+     * Returns the value returned by the underlying I2C T_WIRE::write() method.
+     * Usually, a 1 is returned if the data was written successfully, 0
+     * otherwise.
      */
     uint8_t write(uint8_t data) {
       return mWire.write(data);
     }
 
     /**
-     * End building of the buffer, and actually transmit the data. Returns the
-     * value returned by the underlying T_WIRE::endTransmission() method. For
-     * the preinstalled Wire library, the status value definitions are buried in
-     * the twi_writeTo() function:
+     * For buffered implementations, end building of the buffer, and actually
+     * transmit the data. For unbuffered implementaitons, send the STOP
+     * condition if `sendStop` is true, otherwise do nothing.
+     *
+     * Returns the value returned by the underlying T_WIRE::endTransmission()
+     * method. For the preinstalled Wire library, the status value definitions
+     * are buried in the twi_writeTo() function:
      *
      *  * 0: success
      *  * 1: length to long for buffer
@@ -84,8 +95,17 @@ class TwoWireInterface {
      *  * 3: data send, NACK received
      *  * 4: other twi error (lost bus arbitration, bus error, ..)
      */
-    uint8_t endTransmission(bool sendStop = true) {
+    uint8_t endTransmission(bool sendStop) {
       return mWire.endTransmission(sendStop);
+    }
+
+    /**
+     * Same as endTransmission(bool) but always send STOP condition. Some
+     * implementaitons do not support repeated START, so do not provide an
+     * `endTransmission(bool)` method that takes a bool.
+     */
+    uint8_t endTransmission() {
+      return mWire.endTransmission();
     }
 
     /**

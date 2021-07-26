@@ -94,15 +94,17 @@ The following shows the flash and static memory sizes of the following
 I2C implementations:
 
 * `TwoWireInterface<TwoWire>`: The hardware `<Wire.h>` library.
-* `SimpleWireInterface`: Software I2C using `digitalWrite()`.
-* `SimpleWireFastInterface`: Software I2C using a `digitalWriteFast()` library.
-  (AVR only.)
+* `SimpleWireInterface`: AceWire's own Software I2C using `digitalWrite()`.
+* `SimpleWireFastInterface`: AceWire's own Software I2C using a
+  `digitalWriteFast()` library. (AVR only)
 * `TwoWireInterface<SoftwareWire>`: Software I2C using
-  https://github.com/Testato/SoftwareWire. (AVR only.)
+  https://github.com/Testato/SoftwareWire. (AVR only)
 * `TwoWireInterface<SWire>`: Software I2C using
   https://github.com/RaemondBW/SWire
 * `TwoWireInterface<SlowSoftWire>`: Software I2C using
   https://github.com/felias-fogg/SlowSoftWire
+* `TwoWireInterface<SeeedSoftwareI2C>`: Software I2C using
+  https://github.com/Seeed-Studio/Arduino_Software_I2C
 
 ### ATtiny85
 
