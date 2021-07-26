@@ -227,9 +227,9 @@ class XxxInterface {
 The `beginTransmission()` method returns a 0 upon success. For implementations
 using a transmit buffer, this will always return a success because nothing is
 actually sent over the wire until the `endTransmission()`. For implementations
-which do not use a buffer, this will the `addr` byte to be sent on the I2C bus.
-If a device responds with an ACK, then the method will return 0, otherwise it
-will return a 1 to indicate failure.
+which do not use a buffer, this will send the `addr` byte on the I2C bus. If a
+device responds with an ACK, then the method will return 0, otherwise it will
+return a 1 to indicate failure.
 
 The `write()` method returns 1 upon success, 0 upon failure. This allows
 compatibility with the native `<Wire.h>` library which returns a `size_t`
