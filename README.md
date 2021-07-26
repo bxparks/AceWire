@@ -199,8 +199,12 @@ To use `SimpleWireFastInterface`, use:
 The classes in this library provide the following unified interface for handling
 I2C communication. Downstream classes can code against this unified interface
 using C++ templates so that different implementations can be selected at
-compile-time. The interface looks like this (where `Xxx` is `TwoWire`,
-`SimpleWire` or `SimpleWireFast`):
+compile-time.
+
+Some implementations use a transmit and receive buffer (e.g. `<Wire.h>`). Other
+implementations do not use any buffers. Some split the difference, using no
+buffer for transmit, but a buffer for receive. The unified interface attempts to
+find a common API among these variations.
 
 ```C++
 class XxxInterface {
@@ -208,15 +212,63 @@ class XxxInterface {
     void begin();
     void end();
 
-    void beginTransmission(uint8_t addr);
+    uint8_t beginTransmission(uint8_t addr);
     uint8_t write(uint8_t data);
-    uint8_t endTransmission(bool sendStop = true);
+    uint8_t endTransmission(bool sendStop);
+    uint8_t endTransmission();
 
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true);
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop);
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity);
     uint8_t read();
     void endRequest();
 };
 ```
+
+The `beginTransmission()` method returns a 0 upon success. For implementations
+using a transmit buffer, this will always return a success because nothing is
+actually sent over the wire until the `endTransmission()`.
+
+The `write()` method returns 1 upon success, 0 upon failure. This allows
+compatibility with the native `<Wire.h>` library which returns a `size_t`
+representing the number of bytes actually written. In this API, the return type
+is a `uint8_t` which is sufficient because only a single byte can be transferred
+at a time. The `write()` method in the native `<Wire.h>` library always returns
+1 because all simply writes the data byte into a buffer. But in non-buffered
+implementations, the data is actually sent over the wire and this method returns
+the ACK/NACK response of the slave device.
+
+The `endTransmission()` method returns 0 upon success. The native `<Wire.h>
+library and a few other libraries return other non-zero error codes are returned
+depending on the error condition:
+
+* 0: success
+* 1: length too long for buffer
+* 2: address send, NACK received
+* 3: data send, NACK received
+* 4: other twi error (lost bus arbitration, bus error, ..)
+
+On non-buffered implementations, the `endTransmission()` method always returns a
+0 because all of the data transmission already happened in the `write()` method
+and the `endTransmission()` method simply sends a STOP condition if requested.
+
+The `requestFrom()` method returns `quantity` if successful, or 0 if an error
+occurs. In buffered implementations, all of the data transfer happens in this
+method so a return value of `quantity` means the transfer was successful. But in
+unbuffered implementations, this method simply sends the `addr` byte, so a 0
+means that the slave device responded with a NACK.
+
+The `read()` method returns the data byte from the slave. There is no ability to
+detect an error condition from the slave in this method, mostly because it is
+the master that sends the ACK or NACK bit to the slave. In both buffered and
+unbuffered implementations, the `read()` should NOT be called if the
+`requestFrom()` method returns failure (i.e. 0).
+
+The `endRequest()` method is an extension added to the native `<Wire.h>` API
+so that client applications can be mostly agnostic about the actual underlying
+I2C implementation. For the `TwoWireInterface` wrapper, this method is an empty
+method that does nothing. For the `SimpleWireInterface` and
+`SimpleWireFastInterface`, this method sends a STOP condition to the slave
+device.
 
 Notice that the classes in this library do *not* inherit from a common interface
 with virtual functions. This saves several hundred bytes of flash memory on
@@ -244,7 +296,7 @@ class TwoWireInterface {
     void begin() {...}
     void end() {...}
 
-    void beginTransmission(uint8_t addr) {...}
+    uint8_t beginTransmission(uint8_t addr) {...}
     uint8_t write(uint8_t data) {...}
     uint8_t endTransmission(bool sendStop = true) {...}
 
@@ -344,7 +396,7 @@ class SimpleWireInterface {
     void begin() {...}
     void end() {...}
 
-    void beginTransmission(uint8_t addr) {...}
+    uint8_t beginTransmission(uint8_t addr) {...}
     uint8_t write(uint8_t data) {...}
     uint8_t endTransmission(bool sendStop = true) {...}
 
@@ -425,7 +477,7 @@ class SimpleWireFastInterface {
     void begin() {...}
     void end() {...}
 
-    void beginTransmission(uint8_t addr) {...}
+    uint8_t beginTransmission(uint8_t addr) {...}
     uint8_t write(uint8_t data) {...}
     uint8_t endTransmission(bool sendStop = true) {...}
 
@@ -696,14 +748,21 @@ may happen, including a crash of the system.
 
 Performing proper error handling for the various I2C libraries is difficult.
 Different I2C implementations handle errors in slightly different ways. For
-non-critical applications with simple hardware configurations, with only a few
-I2C devices on the bus, it may be practical to just ignore all reported errors
-from the underlying library.
+many non-critical applications with simple hardware configurations, with only a
+few I2C devices on the bus, it may be practical to just ignore all reported
+errors from the underlying library.
+
+Some error checking is possible by checking the return values of
+`beginTransmission()`, `write()` and `endTransmission()`. You need to keep in
+mind that the underlying I2C library may trigger the error conditions at
+different points in the API flow, depending on whether the implementation uses
+buffers or not, and the error codes returned may be slightly different.
 
 The software I2C implementations provided in this library (`SimpleWireInterface`
 and `SimpleWireFastInterface`) do not implement clock stretching, and they do
-not check to see if another I2C master is controlling the bus. Therefore, cannot
-become wedged into an infinite loop, so they do not provide a timeout parameter.
+not check to see if another I2C master is controlling the bus. Therefore, they
+cannot become wedged into an infinite loop so they do not provide a timeout
+parameter.
 
 The hardware `<Wire.h>` has the potential for becoming wedged. Recently, some
 work was been done to allow the library to time out after a certain amount of

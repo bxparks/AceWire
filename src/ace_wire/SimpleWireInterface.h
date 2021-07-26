@@ -101,9 +101,11 @@ class SimpleWireInterface {
 
     /**
      * Send the I2C START condition.
+     *
      * @param addr I2C address of slave device
+     * @return 0 if ACK, 1 if NACK
      */
-    void beginTransmission(uint8_t addr) const {
+    uint8_t beginTransmission(uint8_t addr) const {
       clockHigh();
       dataHigh();
 
@@ -112,7 +114,8 @@ class SimpleWireInterface {
 
       // Send I2C addr (7 bits) and the R/W bit set to "write" (0x00).
       uint8_t effectiveAddr = (addr << 1) | 0x00;
-      write(effectiveAddr);
+      uint8_t res = write(effectiveAddr);
+      return res ^ 0x1;
     }
 
     /**
@@ -123,7 +126,7 @@ class SimpleWireInterface {
      * does not seem to cause any problems with the LED modules that I have
      * tested.
      *
-     * @return 1 if device responded with ACK, 0 for NACK.
+     * @return 1 if successful with ACK, 0 for NACK.
      */
     uint8_t write(uint8_t data) const {
       for (uint8_t i = 0;  i < 8; ++i) {
@@ -143,7 +146,7 @@ class SimpleWireInterface {
       }
 
       uint8_t ack = readAck();
-      return ack ^ 0x1; // invert the 0 and 1
+      return ack ^ 0x1;
     }
 
     /**
@@ -167,8 +170,8 @@ class SimpleWireInterface {
      * true, then a STOP condition will be sent when endRequest() is called at
      * the end of the transaction.
      *
-     * @return always returns 'quantity' (Perhaps it should return 0 if the addr
-     * is not successfully written).
+     * @return 'quantity' if addr was written successfully and the the device
+     * responded with ACK, 0 if device responded with NACK
      */
     uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true) {
       mQuantity = quantity;
@@ -182,9 +185,9 @@ class SimpleWireInterface {
 
       // Send I2C addr (7 bits) and the R/W bit set to "read" (0x01).
       uint8_t effectiveAddr = (addr << 1) | 0x01;
-      write(effectiveAddr);
+      uint8_t ack = write(effectiveAddr);
 
-      return quantity;
+      return (ack == 0) ? quantity : 0;
     }
 
     /**

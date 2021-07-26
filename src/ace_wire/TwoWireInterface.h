@@ -59,38 +59,41 @@ class TwoWireInterface {
     void end() {}
 
     /**
-     * For buffered implementations, prepare the write buffer to accept a
-     * sequence of data, and save the addr for transmission when
-     * `endTransmission()` is called. For unbuffered implementations,
-     * immediately send the address byte on the I2C bus with the Write bit set.
+     * Prepare the write buffer to accept a sequence of data, and save the addr
+     * for transmission when `endTransmission()` is called. For unbuffered
+     * implementations, immediately send the address byte on the I2C bus with
+     * the Write bit set.
+     *
+     * @return always returns 0 to indicate success because the `addr` is simply
+     *    written into a buffer
      */
-    void beginTransmission(uint8_t addr) {
+    uint8_t beginTransmission(uint8_t addr) {
       mWire.beginTransmission(addr);
+      return 0;
     }
 
     /**
-     * For buffered implementations, Write data into the write buffer. For
-     * unbuffered implementations, actually send the byte to the I2C device.
+     * Write data into the write buffer. For unbuffered implementations,
+     * immediately send the address byte on the I2C bus with the Write bit set.
      *
-     * Returns the value returned by the underlying I2C T_WIRE::write() method.
-     * Usually, a 1 is returned if the data was written successfully, 0
-     * otherwise.
+     * @returns the number of bytes written into buffer, will always be 1. For
+     * unbuffered implementations, 0 can be returned if the device responds with
+     * a NACK
      */
     uint8_t write(uint8_t data) {
-      return mWire.write(data);
+      return (uint8_t) mWire.write(data);
     }
 
     /**
-     * For buffered implementations, end building of the buffer, and actually
-     * transmit the data. For unbuffered implementaitons, send the STOP
-     * condition if `sendStop` is true, otherwise do nothing.
+     * Send the data in the buffer, with a STOP condition if `sendStop` is true.
+     * For unbuffered implementations, just send the STOP condition.
      *
      * Returns the value returned by the underlying T_WIRE::endTransmission()
      * method. For the preinstalled Wire library, the status value definitions
      * are buried in the twi_writeTo() function:
      *
      *  * 0: success
-     *  * 1: length to long for buffer
+     *  * 1: length too long for buffer
      *  * 2: address send, NACK received
      *  * 3: data send, NACK received
      *  * 4: other twi error (lost bus arbitration, bus error, ..)
@@ -99,11 +102,7 @@ class TwoWireInterface {
       return mWire.endTransmission(sendStop);
     }
 
-    /**
-     * Same as endTransmission(bool) but always send STOP condition. Some
-     * implementaitons do not support repeated START, so do not provide an
-     * `endTransmission(bool)` method that takes a bool.
-     */
+    /** Same as endTransmission(bool) but always send STOP condition. */
     uint8_t endTransmission() {
       return mWire.endTransmission();
     }
@@ -113,7 +112,9 @@ class TwoWireInterface {
      * send a STOP condition if `sendStop` is true.
      *
      * @return the value returned by the underlying T_WIRE::requestFrom()
-     * method, which will normally be 'quantity'.
+     * method, which will normally be 'quantity'. Some implementations,
+     * particularly the unbuffered ones, will return 0 to indicate a NACK
+     * response from the slave device.
      */
     uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop) {
       return mWire.requestFrom(addr, quantity, (uint8_t) sendStop);
@@ -129,8 +130,7 @@ class TwoWireInterface {
      *
      * @return the value returned by the underlying T_WIRE::requestFrom()
      * method, which will normally be 'quantity' or 0 if an error is
-     * encountered. Different T_WIRE implementations may handle error conditions
-     * differently.
+     * encountered.
      */
     uint8_t requestFrom(uint8_t addr, uint8_t quantity) {
       return mWire.requestFrom(addr, quantity);
@@ -142,8 +142,8 @@ class TwoWireInterface {
     }
 
     /**
-     * End requestFrom(). Clients should always call this. This implementation
-     * does nothing, but other implementations will perform additional actions.
+     * End requestFrom(). Clients should always call this for compatibility with
+     * SimpleWireInterface and SimpleWireFastInterface.
      */
     void endRequest() {}
 
