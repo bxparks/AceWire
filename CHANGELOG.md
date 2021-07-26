@@ -7,9 +7,12 @@
         * https://github.com/Testato/SoftwareWire. (AVR only.)
         * https://github.com/RaemondBW/SWire
         * https://github.com/felias-fogg/SlowSoftWire
+        * https://github.com/Seeed-Studio/Arduino_Software_I2C
     * Add GitHub Actions validation.
     * Add support for "repeated start" by adding `sendStop` parameter to
       `endTransmission()`.
+    * Support better error handling by returning a `uint8_t` status code from
+      `beginTransmission()`.
 * 0.2 (2021-07-19)
     * Add ability to read from I2C device using `requestFrom()`, `read(),
       and `endRequest()`.
