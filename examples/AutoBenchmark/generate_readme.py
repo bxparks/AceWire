@@ -104,20 +104,27 @@ The following implementations are tested:
 * `SimpleWireInterface,1us`: AceWire's own Software I2C using `digitalWrite()`
   using a `delayMicros` of 1 micros.
 * `SimpleWireFastInterface,1us`: AceWire's own Software I2C using a
-  `digitalWriteFast()` library and a `delayMicros` of 1 micros (compatible with AVR only).
-* `TwoWireInterface<SoftwareWire>,100kHz`: Software I2C using
-  https://github.com/Testato/SoftwareWire set to 100 kHz (compatible with AVR
-  only).
-* `TwoWireInterface<SoftwareWire>,400kHz`: Software I2C using
-  https://github.com/Testato/SoftwareWire set to 400 kHz (compatible with AVR
-  only).
-* `TwoWireInterface<SWire>`: Software I2C using
-  https://github.com/RaemondBW/SWire (results for ESP32 suspicious, seems
-  like `endTransmission()` is terminating prematurely)
-* `TwoWireInterface<SlowSoftWire>`: Software I2C using
-  https://github.com/felias-fogg/SlowSoftWire
-* `TwoWireInterface<SeeedSoftwareI2C>`: Software I2C using
-  https://github.com/Seeed-Studio/Arduino_Software_I2C
+  `digitalWriteFast()` library and a `delayMicros` of 1 micros (compatible with
+  AVR only).
+* Third party libraries
+    * `TwoWireInterface<SoftwareWire>,100kHz`: Software I2C using
+      https://github.com/Testato/SoftwareWire set to 100 kHz (compatible with
+      AVR only).
+    * `TwoWireInterface<SoftwareWire>,400kHz`: Software I2C using
+      https://github.com/Testato/SoftwareWire set to 400 kHz (compatible with
+      AVR only).
+    * `TwoWireInterface<SWire>`: Software I2C using
+      https://github.com/RaemondBW/SWire
+    * `TwoWireInterface<SlowSoftWire>`: Software I2C using
+      https://github.com/felias-fogg/SlowSoftWire
+    * `TwoWireInterface<SeeedSoftwareI2C>`: Software I2C using
+      https://github.com/Seeed-Studio/Arduino_Software_I2C
+        * [Seeed SoftwareI2C](https://github.com/Seeed-Studio/Arduino_Software_I2C)
+          does not insert any `delayMicroseconds()` between transitions of SDA
+          and SCL signals.
+        * On sufficiently fast 32-bit processors (e.g. ESP32 and Teensy32), the
+          clock rate of the signals becomes faster than the I2C specifications
+          and the slave device will not work.
 
 ### Arduino Nano
 
