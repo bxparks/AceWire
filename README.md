@@ -51,7 +51,7 @@ implementations (`SimpleWireInterface`, `SimpleWireFastInterface`):
       compatible with the `TwoWire` class. At least 5 different third party
       libraries have been verified to work with `TwoWireInterface`:
         * [Using Third Party I2C Libraries](#UsingThirdPartyI2CLibraries)
-        * [Third Party Compatibility](##ThirdPartyCompatibility)
+        * [Third Party Compatibility](#ThirdPartyCompatibility)
 * `SimpleWireInterface.h`
     * AceWire's own software bitbanging implementation that supports writing
       and reading from simple I2C devices, such as an HT16K33 LED controller
