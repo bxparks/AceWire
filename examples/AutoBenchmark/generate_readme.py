@@ -84,7 +84,7 @@ number of `TimingStats::update()` calls that were made.
 
 ## CPU Time Changes
 
-**v0.2:**
+**v0.2+:**
 
 ## Results
 
@@ -95,11 +95,29 @@ slave device, for a total of 9 bits.
 The "eff kbps" is the transfer speed in bits per second, which includes the
 overhead of the START and STOP conditions.
 
-On AVR processors, the "fast" options are available using one of the
-digitalWriteFast libraries whose `digitalWriteFast()` functions can be up to 50X
-faster if the `pin` number and `value` parameters are compile-time constants. In
-addition, the `digitalWriteFast` functions reduce flash memory consumption by
-600-700 bytes compared to their non-fast equivalents.
+The following implementations are tested:
+
+* `TwoWireInterface<TwoWire>,100kHz`: The hardware `<Wire.h>` library set to 100
+  kHz (default).
+* `TwoWireInterface<TwoWire>,400kHz`: The hardware `<Wire.h>` library at to 400
+  kHz (default).
+* `SimpleWireInterface,1us`: AceWire's own Software I2C using `digitalWrite()`
+  using a `delayMicros` of 1 micros.
+* `SimpleWireFastInterface,1us`: AceWire's own Software I2C using a
+  `digitalWriteFast()` library and a `delayMicros` of 1 micros (compatible with AVR only).
+* `TwoWireInterface<SoftwareWire>,100kHz`: Software I2C using
+  https://github.com/Testato/SoftwareWire set to 100 kHz (compatible with AVR
+  only).
+* `TwoWireInterface<SoftwareWire>,400kHz`: Software I2C using
+  https://github.com/Testato/SoftwareWire set to 400 kHz (compatible with AVR
+  only).
+* `TwoWireInterface<SWire>`: Software I2C using
+  https://github.com/RaemondBW/SWire (results for ESP32 suspicious, seems
+  like `endTransmission()` is terminating prematurely)
+* `TwoWireInterface<SlowSoftWire>`: Software I2C using
+  https://github.com/felias-fogg/SlowSoftWire
+* `TwoWireInterface<SeeedSoftwareI2C>`: Software I2C using
+  https://github.com/Seeed-Studio/Arduino_Software_I2C
 
 ### Arduino Nano
 

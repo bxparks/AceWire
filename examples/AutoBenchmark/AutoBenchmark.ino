@@ -34,14 +34,21 @@ SOFTWARE.
 
 // These work only for AVR.
 #if defined(ARDUINO_ARCH_AVR)
-  #include <SoftwareWire.h> // https://github.com/Testato/SoftwareWire
-  #include <SWire.h> // https://github.com/RaemondBW/SWire
+  // https://github.com/Testato/SoftwareWire
+  #include <SoftwareWire.h>
 #endif
 
-// This works for all architectures, but I don't want the extra maintenance
+// These work for all architectures, but I don't want the extra maintenance
 // under EpoxyDuino.
 #if ! defined(EPOXY_DUINO)
-#include <SlowSoftWire.h> // https://github.com/felias-fogg/SlowSoftWire
+  // https://github.com/RaemondBW/SWire
+  #include <SWire.h>
+
+  // https://github.com/felias-fogg/SlowSoftWire
+  #include <SlowSoftWire.h>
+
+  // https://github.com/Seeed-Studio/Arduino_Software_I2C
+  #include <SoftwareI2C.h>
 #endif
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
@@ -215,6 +222,9 @@ void runSoftwareWire400() {
   wireInterface.end();
   softwareWire.end();
 }
+#endif
+
+#if ! defined(EPOXY_DUINO)
 
 // Use https://github.com/RaemondBW/SWire
 void runSWire() {
@@ -229,9 +239,6 @@ void runSWire() {
   // no swire.end() defined
 }
 
-#endif
-
-#if ! defined(EPOXY_DUINO)
 // Use https://github.com/felias-fogg/SlowSoftWire
 void runSlowSoftWire() {
   SlowSoftWire slowSoftWire(SDA_PIN, SCL_PIN);
@@ -243,6 +250,19 @@ void runSlowSoftWire() {
   wireInterface.end();
   // no slowSoftWire.end() (but is declared in header file)
 }
+
+// Use https://github.com/Seeed-Studio/Arduino_Software_I2C
+void runSeeedSoftwareI2C() {
+  SoftwareI2C seeedWire;
+  using WireInterface = TwoWireInterface<SoftwareI2C>;
+  WireInterface wireInterface(seeedWire);
+
+  seeedWire.begin(SDA_PIN, SCL_PIN);
+  wireInterface.begin();
+  runBenchmark(F("TwoWireInterface<SeeedSoftwareI2C>"), wireInterface);
+  wireInterface.end();
+}
+
 #endif
 
 //-----------------------------------------------------------------------------
@@ -261,12 +281,12 @@ void runBenchmarks() {
 #if defined(ARDUINO_ARCH_AVR)
   runSoftwareWire100();
   runSoftwareWire400();
-
-  runSWire();
 #endif
 
 #if ! defined(EPOXY_DUINO)
+  runSWire();
   runSlowSoftWire();
+  runSeeedSoftwareI2C();
 #endif
 }
 
