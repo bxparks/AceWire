@@ -232,18 +232,22 @@ class SimpleWireInterface {
 
   private:
     /**
-     * Read the ACK/NACK bit from the device upon the falling edge of the 8th
-     * CLK, which happens in the write() loop above.
+     * Read the ACK/NACK bit from the device which is expected to be set after
+     * the falling edge of the 8th CLK, which happens in the write() loop above.
      *
      * @return 0 for ACK (active LOW), 1 or NACK (passive HIGH).
      */
     uint8_t readAck() const {
       // Go into INPUT mode, reusing dataHigh(), saving 10 flash bytes on AVR.
       dataHigh();
+
+      // Set the clock HIGH, because the I2C protocol says that SDA will not
+      // change when SCL is HIGH and we expect the slave to abide by that.
+      clockHigh();
+
       uint8_t ack = digitalRead(mDataPin);
 
       // Device releases SDA upon falling edge of the 9th CLK.
-      clockHigh();
       clockLow();
       return ack;
     }
