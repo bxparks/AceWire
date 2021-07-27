@@ -31,14 +31,15 @@ into a separate library. It has 3 primary purposes:
     * Otherwise, some parts of the app would use `<Wire.h>`, and other parts of
       the app would use a different I2C implementation.
 
-The `TwoWire` class in `<Wire.h>` cannot be used polymorphically. In other
-words, subclasses cannot be used through a pointer (or reference) to the base
-`TwoWire` class. To get around this problem, this library uses C++ templates to
-provide compile-time polymorphism instead of runtime polymorphism. This also
-means that the calling application code pays only a minimal or zero-cost runtime
-overhead for the abstraction, by avoiding the `virtual` dispatch.
+The `TwoWire` class in default `<Wire.h>` library cannot be used
+polymorphically. In other words, subclasses cannot be used through a pointer (or
+reference) to the base `TwoWire` class. To get around this problem, this library
+uses C++ templates to provide compile-time polymorphism instead of runtime
+polymorphism. This also means that the calling application code pays only a
+minimal or zero-cost runtime overhead for the abstraction, by avoiding the
+`virtual` dispatch.
 
-The library provides an I2C wrapper class (`TwoWireInterface1) around other
+The library provides an I2C wrapper class (`TwoWireInterface`) around other
 third party I2C implementations, as well as 2 of its own software I2C
 implementations (`SimpleWireInterface`, `SimpleWireFastInterface`):
 
@@ -58,8 +59,10 @@ implementations (`SimpleWireInterface`, `SimpleWireFastInterface`):
       chip and a DS3231 RTC chip.
 * `SimpleWireFastInterface.h`
     * Same as `SimpleWireInterface.h` using one of the `<digitalWriteFast.h>`
-      libraries.
+      libraries that's available on AVR processors.
     * Can be up to 4X faster than `SimpleWireInterface` on AVR processors.
+    * Can consume about 10X less flash memory than `<Wire.h>`, about 250 bytes
+      of flash compared to 2500 bytes.
 
 The library currently supports only a limited set of I2C functionality:
 
