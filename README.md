@@ -291,11 +291,13 @@ that method cannot be implemented within the I2C specification. When the master
 is reading from the slave, it is the master that sends the ACK/NACK bit to the
 slave. There is no mechanism for the slave to tell the master when no more
 bytes are available. If the slave happens to stop sending early, then the
-SDA line will passively pull to HIGH, and the master will read `0xFF`. In all
-I2C implementations that happen to provide it, the `available()` method will
-simply return the number of bytes requested by the master, i.e. `quantity`.
-Users are advised to just ignore the `available()` method and always read
-`quantity` number of bytes. For additional information, see
+SDA line will passively pull to HIGH, and the master will read `0xFF`.
+
+In most I2C implementations, `available()` simply returns the number of bytes
+requested (`quantity`) minus the number of times `read()` was called. There is
+at least one implementation which instead returns the number of times that
+`read()` was called. I recommend users to ignore the `available()` method and
+always read `quantity` number of bytes. For additional information, see
 [ArduinoCore-avr#384](https://github.com/arduino/ArduinoCore-avr/issues/384) and
 [ArduinoCore-avr#171](https://github.com/arduino/ArduinoCore-avr/issues/171).
 
