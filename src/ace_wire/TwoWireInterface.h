@@ -141,12 +141,6 @@ class TwoWireInterface {
       return mWire.read();
     }
 
-    /**
-     * End requestFrom(). Clients should always call this for compatibility with
-     * SimpleWireInterface and SimpleWireFastInterface.
-     */
-    void endRequest() {}
-
     // Use default copy constructor and assignment operator.
     TwoWireInterface(const TwoWireInterface&) = default;
     TwoWireInterface& operator=(const TwoWireInterface&) = default;

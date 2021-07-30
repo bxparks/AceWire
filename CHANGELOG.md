@@ -13,6 +13,8 @@
       `endTransmission()`.
     * Support better error handling by returning a `uint8_t` status code from
       `beginTransmission()`.
+    * Remove `endRequest()`. STOP condition is now sent by the `read()` method
+      upon reading the last byte.
 * 0.2 (2021-07-19)
     * Add ability to read from I2C device using `requestFrom()`, `read(),
       and `endRequest()`.

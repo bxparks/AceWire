@@ -190,7 +190,6 @@ void loop() {
 
   wireInterface.requestFrom(DS3231_I2C_ADDRESS, 1);
   wireInterface.read();
-  wireInterface.endRequest();
 
 #else
   #error Unknown FEATURE

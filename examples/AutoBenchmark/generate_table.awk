@@ -46,7 +46,7 @@ BEGIN {
 END {
   TOTAL_BENCHMARKS = benchmark_index
   TOTAL_SIZEOF = sizeof_index
-  NUM_TRANSFER_BYTES = 11
+  NUM_TRANSFER_BYTES = 9
 
   printf("Sizes of Objects:\n")
   for (i = 0; i < TOTAL_SIZEOF; i++) {

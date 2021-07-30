@@ -224,7 +224,6 @@ class XxxInterface {
     uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop);
     uint8_t requestFrom(uint8_t addr, uint8_t quantity);
     uint8_t read();
-    void endRequest();
 };
 ```
 
@@ -269,13 +268,6 @@ detect an error condition from the slave in this method, mostly because it is
 the master that sends the ACK or NACK bit to the slave. In both buffered and
 unbuffered implementations, the `read()` should NOT be called if the
 `requestFrom()` method returns failure (i.e. 0).
-
-The `endRequest()` method is an extension added to the native `<Wire.h>` API
-so that client applications can be mostly agnostic about the actual underlying
-I2C implementation. For the `TwoWireInterface` wrapper, this method is an empty
-method that does nothing. For the `SimpleWireInterface` and
-`SimpleWireFastInterface`, this method sends a STOP condition to the slave
-device.
 
 Notice that the classes in this library do *not* inherit from a common interface
 with virtual functions. This saves several hundred bytes of flash memory on
@@ -326,7 +318,6 @@ class TwoWireInterface {
     uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop) {...}
     uint8_t requestFrom(uint8_t addr, uint8_t quantity) {...}
     uint8_t read() {...}
-    void endRequest() {...}
 };
 ```
 
@@ -367,7 +358,6 @@ class MyClass {
       uint8_t data1 = mWireInterface.read();
       uint8_t data2 = mWireInterface.read();
       ...
-      mWireInterface.endRequest(); // this is important!
     }
 
   private:
@@ -395,7 +385,7 @@ platforms.
 
 See the [Writing to I2C](#WritingToI2C) and [Reading from I2C](#ReadingFromI2C)
 sections below for documentation about the `beginTransmission()`,
-`endTransmission()`, `requestFrom()`, and `endRequest()` methods.
+`endTransmission()`, and `requestFrom()`.
 
 <a name="SimpleWireInterface"></a>
 ### SimpleWireInterface
@@ -427,7 +417,6 @@ class SimpleWireInterface {
       ...
     }
     uint8_t read() {...}
-    void endRequest() {...}
 };
 ```
 It is configured and used by the calling code `MyClass` like this:
@@ -508,7 +497,6 @@ class SimpleWireFastInterface {
       ...
     }
     uint8_t read() {...}
-    void endRequest() {...}
 };
 ```
 
@@ -733,7 +721,6 @@ class MyClass {
       uint8_t data1 = mWireInterface.read();
       uint8_t data2 = mWireInterface.read();
       ...
-      mWireInterface.endRequest();
     }
 
   private:
@@ -743,19 +730,6 @@ class MyClass {
 
 The `requestFrom()` and `read()` methods should look familiar to those who have
 used the `TwoWire` class from `<Wire.h>`.
-
-The `endRequest()` method is new. It is a no-op function for `TwoWireInterface`
-because it assumes that the underlying implementations use a receive buffer, so
-all the work was already done in the `requestFrom()` method. However, the
-`SimpleWireInterface` and `SimpleWireFastInterface` implementations do not use a
-buffer. They extract the data stream directly from the I2C bus using
-`digitalRead()` or `digitalReadFast()` methods. So the `endRequest()` method
-must be called by the `MyClass` calling class, so that the I2C "stop" condition
-can be sent to the device according to the I2C specification.
-
-To be compatible with both types of implementations (ones with a receive buffer
-and ones without), the calling code must pair each `requestFrom()` call with a
-matching call to `endRequest()` at the end of the transaction.
 
 The `SEND_STOP` boolean flag indicates whether the I2C master will send a "stop"
 condition after reading the required number of bytes. Usually it is a good idea

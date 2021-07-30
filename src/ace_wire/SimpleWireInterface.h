@@ -49,9 +49,9 @@ namespace ace_wire {
  * address (along with the 'read' bit 0x01) right away. Then each call
  * to read() returns the data byte from the slave. Before returning from read(),
  * the master sends a NACK if total number of bytes read is not 'quantity', or
- * an ACK if 'quantity' has just been read. After calling read() 'quantity'
- * times, the client calls endRequest() to send the STOP condition, but only if
- * the 'sendStop' flag of requestFrom() was set to be true (default).
+ * an ACK if 'quantity' has just been read. A STOP condition is also sent after
+ * the last byte, if the 'sendStop' flag of requestFrom() was set to be true
+ * (default).
  */
 class SimpleWireInterface {
   public:
@@ -167,8 +167,7 @@ class SimpleWireInterface {
 
     /**
      * Prepare to read bytes by sending I2C START condition. If `sendStop` is
-     * true, then a STOP condition will be sent when endRequest() is called at
-     * the end of the transaction.
+     * true, then a STOP condition will be sent by `read()` after the last byte.
      *
      * @return 'quantity' if addr was written successfully and the the device
      * responded with ACK, 0 if device responded with NACK
@@ -187,7 +186,7 @@ class SimpleWireInterface {
       uint8_t effectiveAddr = (addr << 1) | 0x01;
       uint8_t ack = write(effectiveAddr);
 
-      return (ack == 0) ? quantity : 0;
+      return (ack == 1) ? quantity : 0;
     }
 
     /**
@@ -195,8 +194,18 @@ class SimpleWireInterface {
      * master to the slave. ACK means the slave will be asked to send more
      * bytes so can hold control of the data line. NACK means no more bytes will
      * be read from the slave and the slave should release the data line.
+     *
+     * If requestFrom() was called with `sendStop = true`, a STOP condition
+     * will be sent after reading the final byte.
+     *
+     * If called when the number of remaining bytes is 0 (which should not
+     * happen if the calling program is correctly implemented), this method
+     * returns immediately with a 0xff.
      */
     uint8_t read() {
+      // Caller should not call when mQuantity is 0, but guard against it.
+      if (! mQuantity) return 0xff;
+
       // Read one byte
       dataHigh();
       uint8_t data = 0;
@@ -214,16 +223,12 @@ class SimpleWireInterface {
         sendAck();
       } else {
         sendNack();
+        if (mSendStop) {
+          endTransmission();
+        }
       }
 
       return data;
-    }
-
-    /**
-     * End requestFrom() by sending I2C STOP condition if 'sendStop' is 'true'.
-     */
-    void endRequest() {
-      endTransmission(mSendStop);
     }
 
     // Use default copy constructor and assignment operator.

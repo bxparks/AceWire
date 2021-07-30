@@ -99,8 +99,8 @@ static void printStats(
 
 TimingStats timingStats;
 
-// Send data to DS3231 over I2C. Set alarm1 and alarm2 registers to avoid
-// changing the date and time. Total bytes sent: 11 bytes.
+// Send data to DS3231 over I2C, checking for some errors along the way. Total
+// bytes sent: 9 bytes.
 template <typename T_WIRE>
 void sendData(T_WIRE& wireInterface) {
   // Send I2C address: 1 byte
@@ -111,23 +111,24 @@ void sendData(T_WIRE& wireInterface) {
   res = wireInterface.write(0x07);
   if (res == 0) SERIAL_PORT_MONITOR.println(F("Error: write(command)"));
 
-  // Send 9 bytes to the alarm registers to preserve the
-  // date and time stored on the DS3231.
+  // Send 7 bytes to the alarm1 and alarm2 registers. Using the alarm registers
+  // avoids changing the date and time stored on the DS3231 in case it is
+  // actually being used as an active date/time source.
   res = wireInterface.write(0x01); // alarm1 seconds
   res = wireInterface.write(0x02); // alarm1 minutes
   res = wireInterface.write(0x03); // alarm1 hours
-  res = wireInterface.write(0x04); // alarm1 day
-  res = wireInterface.write(0x05); // alarm1 date
-  res = wireInterface.write(0x01); // alarm2 minutes
-  res = wireInterface.write(0x02); // alarm2 hours
-  res = wireInterface.write(0x03); // alarm2 day
-  res = wireInterface.write(0x04); // alarm2 date
+  res = wireInterface.write(0x04); // alarm1 day/date
+  res = wireInterface.write(0x05); // alarm2 minutes
+  res = wireInterface.write(0x06); // alarm2 hours
+  res = wireInterface.write(0x07); // alarm2 day/date
 
-  // Send the buffer, for buffered implementations: 9 bytes
+  // For buffered implementations, this causes the actual bit transfers. For
+  // unbuffered implementations, this causes just the STOP condition to be sent.
+  // Total transfer: 7 bytes
   res = wireInterface.endTransmission();
   if (res) SERIAL_PORT_MONITOR.println(F("Error: endTransmission()"));
 
-  // Total bytes: 11
+  // Total bytes: 9
 }
 
 template <typename T_WIRE>
@@ -149,6 +150,13 @@ void runBenchmark(
 // Use built-in <Wire.h> at 100 kHz
 void runTwoWire100() {
 #if defined(ESP32)
+  // Create our own instance of TwoWire instead of using the pre-defined Wire or
+  // Wire1 instances on ESP32 because we need to release the I2C bus at the end
+  // of this function, but the ESP32 version of TwoWire does not expose an end()
+  // method. Instead, it uses the destructor to perform the cleanup, which we
+  // cannot trigger when using the pre-defined Wire or Wire1 instances. By using
+  // our own instance, the compiler will automatically trigger the destructor at
+  // the end of the scope.
   TwoWire wire(0);
 #else
   TwoWire& wire = Wire;
