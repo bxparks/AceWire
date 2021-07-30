@@ -152,6 +152,7 @@ digitalWriteFast libraries, for example:
 * [Doxygen docs](https://bxparks.github.io/AceWire/html)
     * On Github pages.
 * Examples:
+    * [examples/ReadWriteDemo](examples/ReadWriteDemo)
     * https://github.com/bxparks/AceSegment/tree/develop/examples/Ht16k33Demo
 
 <a name="Usage"></a>
@@ -745,15 +746,45 @@ may happen, including a crash of the system.
 
 Performing proper error handling for the various I2C libraries is difficult.
 Different I2C implementations handle errors in slightly different ways. For
-many non-critical applications with simple hardware configurations, with only a
-few I2C devices on the bus, it may be practical to just ignore all reported
-errors from the underlying library.
+some non-critical applications with simple hardware configurations, with only a
+few I2C devices on the bus, it may be acceptable to just ignore the error
+statuses from the underlying library, and just assume that the writing or
+reading operations are always successful.
 
-Some error checking is possible by checking the return values of
-`beginTransmission()`, `write()` and `endTransmission()`. You need to keep in
-mind that the underlying I2C library may trigger the error conditions at
-different points in the API flow, depending on whether the implementation uses
-buffers or not, and the error codes returned may be slightly different.
+Some error checking is possible by checking the return values of some of the
+methods:
+
+* The `beginTransmission()` method in the native `<Wire.h>` library returns a
+  `void`. In this library, it returns a `uint8_t` where a `0` indicates success.
+  The implementation in `TwoWireInterface` always returns a 0 because it assumes
+  that it is a wrapper around the native `<Wire.h>` library. But the software
+  implementations of `SimpleWireInterface` and `SimpleWireFastInterface` do not
+  use buffers, so `beginTransmission()` returns the ACK/NACk response from the
+  device after it has been sent the address byte.
+* The `write()` method returns a 1 on success and a 0 on failure. This is the
+  reverse of the status code for `endTransmission()` because the
+  implementation of `write()` in the native `TwoWire` class returns the number
+  of bytes that was transferred by this method, not the value of the ACK/NACK
+  response from the slave device.
+* The `endTransmission()` returns 0 upon success, and a non-zero error code
+  upon failure.
+* The `requestFrom()` method returns `quantity` upon success, and 0 upon
+  failure.
+* The `read()` method cannot return an error code because the I2C protocol does
+  not allow the slave device from sending an ACK/NACK to the master during the
+  reading operation. It is the master that sends the ACK/NACK to the slave
+  device. In many software implementations, the number of calls to `read()`
+  must be exactly `quantity`, even if an error condition is raised in the middle
+  of the transaction, because the I2C STOP condition is issued by the last
+  `read()` operation.
+
+See [examples/ReadWriteDemo](examples/ReadWriteDemo) for examples of some error
+detection and handling.
+
+Keep in mind that different I2C libraries may trigger error conditions at
+different points in their workflow. Quite often, it depends on whether the
+implementation is buffered or unbuffered. You may need to customize the error
+handling for different I2C libraries.
 
 The software I2C implementations provided in this library (`SimpleWireInterface`
 and `SimpleWireFastInterface`) do not implement clock stretching, and they do
@@ -761,13 +792,9 @@ not check to see if another I2C master is controlling the bus. Therefore, they
 cannot become wedged into an infinite loop so they do not provide a timeout
 parameter.
 
-The hardware `<Wire.h>` has the potential for becoming wedged. Recently, some
-work was been done to allow the library to time out after a certain amount of
-time. (I am not too familiar with those latest feature additions.)
-
-Other third party libaries (accessed through the `TwoWireInterface` wrapper
-class) may handle errors in different ways. Usually, the error handling behavior
-of the code is not documented so you probably need to dive into the code.
+The native `<Wire.h>` has the potential for becoming wedged. Recently, some work
+was been done to allow the library to time out after a certain amount of time.
+But I am not very familiar with those latest feature additions.
 
 <a name="ResourceConsumption"></a>
 ## Resource Consumption
