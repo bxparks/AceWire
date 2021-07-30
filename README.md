@@ -152,6 +152,7 @@ digitalWriteFast libraries, for example:
 * [Doxygen docs](https://bxparks.github.io/AceWire/html)
     * On Github pages.
 * Examples:
+    * [examples/ReadWriteDemo](examples/ReadWriteDemo)
     * https://github.com/bxparks/AceSegment/tree/develop/examples/Ht16k33Demo
 
 <a name="Usage"></a>
@@ -224,7 +225,6 @@ class XxxInterface {
     uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop);
     uint8_t requestFrom(uint8_t addr, uint8_t quantity);
     uint8_t read();
-    void endRequest();
 };
 ```
 
@@ -269,13 +269,6 @@ detect an error condition from the slave in this method, mostly because it is
 the master that sends the ACK or NACK bit to the slave. In both buffered and
 unbuffered implementations, the `read()` should NOT be called if the
 `requestFrom()` method returns failure (i.e. 0).
-
-The `endRequest()` method is an extension added to the native `<Wire.h>` API
-so that client applications can be mostly agnostic about the actual underlying
-I2C implementation. For the `TwoWireInterface` wrapper, this method is an empty
-method that does nothing. For the `SimpleWireInterface` and
-`SimpleWireFastInterface`, this method sends a STOP condition to the slave
-device.
 
 Notice that the classes in this library do *not* inherit from a common interface
 with virtual functions. This saves several hundred bytes of flash memory on
@@ -326,7 +319,6 @@ class TwoWireInterface {
     uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop) {...}
     uint8_t requestFrom(uint8_t addr, uint8_t quantity) {...}
     uint8_t read() {...}
-    void endRequest() {...}
 };
 ```
 
@@ -367,7 +359,6 @@ class MyClass {
       uint8_t data1 = mWireInterface.read();
       uint8_t data2 = mWireInterface.read();
       ...
-      mWireInterface.endRequest(); // this is important!
     }
 
   private:
@@ -395,7 +386,7 @@ platforms.
 
 See the [Writing to I2C](#WritingToI2C) and [Reading from I2C](#ReadingFromI2C)
 sections below for documentation about the `beginTransmission()`,
-`endTransmission()`, `requestFrom()`, and `endRequest()` methods.
+`endTransmission()`, and `requestFrom()`.
 
 <a name="SimpleWireInterface"></a>
 ### SimpleWireInterface
@@ -427,7 +418,6 @@ class SimpleWireInterface {
       ...
     }
     uint8_t read() {...}
-    void endRequest() {...}
 };
 ```
 It is configured and used by the calling code `MyClass` like this:
@@ -508,7 +498,6 @@ class SimpleWireFastInterface {
       ...
     }
     uint8_t read() {...}
-    void endRequest() {...}
 };
 ```
 
@@ -733,7 +722,6 @@ class MyClass {
       uint8_t data1 = mWireInterface.read();
       uint8_t data2 = mWireInterface.read();
       ...
-      mWireInterface.endRequest();
     }
 
   private:
@@ -743,19 +731,6 @@ class MyClass {
 
 The `requestFrom()` and `read()` methods should look familiar to those who have
 used the `TwoWire` class from `<Wire.h>`.
-
-The `endRequest()` method is new. It is a no-op function for `TwoWireInterface`
-because it assumes that the underlying implementations use a receive buffer, so
-all the work was already done in the `requestFrom()` method. However, the
-`SimpleWireInterface` and `SimpleWireFastInterface` implementations do not use a
-buffer. They extract the data stream directly from the I2C bus using
-`digitalRead()` or `digitalReadFast()` methods. So the `endRequest()` method
-must be called by the `MyClass` calling class, so that the I2C "stop" condition
-can be sent to the device according to the I2C specification.
-
-To be compatible with both types of implementations (ones with a receive buffer
-and ones without), the calling code must pair each `requestFrom()` call with a
-matching call to `endRequest()` at the end of the transaction.
 
 The `SEND_STOP` boolean flag indicates whether the I2C master will send a "stop"
 condition after reading the required number of bytes. Usually it is a good idea
@@ -771,15 +746,45 @@ may happen, including a crash of the system.
 
 Performing proper error handling for the various I2C libraries is difficult.
 Different I2C implementations handle errors in slightly different ways. For
-many non-critical applications with simple hardware configurations, with only a
-few I2C devices on the bus, it may be practical to just ignore all reported
-errors from the underlying library.
+some non-critical applications with simple hardware configurations, with only a
+few I2C devices on the bus, it may be acceptable to just ignore the error
+statuses from the underlying library, and just assume that the writing or
+reading operations are always successful.
 
-Some error checking is possible by checking the return values of
-`beginTransmission()`, `write()` and `endTransmission()`. You need to keep in
-mind that the underlying I2C library may trigger the error conditions at
-different points in the API flow, depending on whether the implementation uses
-buffers or not, and the error codes returned may be slightly different.
+Some error checking is possible by checking the return values of some of the
+methods:
+
+* The `beginTransmission()` method in the native `<Wire.h>` library returns a
+  `void`. In this library, it returns a `uint8_t` where a `0` indicates success.
+  The implementation in `TwoWireInterface` always returns a 0 because it assumes
+  that it is a wrapper around the native `<Wire.h>` library. But the software
+  implementations of `SimpleWireInterface` and `SimpleWireFastInterface` do not
+  use buffers, so `beginTransmission()` returns the ACK/NACk response from the
+  device after it has been sent the address byte.
+* The `write()` method returns a 1 on success and a 0 on failure. This is the
+  reverse of the status code for `endTransmission()` because the
+  implementation of `write()` in the native `TwoWire` class returns the number
+  of bytes that was transferred by this method, not the value of the ACK/NACK
+  response from the slave device.
+* The `endTransmission()` returns 0 upon success, and a non-zero error code
+  upon failure.
+* The `requestFrom()` method returns `quantity` upon success, and 0 upon
+  failure.
+* The `read()` method cannot return an error code because the I2C protocol does
+  not allow the slave device from sending an ACK/NACK to the master during the
+  reading operation. It is the master that sends the ACK/NACK to the slave
+  device. In many software implementations, the number of calls to `read()`
+  must be exactly `quantity`, even if an error condition is raised in the middle
+  of the transaction, because the I2C STOP condition is issued by the last
+  `read()` operation.
+
+See [examples/ReadWriteDemo](examples/ReadWriteDemo) for examples of some error
+detection and handling.
+
+Keep in mind that different I2C libraries may trigger error conditions at
+different points in their workflow. Quite often, it depends on whether the
+implementation is buffered or unbuffered. You may need to customize the error
+handling for different I2C libraries.
 
 The software I2C implementations provided in this library (`SimpleWireInterface`
 and `SimpleWireFastInterface`) do not implement clock stretching, and they do
@@ -787,13 +792,9 @@ not check to see if another I2C master is controlling the bus. Therefore, they
 cannot become wedged into an infinite loop so they do not provide a timeout
 parameter.
 
-The hardware `<Wire.h>` has the potential for becoming wedged. Recently, some
-work was been done to allow the library to time out after a certain amount of
-time. (I am not too familiar with those latest feature additions.)
-
-Other third party libaries (accessed through the `TwoWireInterface` wrapper
-class) may handle errors in different ways. Usually, the error handling behavior
-of the code is not documented so you probably need to dive into the code.
+The native `<Wire.h>` has the potential for becoming wedged. Recently, some work
+was been done to allow the library to time out after a certain amount of time.
+But I am not very familiar with those latest feature additions.
 
 <a name="ResourceConsumption"></a>
 ## Resource Consumption
@@ -813,8 +814,8 @@ The Memory benchmark numbers can be seen in
 | baseline                            |    456/   11 |     0/    0 |
 |-------------------------------------+--------------+-------------|
 | TwoWireInterface<TwoWire>           |   2926/  229 |  2470/  218 |
-| SimpleWireInterface                 |   1320/   16 |   864/    5 |
-| SimpleWireFastInterface             |    698/   13 |   242/    2 |
+| SimpleWireInterface                 |   1336/   16 |   880/    5 |
+| SimpleWireFastInterface             |    714/   13 |   258/    2 |
 |-------------------------------------+--------------+-------------|
 | TwoWireInterface<SoftwareWire>      |   2454/   72 |  1998/   61 |
 | TwoWireInterface<SWire>             |   1698/  157 |  1242/  146 |
@@ -832,11 +833,11 @@ The Memory benchmark numbers can be seen in
 | baseline                            | 256700/26784 |     0/    0 |
 |-------------------------------------+--------------+-------------|
 | TwoWireInterface<TwoWire>           | 261404/27268 |  4704/  484 |
-| SimpleWireInterface                 | 257764/26804 |  1064/   20 |
+| SimpleWireInterface                 | 257780/26804 |  1080/   20 |
 |-------------------------------------+--------------+-------------|
 | TwoWireInterface<SWire>             | 258408/26944 |  1708/  160 |
 | TwoWireInterface<SlowSoftWire>      | 259972/26884 |  3272/  100 |
-| TwoWireInterface<SeeedSoftwareI2C>  | 257956/26812 |  1256/   28 |
+| TwoWireInterface<SeeedSoftwareI2C>  | 257904/26812 |  1204/   28 |
 +------------------------------------------------------------------+
 ```
 
@@ -852,16 +853,16 @@ The CPU benchmark numbers can be seen in
 +-----------------------------------------+-------------------+----------+
 | Functionality                           |   min/  avg/  max | eff kbps |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<TwoWire>,100kHz        |  1132/ 1137/ 1160 |     87.1 |
-| TwoWireInterface<TwoWire>,400kHz        |   376/  380/  392 |    260.5 |
-| SimpleWireInterface,1us                 |  2004/ 2021/ 2212 |     49.0 |
-| SimpleWireFastInterface,1us             |   168/  181/  192 |    547.0 |
+| TwoWireInterface<TwoWire>,100kHz        |   932/  936/  948 |     86.5 |
+| TwoWireInterface<TwoWire>,400kHz        |   312/  321/  332 |    252.3 |
+| SimpleWireInterface,1us                 |  1644/ 1664/ 1824 |     48.7 |
+| SimpleWireFastInterface,1us             |   140/  152/  160 |    532.9 |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<SoftwareWire>,100kHz   |  1660/ 1670/ 1740 |     59.3 |
-| TwoWireInterface<SoftwareWire>,400kHz   |  1196/ 1206/ 1328 |     82.1 |
-| TwoWireInterface<SWire>                 |  3068/ 3085/ 3380 |     32.1 |
-| TwoWireInterface<SlowSoftWire>          |  2260/ 2274/ 2500 |     43.5 |
-| TwoWireInterface<SeeedSoftwareI2C>      |  1784/ 1804/ 1972 |     54.9 |
+| TwoWireInterface<SoftwareWire>,100kHz   |  1368/ 1374/ 1432 |     59.0 |
+| TwoWireInterface<SoftwareWire>,400kHz   |   984/  994/ 1088 |     81.5 |
+| TwoWireInterface<SWire>                 |  2504/ 2524/ 2768 |     32.1 |
+| TwoWireInterface<SlowSoftWire>          |  1852/ 1869/ 2048 |     43.3 |
+| TwoWireInterface<SeeedSoftwareI2C>      |  1468/ 1485/ 1620 |     54.5 |
 +-----------------------------------------+-------------------+----------+
 ```
 
@@ -871,13 +872,13 @@ The CPU benchmark numbers can be seen in
 +-----------------------------------------+-------------------+----------+
 | Functionality                           |   min/  avg/  max | eff kbps |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<TwoWire>,100kHz        |  1031/ 1040/ 1205 |     95.2 |
-| TwoWireInterface<TwoWire>,400kHz        |   270/  270/  274 |    366.7 |
-| SimpleWireInterface,1us                 |  1037/ 1040/ 1096 |     95.2 |
+| TwoWireInterface<TwoWire>,100kHz        |   849/  856/ 1003 |     94.6 |
+| TwoWireInterface<TwoWire>,400kHz        |   222/  222/  223 |    364.9 |
+| SimpleWireInterface,1us                 |   853/  855/  901 |     94.7 |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<SWire>                 |  1130/ 1134/ 1206 |     87.3 |
-| TwoWireInterface<SlowSoftWire>          |  1051/ 1056/ 1143 |     93.8 |
-| TwoWireInterface<SeeedSoftwareI2C>      |   383/  386/  444 |    256.5 |
+| TwoWireInterface<SWire>                 |   928/  934/ 1011 |     86.7 |
+| TwoWireInterface<SlowSoftWire>          |   866/  870/  945 |     93.1 |
+| TwoWireInterface<SeeedSoftwareI2C>      |   314/  317/  378 |    255.5 |
 +-----------------------------------------+-------------------+----------+
 ```
 

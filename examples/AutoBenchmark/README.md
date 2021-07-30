@@ -119,16 +119,16 @@ CPU:
 +-----------------------------------------+-------------------+----------+
 | Functionality                           |   min/  avg/  max | eff kbps |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<TwoWire>,100kHz        |  1132/ 1137/ 1160 |     87.1 |
-| TwoWireInterface<TwoWire>,400kHz        |   376/  380/  392 |    260.5 |
-| SimpleWireInterface,1us                 |  2004/ 2021/ 2212 |     49.0 |
-| SimpleWireFastInterface,1us             |   168/  181/  192 |    547.0 |
+| TwoWireInterface<TwoWire>,100kHz        |   932/  936/  948 |     86.5 |
+| TwoWireInterface<TwoWire>,400kHz        |   312/  321/  332 |    252.3 |
+| SimpleWireInterface,1us                 |  1644/ 1664/ 1824 |     48.7 |
+| SimpleWireFastInterface,1us             |   140/  152/  160 |    532.9 |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<SoftwareWire>,100kHz   |  1660/ 1670/ 1740 |     59.3 |
-| TwoWireInterface<SoftwareWire>,400kHz   |  1196/ 1206/ 1328 |     82.1 |
-| TwoWireInterface<SWire>                 |  3068/ 3085/ 3380 |     32.1 |
-| TwoWireInterface<SlowSoftWire>          |  2260/ 2274/ 2500 |     43.5 |
-| TwoWireInterface<SeeedSoftwareI2C>      |  1784/ 1804/ 1972 |     54.9 |
+| TwoWireInterface<SoftwareWire>,100kHz   |  1368/ 1374/ 1432 |     59.0 |
+| TwoWireInterface<SoftwareWire>,400kHz   |   984/  994/ 1088 |     81.5 |
+| TwoWireInterface<SWire>                 |  2504/ 2524/ 2768 |     32.1 |
+| TwoWireInterface<SlowSoftWire>          |  1852/ 1869/ 2048 |     43.3 |
+| TwoWireInterface<SeeedSoftwareI2C>      |  1468/ 1485/ 1620 |     54.5 |
 +-----------------------------------------+-------------------+----------+
 
 ```
@@ -150,16 +150,16 @@ CPU:
 +-----------------------------------------+-------------------+----------+
 | Functionality                           |   min/  avg/  max | eff kbps |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<TwoWire>,100kHz        |  1128/ 1133/ 1140 |     87.4 |
-| TwoWireInterface<TwoWire>,400kHz        |   376/  379/  384 |    261.2 |
-| SimpleWireInterface,1us                 |  2016/ 2019/ 2024 |     49.0 |
-| SimpleWireFastInterface,1us             |   168/  172/  176 |    575.6 |
+| TwoWireInterface<TwoWire>,100kHz        |   932/  934/  944 |     86.7 |
+| TwoWireInterface<TwoWire>,400kHz        |   308/  313/  320 |    258.8 |
+| SimpleWireInterface,1us                 |  1652/ 1658/ 1664 |     48.9 |
+| SimpleWireFastInterface,1us             |   140/  142/  148 |    570.4 |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<SoftwareWire>,100kHz   |  1668/ 1676/ 1680 |     59.1 |
-| TwoWireInterface<SoftwareWire>,400kHz   |  1200/ 1205/ 1216 |     82.2 |
-| TwoWireInterface<SWire>                 |  3292/ 3297/ 3304 |     30.0 |
-| TwoWireInterface<SlowSoftWire>          |  2272/ 2275/ 2284 |     43.5 |
-| TwoWireInterface<SeeedSoftwareI2C>      |  2212/ 2217/ 2224 |     44.7 |
+| TwoWireInterface<SoftwareWire>,100kHz   |  1372/ 1378/ 1388 |     58.8 |
+| TwoWireInterface<SoftwareWire>,400kHz   |   992/  992/  996 |     81.7 |
+| TwoWireInterface<SWire>                 |  2688/ 2695/ 2700 |     30.1 |
+| TwoWireInterface<SlowSoftWire>          |  1860/ 1867/ 1872 |     43.4 |
+| TwoWireInterface<SeeedSoftwareI2C>      |  1812/ 1821/ 1824 |     44.5 |
 +-----------------------------------------+-------------------+----------+
 
 ```
@@ -179,13 +179,13 @@ CPU:
 +-----------------------------------------+-------------------+----------+
 | Functionality                           |   min/  avg/  max | eff kbps |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<TwoWire>,100kHz        |  1041/ 1042/ 1046 |     95.0 |
-| TwoWireInterface<TwoWire>,400kHz        |   293/  293/  297 |    337.9 |
-| SimpleWireInterface,1us                 |  1650/ 1652/ 1655 |     59.9 |
+| TwoWireInterface<TwoWire>,100kHz        |   853/  853/  854 |     95.0 |
+| TwoWireInterface<TwoWire>,400kHz        |   241/  241/  243 |    336.1 |
+| SimpleWireInterface,1us                 |  1356/ 1359/ 1363 |     59.6 |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<SWire>                 |  1770/ 1772/ 1775 |     55.9 |
-| TwoWireInterface<SlowSoftWire>          |  1243/ 1244/ 1248 |     79.6 |
-| TwoWireInterface<SeeedSoftwareI2C>      |   633/  636/  640 |    155.7 |
+| TwoWireInterface<SWire>                 |  1451/ 1454/ 1458 |     55.7 |
+| TwoWireInterface<SlowSoftWire>          |  1024/ 1024/ 1027 |     79.1 |
+| TwoWireInterface<SeeedSoftwareI2C>      |   520/  523/  526 |    154.9 |
 +-----------------------------------------+-------------------+----------+
 
 ```
@@ -205,13 +205,13 @@ CPU:
 +-----------------------------------------+-------------------+----------+
 | Functionality                           |   min/  avg/  max | eff kbps |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<TwoWire>,100kHz        |  1023/ 1024/ 1028 |     96.7 |
-| TwoWireInterface<TwoWire>,400kHz        |   307/  308/  312 |    321.4 |
-| SimpleWireInterface,1us                 |  2356/ 2358/ 2362 |     42.0 |
+| TwoWireInterface<TwoWire>,100kHz        |   841/  841/  849 |     96.3 |
+| TwoWireInterface<TwoWire>,400kHz        |   255/  256/  261 |    316.4 |
+| SimpleWireInterface,1us                 |  1937/ 1941/ 1942 |     41.7 |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<SWire>                 |  2420/ 2423/ 2446 |     40.9 |
-| TwoWireInterface<SlowSoftWire>          |  2429/ 2433/ 2446 |     40.7 |
-| TwoWireInterface<SeeedSoftwareI2C>      |   486/  488/  494 |    202.9 |
+| TwoWireInterface<SWire>                 |  1988/ 1989/ 1990 |     40.7 |
+| TwoWireInterface<SlowSoftWire>          |  1998/ 2000/ 2012 |     40.5 |
+| TwoWireInterface<SeeedSoftwareI2C>      |   398/  400/  408 |    202.5 |
 +-----------------------------------------+-------------------+----------+
 
 ```
@@ -231,13 +231,13 @@ CPU:
 +-----------------------------------------+-------------------+----------+
 | Functionality                           |   min/  avg/  max | eff kbps |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<TwoWire>,100kHz        |  1031/ 1040/ 1205 |     95.2 |
-| TwoWireInterface<TwoWire>,400kHz        |   270/  270/  274 |    366.7 |
-| SimpleWireInterface,1us                 |  1037/ 1040/ 1096 |     95.2 |
+| TwoWireInterface<TwoWire>,100kHz        |   849/  856/ 1003 |     94.6 |
+| TwoWireInterface<TwoWire>,400kHz        |   222/  222/  223 |    364.9 |
+| SimpleWireInterface,1us                 |   853/  855/  901 |     94.7 |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<SWire>                 |  1130/ 1134/ 1206 |     87.3 |
-| TwoWireInterface<SlowSoftWire>          |  1051/ 1056/ 1143 |     93.8 |
-| TwoWireInterface<SeeedSoftwareI2C>      |   383/  386/  444 |    256.5 |
+| TwoWireInterface<SWire>                 |   928/  934/ 1011 |     86.7 |
+| TwoWireInterface<SlowSoftWire>          |   866/  870/  945 |     93.1 |
+| TwoWireInterface<SeeedSoftwareI2C>      |   314/  317/  378 |    255.5 |
 +-----------------------------------------+-------------------+----------+
 
 ```
@@ -257,13 +257,13 @@ CPU:
 +-----------------------------------------+-------------------+----------+
 | Functionality                           |   min/  avg/  max | eff kbps |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<TwoWire>,100kHz        |  1082/ 1090/ 1219 |     90.8 |
-| TwoWireInterface<TwoWire>,400kHz        |   332/  336/  407 |    294.6 |
-| SimpleWireInterface,1us                 |   637/  645/  659 |    153.5 |
+| TwoWireInterface<TwoWire>,100kHz        |   899/  906/ 1032 |     89.4 |
+| TwoWireInterface<TwoWire>,400kHz        |   284/  287/  358 |    282.2 |
+| SimpleWireInterface,1us                 |   524/  530/  539 |    152.8 |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<SWire>                 |   518/  527/  548 |    187.9 |
-| TwoWireInterface<SlowSoftWire>          |   631/  642/  667 |    154.2 |
-| TwoWireInterface<SeeedSoftwareI2C>      |    71/  123/  878 |    804.9 |
+| TwoWireInterface<SWire>                 |   424/  433/  454 |    187.1 |
+| TwoWireInterface<SlowSoftWire>          |   520/  530/  554 |    152.8 |
+| TwoWireInterface<SeeedSoftwareI2C>      |    58/   59/   70 |   1372.9 |
 +-----------------------------------------+-------------------+----------+
 
 ```
@@ -284,13 +284,13 @@ CPU:
 +-----------------------------------------+-------------------+----------+
 | Functionality                           |   min/  avg/  max | eff kbps |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<TwoWire>,100kHz        |  1013/ 1017/ 1019 |     97.3 |
-| TwoWireInterface<TwoWire>,400kHz        |   279/  279/  282 |    354.8 |
-| SimpleWireInterface,1us                 |   453/  455/  461 |    217.6 |
+| TwoWireInterface<TwoWire>,100kHz        |   832/  836/  837 |     96.9 |
+| TwoWireInterface<TwoWire>,400kHz        |   229/  229/  230 |    353.7 |
+| SimpleWireInterface,1us                 |   389/  390/  396 |    207.7 |
 |-----------------------------------------+-------------------+----------|
-| TwoWireInterface<SWire>                 |   550/  551/  557 |    179.7 |
-| TwoWireInterface<SlowSoftWire>          |   650/  652/  657 |    151.8 |
-| TwoWireInterface<SeeedSoftwareI2C>      |   137/  138/  140 |    717.4 |
+| TwoWireInterface<SWire>                 |   457/  457/  463 |    177.2 |
+| TwoWireInterface<SlowSoftWire>          |   552/  553/  559 |    146.5 |
+| TwoWireInterface<SeeedSoftwareI2C>      |   119/  119/  121 |    680.7 |
 +-----------------------------------------+-------------------+----------+
 
 ```
