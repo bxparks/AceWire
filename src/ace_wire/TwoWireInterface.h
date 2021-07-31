@@ -58,36 +58,88 @@ class TwoWireInterface {
     /** End the interface. Currently does nothing. */
     void end() {}
 
-    /** Start transmission at specified I2C addr. */
-    void beginTransmission(uint8_t addr) {
+    /**
+     * Prepare the write buffer to accept a sequence of data, and save the addr
+     * for transmission when `endTransmission()` is called. For unbuffered
+     * implementations, immediately send the address byte on the I2C bus with
+     * the Write bit set.
+     *
+     * @return always returns 0 to indicate success because the `addr` is simply
+     *    written into a buffer
+     */
+    uint8_t beginTransmission(uint8_t addr) {
       mWire.beginTransmission(addr);
+      return 0;
     }
 
-    /** Write data into the write buffer. */
-    void write(uint8_t data) {
-      mWire.write(data);
+    /**
+     * Write data into the write buffer. For unbuffered implementations,
+     * immediately send the address byte on the I2C bus with the Write bit set.
+     *
+     * @returns the number of bytes written into buffer, will always be 1. For
+     * unbuffered implementations, 0 can be returned if the device responds with
+     * a NACK
+     */
+    uint8_t write(uint8_t data) {
+      return (uint8_t) mWire.write(data);
     }
 
-    /** End building of the buffer, and actually transmit the data. */
-    void endTransmission() {
-      mWire.endTransmission();
+    /**
+     * Send the data in the buffer, with a STOP condition if `sendStop` is true.
+     * For unbuffered implementations, just send the STOP condition.
+     *
+     * Returns the value returned by the underlying T_WIRE::endTransmission()
+     * method. For the preinstalled Wire library, the status value definitions
+     * are buried in the twi_writeTo() function:
+     *
+     *  * 0: success
+     *  * 1: length too long for buffer
+     *  * 2: address send, NACK received
+     *  * 3: data send, NACK received
+     *  * 4: other twi error (lost bus arbitration, bus error, ..)
+     */
+    uint8_t endTransmission(bool sendStop) {
+      return mWire.endTransmission(sendStop);
     }
 
-    /** Read bytes from the slave and store in buffer owned by T_WIRE. */
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool stop = true) {
-      return mWire.requestFrom(addr, quantity, (uint8_t) stop);
+    /** Same as endTransmission(bool) but always send STOP condition. */
+    uint8_t endTransmission() {
+      return mWire.endTransmission();
+    }
+
+    /**
+     * Read bytes from the slave and store in buffer owned by T_WIRE and
+     * send a STOP condition if `sendStop` is true.
+     *
+     * @return the value returned by the underlying T_WIRE::requestFrom()
+     * method, which will normally be 'quantity'. Some implementations,
+     * particularly the unbuffered ones, will return 0 to indicate a NACK
+     * response from the slave device.
+     */
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop) {
+      return mWire.requestFrom(addr, quantity, (uint8_t) sendStop);
+    }
+
+    /**
+     * Read bytes from the slave and store in buffer owned by T_WIRE, and always
+     * send a STOP condition.
+     *
+     * Some I2C implementations do not provide a 3-argument version of
+     * requestFrom(), so we need to provide an explicit 2-argument versions
+     * instead of using a default argument of `sendStop = true`.
+     *
+     * @return the value returned by the underlying T_WIRE::requestFrom()
+     * method, which will normally be 'quantity' or 0 if an error is
+     * encountered.
+     */
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity) {
+      return mWire.requestFrom(addr, quantity);
     }
 
     /** Read byte from buffer. */
     uint8_t read() {
       return mWire.read();
     }
-
-    /**
-     * End requestFrom(). Clients should always call this. This implementation
-     * does nothing, but other implementations will perform additional actions.
-     */
-    void endRequest() {}
 
     // Use default copy constructor and assignment operator.
     TwoWireInterface(const TwoWireInterface&) = default;
