@@ -40,7 +40,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceWire v0.2+
+**Version**: AceWire v0.3
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -84,7 +84,7 @@ $ make README.md
 
 ## Library Size Changes
 
-**v0.2+**
+**v0.3*
 
 * Initial iteration of MemoryBenchmarks.
 

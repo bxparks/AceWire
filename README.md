@@ -74,7 +74,7 @@ The library currently supports only a limited set of I2C functionality:
 * repeated start seems to work
 * only 7-bit addresses are supported, 10-bit addresses are not supported
 
-**Version**: 0.2+ (2021-07-19)
+**Version**: 0.3 (2021-07-30)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 

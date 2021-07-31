@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+* 0.3 (2021-07-30)
     * Add `examples/MemoryBenchmark` and `examples/AutoBenchmark` to gather
       memory and CPU consumption numbers of the pre-installed hardware
       `<Wire.h>` and some selected third party I2C libaries:

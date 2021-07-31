@@ -29,7 +29,7 @@ the AceWire library. To obtain accurate results, an actual I2C device must exist
 on the bus. Currently, I use a DS3231 RTC chip because it is relatively small
 and inexpensive and I can install one on each of my development boards.
 
-**Version**: AceWire v0.2+
+**Version**: AceWire v0.3
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -84,7 +84,7 @@ number of `TimingStats::update()` calls that were made.
 
 ## CPU Time Changes
 
-**v0.2+:**
+**v0.3**
 
 ## Results
 
