@@ -244,9 +244,10 @@ at a time. The `write()` method in the native `<Wire.h>` library always returns
 implementations, the data is actually sent over the wire and this method returns
 the ACK/NACK response of the slave device.
 
-The `endTransmission()` method returns 0 upon success. The native `<Wire.h>
-library and a few other libraries return other non-zero error codes are returned
-depending on the error condition:
+The `endTransmission()` method returns 0 upon success. The native `<Wire.h>`
+library and a few other libraries return other non-zero error codes depending on
+the error condition. These error codes are poorly documented so it is not clear
+if other I2C libraries actually follow them:
 
 * 0: success
 * 1: length too long for buffer
@@ -297,6 +298,13 @@ always read `quantity` number of bytes. For additional information, see
 [ArduinoCore-avr#384](https://github.com/arduino/ArduinoCore-avr/issues/384) and
 [ArduinoCore-avr#171](https://github.com/arduino/ArduinoCore-avr/issues/171).
 
+Two overloaded versions of `endTransmission()` and `requestFrom()` are defined,
+instead of defining a default value for the `sendStop` parameter. This allows
+the template class to be used with third party I2C libraries which do not
+provide a version of `endTransmission()` or `requestFrom()` methods with the
+`sendStop` parameter. (The template class will still compile as long as the
+non-existent third party method is not used at all by the calling code.)
+
 <a name="TwoWireInterface"></a>
 ### TwoWireInterface
 
@@ -314,7 +322,8 @@ class TwoWireInterface {
 
     uint8_t beginTransmission(uint8_t addr) {...}
     uint8_t write(uint8_t data) {...}
-    uint8_t endTransmission(bool sendStop = true) {...}
+    uint8_t endTransmission(bool sendStop) {...}
+    uint8_t endTransmission() {...}
 
     uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop) {...}
     uint8_t requestFrom(uint8_t addr, uint8_t quantity) {...}
