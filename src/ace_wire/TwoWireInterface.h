@@ -31,8 +31,9 @@ namespace ace_wire {
 
 /**
  * A thin wrapper around an I2C `TwoWire` class and its `Wire` object. This is a
- * template class to avoid including the <Wire.h> header file, which increases
- * flash memory on AVR by about 1000 byte even if the Wire object is never used.
+ * template class to avoid including the `<Wire.h>` header file, which increases
+ * flash memory on AVR by about 1000 byte even if the `Wire` object is never
+ * used.
  *
  * This wrapper can also be used with alternative implementations of I2C
  * (software or hardware) so long as they implement some basic API of the
@@ -40,6 +41,10 @@ namespace ace_wire {
  * `endTransmission() methods. Since `TwoWireInterface` is a template, the
  * alternative implementation classes do *not* need to inherit from the
  * `TwoWire` class.
+ *
+ * @tparam T_WIRE underlying class that implements the I2C protocol, usually
+ *    `TwoWire` from the pre-installed Wire library, but can be used with other
+ *    third party libraries that look like `TwoWire`
  */
 template <typename T_WIRE>
 class TwoWireInterface {

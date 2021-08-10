@@ -101,8 +101,8 @@ TimingStats timingStats;
 
 // Send data to DS3231 over I2C, checking for some errors along the way. Total
 // bytes sent: 9 bytes.
-template <typename T_WIRE>
-void sendData(T_WIRE& wireInterface) {
+template <typename T_WIREI>
+void sendData(T_WIREI& wireInterface) {
   // Send I2C address: 1 byte
   uint8_t res = wireInterface.beginTransmission(DS3231_I2C_ADDRESS);
   if (res) SERIAL_PORT_MONITOR.println(F("Error: beginTransmission()"));
@@ -131,9 +131,9 @@ void sendData(T_WIRE& wireInterface) {
   // Total bytes: 9
 }
 
-template <typename T_WIRE>
+template <typename T_WIREI>
 void runBenchmark(
-    const __FlashStringHelper* name, T_WIRE& wireInterface) {
+    const __FlashStringHelper* name, T_WIREI& wireInterface) {
   timingStats.reset();
   const uint16_t numSamples = 20;
   for (uint16_t i = 0; i < numSamples; ++i) {
