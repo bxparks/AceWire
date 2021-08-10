@@ -31,17 +31,14 @@ into a separate library. It has 3 primary purposes:
     * Otherwise, some parts of the app would use `<Wire.h>`, and other parts of
       the app would use a different I2C implementation.
 
-The `TwoWire` class in default `<Wire.h>` library cannot be used
+The `TwoWire` class in the pre-installed `<Wire.h>` library cannot be used
 polymorphically. In other words, subclasses cannot be used through a pointer (or
 reference) to the base `TwoWire` class. To get around this problem, this library
 uses C++ templates to provide compile-time polymorphism instead of runtime
 polymorphism. This also means that the calling application code pays only a
-minimal or zero-cost runtime overhead for the abstraction, by avoiding the
-`virtual` dispatch.
+minimal runtime overhead for the abstraction by avoiding the `virtual` dispatch.
 
-The library provides an I2C wrapper class (`TwoWireInterface`) around other
-third party I2C implementations, as well as 2 of its own software I2C
-implementations (`SimpleWireInterface`, `SimpleWireFastInterface`):
+The library provides three I2C classes:
 
 * `TwoWireInterface.h`
     * Thin wrapper around an actual I2C implementation library.
@@ -74,7 +71,7 @@ The library currently supports only a limited set of I2C functionality:
 * repeated start seems to work
 * only 7-bit addresses are supported, 10-bit addresses are not supported
 
-**Version**: 0.3 (2021-07-30)
+**Version**: 0.3.1 (2021-08-10)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -244,9 +241,10 @@ at a time. The `write()` method in the native `<Wire.h>` library always returns
 implementations, the data is actually sent over the wire and this method returns
 the ACK/NACK response of the slave device.
 
-The `endTransmission()` method returns 0 upon success. The native `<Wire.h>
-library and a few other libraries return other non-zero error codes are returned
-depending on the error condition:
+The `endTransmission()` method returns 0 upon success. The native `<Wire.h>`
+library and a few other libraries return other non-zero error codes depending on
+the error condition. These error codes are poorly documented so it is not clear
+if other I2C libraries actually follow them:
 
 * 0: success
 * 1: length too long for buffer
@@ -297,6 +295,13 @@ always read `quantity` number of bytes. For additional information, see
 [ArduinoCore-avr#384](https://github.com/arduino/ArduinoCore-avr/issues/384) and
 [ArduinoCore-avr#171](https://github.com/arduino/ArduinoCore-avr/issues/171).
 
+Two overloaded versions of `endTransmission()` and `requestFrom()` are defined,
+instead of defining a default value for the `sendStop` parameter. This allows
+the template class to be used with third party I2C libraries which do not
+provide a version of `endTransmission()` or `requestFrom()` methods with the
+`sendStop` parameter. (The template class will still compile as long as the
+non-existent third party method is not used at all by the calling code.)
+
 <a name="TwoWireInterface"></a>
 ### TwoWireInterface
 
@@ -314,7 +319,8 @@ class TwoWireInterface {
 
     uint8_t beginTransmission(uint8_t addr) {...}
     uint8_t write(uint8_t data) {...}
-    uint8_t endTransmission(bool sendStop = true) {...}
+    uint8_t endTransmission(bool sendStop) {...}
+    uint8_t endTransmission() {...}
 
     uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop) {...}
     uint8_t requestFrom(uint8_t addr, uint8_t quantity) {...}
@@ -334,7 +340,7 @@ It is configured and used by the calling code `MyClass` like this:
 #include <AceWire.h>
 using ace_wire::TwoWireInterface;
 
-template <typename T_WIRE>
+template <typename T_WIREI>
 class MyClass {
   private:
     static const uint8_t ADDRESS = ...;
@@ -342,7 +348,7 @@ class MyClass {
     static const bool SEND_STOP = true;
 
   public:
-    explicit MyClass(T_WIRE& wireInterface)
+    explicit MyClass(T_WIREI& wireInterface)
         : mWireInterface(wireInterface)
     {...}
 
@@ -362,7 +368,7 @@ class MyClass {
     }
 
   private:
-    T_WIRE mWireInterface; // copied by value
+    T_WIREI mWireInterface; // copied by value
 };
 
 using WireInterface = TwoWireInterface<TwoWire>;
@@ -380,9 +386,20 @@ The `using` statement is the C++11 version of a `typedef` that defines
 `WireInterface`. It is not strictly necessary here, but it allows the same
 code structure to be used for the more complicated examples below.
 
-The `T_WIRE` template parameter contains a `T_` prefix to avoid name collisions
-with too many `#define` macros defined in the global namespace on Arduino
-platforms.
+Both the `T_WIRE` and `T_WIREI` template parameters contain a `T_` prefix to
+avoid name collisions with the numerous `#define` macros defined in the global
+namespace on Arduino platforms. The difference between `T_WIRE` and `T_WIREI`
+may be a bit confusing so I hope the following explanation helps:
+
+* `T_WIRE`
+    * template parameter of the `TwoWireInterface` template class
+    * represents a class that looks and acts like the `TwoWire` class from the
+      built-in `<Wire.h>` library
+    * can be a class from a third party library
+* `T_WIREI`
+    * template parameter of a user-defined class from the calling application
+    * represents one of the "interface" classes in *this* library:
+      `TwoWireInterface`, `SimpleWireInterface`, or `SimpleWireFastInterface`
 
 See the [Writing to I2C](#WritingToI2C) and [Reading from I2C](#ReadingFromI2C)
 sections below for documentation about the `beginTransmission()`,
@@ -427,7 +444,7 @@ It is configured and used by the calling code `MyClass` like this:
 #include <AceWire.h>
 using ace_wire::SimpleWireInterface;
 
-template <typename T_WIRE>
+template <typename T_WIREI>
 class MyClass {
   // Exactly the same as above.
 };
@@ -512,7 +529,7 @@ It is configured and used by the calling code `MyClass` like this:
   using ace_wire::SimpleWireFastInterface;
 #endif
 
-template <typename T_WIRE>
+template <typename T_WIREI>
 class MyClass {
   // Exactly the same as above.
 };
@@ -541,32 +558,32 @@ never used.
 <a name="StoringInterfaceObjects"></a>
 ### Storing Interface Objects
 
-In the above examples, the `MyClass` object holds the `T_WIRE` interface object
+In the above examples, the `MyClass` object holds the `T_WIREI` interface object
 **by value**. In other words, the interface object is copied into the `MyClass`
 object. This is efficient because interface objects are very small in size, and
 copying them by-value avoids an extra level of indirection when they are used
 inside the `MyClass` object. The compiler will generate code that is equivalent
 to calling the underlying `Wire` methods through the `TwoWire` pointer.
 
-The alternative is to save the `T_WIRE` object **by reference** like this:
+The alternative is to save the `T_WIREI` object **by reference** like this:
 
 ```C++
-template <typename T_WIRE>
+template <typename T_WIREI>
 class MyClass {
   public:
-    explicit MyClass(T_WIRE& wireInterface)
+    explicit MyClass(T_WIREI& wireInterface)
         : mWireInterface(wireInterface)
     {...}
 
     [...]
 
   private:
-    T_WIRE& mWireInterface; // copied by reference
+    T_WIREI& mWireInterface; // copied by reference
 };
 ```
 
 The internal size of the `TwoWireInterface` object is just a single reference to
-the `T_WIRE` object, so there is no difference in the static memory size.
+the `T_WIREI` object, so there is no difference in the static memory size.
 However, storing the `mWireInterface` as a reference causes an unnecessary extra
 layer of indirection every time the `mWireInterface` object is called. In almost
 every case, I recommend storing the `XxxInterface` object by value into the
@@ -596,7 +613,7 @@ be used with `SoftwareWire` as shown below:
 #include <AceWire.h>
 using ace_wire::TwoWireInterface;
 
-template <typename T_WIRE>
+template <typename T_WIREI>
 class MyClass {
   // Exactly same as above.
 };
@@ -616,8 +633,8 @@ void setup() {
 }
 ```
 
-The critical point is that `MyClass<T_WIRE>` remains unchanged from the previous
-example, and everything should just work.
+The critical point is that `MyClass<T_WIREI>` remains unchanged from the
+previous example, and everything should just work.
 
 <a name="ThirdPartyCompatibility"></a>
 ### Third Party Compatibility
@@ -655,12 +672,12 @@ by taking advantage of C++ templates.
 <a name="WritingToI2C"></a>
 ### Writing to I2C
 
-Once the `T_WIRE mWireInstnace` is created in the `MyClass<T_WIRE>` class,
+Once the `T_WIREI mWireInstnace` is created in the `MyClass<T_WIREI>` class,
 writing to the I2C device is basically the same as using the `Wire` object
 directly:
 
 ```C++
-template <typename T_WIRE>
+template <typename T_WIREI>
 class MyClass {
   private:
     static const uint8_t ADDRESS = ...;
@@ -676,7 +693,7 @@ class MyClass {
     }
 
   private:
-    T_WIRE mWireInterface; // copied by value
+    T_WIREI mWireInterface; // copied by value
 };
 ```
 
@@ -708,7 +725,7 @@ Reading from the I2C bus is similar to writing. Once the `mWireInterface` object
 is available in the `MyClass` object, we can read bytes from the I2C like this:
 
 ```C++
-template <typename T_WIRE>
+template <typename T_WIREI>
 class MyClass {
   private:
     static const uint8_t ADDRESS = ...;
@@ -725,7 +742,7 @@ class MyClass {
     }
 
   private:
-    T_WIRE mWireInterface; // copied by value
+    T_WIREI mWireInterface; // copied by value
 };
 ```
 

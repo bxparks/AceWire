@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceWire
-   &#160;<span id="projectnumber">0.3.0</span>
+   &#160;<span id="projectnumber">0.3.1</span>
    </div>
    <div id="projectbrief">Unified interface for selecting different I2C implementations on Arduino platforms</div>
   </td>
@@ -126,10 +126,16 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 class ace_wire::TwoWireInterface&lt; T_WIRE &gt;</h3>
 
 <p>A thin wrapper around an I2C <code>TwoWire</code> class and its <code>Wire</code> object. </p>
-<p>This is a template class to avoid including the &lt;Wire.h&gt; header file, which increases flash memory on AVR by about 1000 byte even if the Wire object is never used.</p>
-<p>This wrapper can also be used with alternative implementations of I2C (software or hardware) so long as they implement some basic API of the <code>TwoWire</code> class: specifically the <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#aaf3ab9ab6c4dbf5e7b2741d1ab980788" title="Prepare the write buffer to accept a sequence of data, and save the addr for transmission when endTra...">beginTransmission()</a></code>, <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#a4263936c9bff1c092855ea49bcd12e85" title="Write data into the write buffer.">write()</a></code> and <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#a4053895317558317d9c428669cac1476" title="Same as endTransmission(bool) but always send STOP condition.">endTransmission()</a> methods. Since</code>TwoWireInterface` is a template, the alternative implementation classes do <em>not</em> need to inherit from the <code>TwoWire</code> class. </p>
+<p>This is a template class to avoid including the <code>&lt;Wire.h&gt;</code> header file, which increases flash memory on AVR by about 1000 byte even if the <code>Wire</code> object is never used.</p>
+<p>This wrapper can also be used with alternative implementations of I2C (software or hardware) so long as they implement some basic API of the <code>TwoWire</code> class: specifically the <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#aaf3ab9ab6c4dbf5e7b2741d1ab980788" title="Prepare the write buffer to accept a sequence of data, and save the addr for transmission when endTra...">beginTransmission()</a></code>, <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#a4263936c9bff1c092855ea49bcd12e85" title="Write data into the write buffer.">write()</a></code> and <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#a4053895317558317d9c428669cac1476" title="Same as endTransmission(bool) but always send STOP condition.">endTransmission()</a> methods. Since</code>TwoWireInterface` is a template, the alternative implementation classes do <em>not</em> need to inherit from the <code>TwoWire</code> class.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T_WIRE</td><td>underlying class that implements the I2C protocol, usually <code>TwoWire</code> from the pre-installed Wire library, but can be used with other third party libraries that look like <code>TwoWire</code> </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00045">45</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00050">50</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a8bd43efe7644927f55afd805c854976b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8bd43efe7644927f55afd805c854976b">&#9670;&nbsp;</a></span>TwoWireInterface()</h2>
@@ -165,7 +171,7 @@ template&lt;typename T_WIRE &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00053">53</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00058">58</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 
 </div>
 </div>
@@ -198,7 +204,7 @@ template&lt;typename T_WIRE &gt; </div>
 <p>Initial the interface. </p>
 <p>Currently does nothing. </p>
 
-<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00056">56</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00061">61</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 
 </div>
 </div>
@@ -232,7 +238,7 @@ template&lt;typename T_WIRE &gt; </div>
 <p>For unbuffered implementations, immediately send the address byte on the I2C bus with the Write bit set.</p>
 <dl class="section return"><dt>Returns</dt><dd>always returns 0 to indicate success because the <code>addr</code> is simply written into a buffer </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00070">70</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00075">75</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 
 </div>
 </div>
@@ -264,7 +270,7 @@ template&lt;typename T_WIRE &gt; </div>
 <p>End the interface. </p>
 <p>Currently does nothing. </p>
 
-<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00059">59</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00064">64</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 
 </div>
 </div>
@@ -305,7 +311,7 @@ template&lt;typename T_WIRE &gt; </div>
 <li>4: other twi error (lost bus arbitration, bus error, ..) </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00101">101</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00106">106</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 
 </div>
 </div>
@@ -349,7 +355,7 @@ template&lt;typename T_WIRE &gt; </div>
 <p>Some I2C implementations do not provide a 3-argument version of <a class="el" href="classace__wire_1_1TwoWireInterface.html#a3fcbcf640b29eb0ff53d2d23edbdab66" title="Read bytes from the slave and store in buffer owned by T_WIRE and send a STOP condition if sendStop i...">requestFrom()</a>, so we need to provide an explicit 2-argument versions instead of using a default argument of <code>sendStop = true</code>.</p>
 <dl class="section return"><dt>Returns</dt><dd>the value returned by the underlying T_WIRE::requestFrom() method, which will normally be 'quantity' or 0 if an error is encountered. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00135">135</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00140">140</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 
 </div>
 </div>
@@ -398,7 +404,7 @@ template&lt;typename T_WIRE &gt; </div>
 <p>Read bytes from the slave and store in buffer owned by T_WIRE and send a STOP condition if <code>sendStop</code> is true. </p>
 <dl class="section return"><dt>Returns</dt><dd>the value returned by the underlying T_WIRE::requestFrom() method, which will normally be 'quantity'. Some implementations, particularly the unbuffered ones, will return 0 to indicate a NACK response from the slave device. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00119">119</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00124">124</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 
 </div>
 </div>
@@ -432,7 +438,7 @@ template&lt;typename T_WIRE &gt; </div>
 <p>For unbuffered implementations, immediately send the address byte on the I2C bus with the Write bit set.</p>
 <dl class="section return"><dt>Returns</dt><dd>the number of bytes written into buffer, will always be 1. For unbuffered implementations, 0 can be returned if the device responds with a NACK </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00083">83</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00088">88</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 
 </div>
 </div>
