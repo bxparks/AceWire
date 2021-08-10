@@ -1,6 +1,9 @@
 # Changelog
 
 * Unreleased
+* 0.3.1 (2021-08-10)
+    * Update documentation of `T_WIRE` versus `T_WIREI`.
+    * No functional change in this release.
 * 0.3 (2021-07-30)
     * Add `examples/MemoryBenchmark` and `examples/AutoBenchmark` to gather
       memory and CPU consumption numbers of the pre-installed hardware

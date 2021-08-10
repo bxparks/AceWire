@@ -31,13 +31,12 @@ into a separate library. It has 3 primary purposes:
     * Otherwise, some parts of the app would use `<Wire.h>`, and other parts of
       the app would use a different I2C implementation.
 
-The `TwoWire` class in default `<Wire.h>` library cannot be used
+The `TwoWire` class in the pre-installed `<Wire.h>` library cannot be used
 polymorphically. In other words, subclasses cannot be used through a pointer (or
 reference) to the base `TwoWire` class. To get around this problem, this library
 uses C++ templates to provide compile-time polymorphism instead of runtime
 polymorphism. This also means that the calling application code pays only a
-minimal or zero-cost runtime overhead for the abstraction, by avoiding the
-`virtual` dispatch.
+minimal runtime overhead for the abstraction by avoiding the `virtual` dispatch.
 
 The library provides three I2C classes:
 
@@ -72,7 +71,7 @@ The library currently supports only a limited set of I2C functionality:
 * repeated start seems to work
 * only 7-bit addresses are supported, 10-bit addresses are not supported
 
-**Version**: 0.3 (2021-07-30)
+**Version**: 0.3.1 (2021-08-10)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
