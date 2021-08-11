@@ -3,63 +3,60 @@
 Wrapper classes that provide a simple, unified interface for different I2C
 implementations on Arduino platforms. The code was initially part of the
 [AceSegment](https://github.com/bxparks/AceSegment) library, but was extracted
-into a separate library. It has 3 primary purposes:
-
-1. Allow client applications to easily select alternate I2C libraries instead of
-   being locked into the pre-installed `<Wire.h>` library. Alternative libraries
-   may be desirable for various reasons:
-    * To use different GPIO pins, instead of the hardware `SDA` and `SCL`.
-    * To reduce flash and static memory consumption compared to `<Wire.h>`.
-    * To use packet sizes larger than the default 32-bytes provided by AVR
-      `<Wire.h>`.
-2. Prevent unnecessary flash memory consumption by preventing `AceSegment`
-   from being forced to include `<Wire.h>` when it is not necessary.
-    * Simply including the `<Wire.h>` header file causes memory consumption of
-      the application to increase by 1140 bytes of flash and 113 bytes of static
-      memory. This happens even if the application never uses anything defined
-      by the `<Wire.h>` library.
-    * The `AceSegment` library provides classes which use the SPI interface, and
-      other classes which use the I2C interface. If it referenced the `<SPI.h>`
-      and `<Wire.h>` header files directly, then client applications which used
-      only the SPI interface would waste 1140 bytes of flash and 113 bytes of
-      ram.
-    * By going through an intermediary library like `AceWire` (and `AceSPI` and
-      `AceTMI`), client applications do not suffer from unnecessary memory
-      bloat.
-3. Allow all libraries to share a common framework for selection a common I2C
-   implementation within a given application.
-    * Otherwise, some parts of the app would use `<Wire.h>`, and other parts of
-      the app would use a different I2C implementation.
-
-The `TwoWire` class in the pre-installed `<Wire.h>` library cannot be used
-polymorphically. In other words, subclasses cannot be used through a pointer (or
-reference) to the base `TwoWire` class. To get around this problem, this library
-uses C++ templates to provide compile-time polymorphism instead of runtime
-polymorphism. This also means that the calling application code pays only a
-minimal runtime overhead for the abstraction by avoiding the `virtual` dispatch.
+into a separate library.
 
 The library provides three I2C classes:
 
 * `TwoWireInterface.h`
-    * Thin wrapper around an actual I2C implementation library.
-    * Compatible with the `TwoWire` class in the pre-installed `<Wire.h>`
-      library.
-    * Compatible with other hardware and software implementations are supported
-      as long as they implement a handful of methods that are syntactically
-      compatible with the `TwoWire` class. At least 5 different third party
-      libraries have been verified to work with `TwoWireInterface`:
+    * A thin, C++ template, wrapper class around an underlying I2C
+      implementation library which provides a unified interface to client
+      applications.
+    * Compatible with the pre-installed `<Wire.h>` library, and other third
+      party I2C libraries which expose an API that is syntactically compatible
+      with the `TwoWire` class. At least 5 different third party libraries have
+      been verified to work with `TwoWireInterface`:
         * [Using Third Party I2C Libraries](#UsingThirdPartyI2CLibraries)
         * [Third Party Compatibility](#ThirdPartyCompatibility)
 * `SimpleWireInterface.h`
     * AceWire's own software bitbanging implementation that supports writing
       and reading from simple I2C devices, such as an HT16K33 LED controller
       chip and a DS3231 RTC chip.
+    * It implements the `TwoWireInterface` directly using `digitalWrite()` and
+      `pinMode().
 * `SimpleWireFastInterface.h`
     * Same as `SimpleWireInterface.h` using one of the `<digitalWriteFast.h>`
       libraries that's available on AVR processors.
     * Can be up to 4X faster than `SimpleWireInterface` on AVR processors.
-    * Can consume about 10X less flash memory than `<Wire.h>`, about 250 bytes
-      of flash compared to 2500 bytes.
+    * Can reduce flash memory consumption by **10X** compared to `<Wire.h>`,
+      about 250 bytes of flash compared to 2500 bytes.
+
+All 3 classes in this library implement the same API, but they do not use object
+inheritance nor virtual methods. They are meant to be used as template arguments
+to the end-user's template class. This design was motivated by the fact that the
+`TwoWire` class in the pre-installed `<Wire.h>` library cannot be used
+polymorphically. In other words, subclasses cannot be used through a pointer (or
+reference) to the base `TwoWire` class. This library uses C++ templates to
+provide compile-time polymorphism instead of runtime polymorphism. This also
+means that the calling application code pays only a minimal runtime overhead for
+the abstraction by avoiding the `virtual` dispatch.
+
+Once the client application implements the API exposed by `TwoWireInterface`,
+it becomes easy to use alternative I2C libraries instead of being locked into
+the pre-installed `<Wire.h>` library. Alternative libraries may be desirable for
+various reasons: To use different GPIO pins, instead of the hardware `SDA` and
+`SCL`; to reduce flash and static memory consumption compared to `<Wire.h>`; to
+use packet sizes larger than the default 32-bytes provided by AVR `<Wire.h>`.
+
+Another advantage of using `<AceWire.h>` is to avoid direct dependency to the
+`<Wire.h>` library. For reasons that are not obvious, simply including the
+`<Wire.h>` header file causes the memory consumption of the application to
+increase by 1140 bytes of flash and 113 bytes of static memory, **even** if the
+application does not use anything from the `<Wire.h>` library. Using the
+`<AceWire.h>` intermediary is particularly useful within another library.
+Instead of depending on `<Wire.h>` directly, the library can depend on
+`<AceWire.h>` instead. If the client application uses something from that
+library that does not need `<Wire.h>`,then the client can still compile and run,
+without suffering from unnecessary memory bloat.
 
 The library currently supports only a limited set of I2C functionality:
 
@@ -225,26 +222,29 @@ class XxxInterface {
 };
 ```
 
-The `beginTransmission()` method returns a 0 upon success. For implementations
-using a transmit buffer, this will always return a success because nothing is
-actually sent over the wire until the `endTransmission()`. For implementations
-which do not use a buffer, this will send the `addr` byte on the I2C bus. If a
-device responds with an ACK, then the method will return 0, otherwise it will
-return a 1 to indicate failure.
+The `beginTransmission()` method returns a 0 upon success and 1 uon failure.
+(This is slightly different than the `beginTransmission()` of the `TwoWire`
+class which returns `void`.) For implementations using a transmit buffer, this
+will always return a success because nothing is actually sent over the wire
+until the `endTransmission()`. For implementations which do not use a buffer,
+this will directly send the `addr` byte on the I2C bus. If a device responds
+with an ACK, then the method will return 0, otherwise it will return a 1 to
+indicate failure.
 
-The `write()` method returns 1 upon success, 0 upon failure. This allows
-compatibility with the native `<Wire.h>` library which returns a `size_t`
-representing the number of bytes actually written. In this API, the return type
-is a `uint8_t` which is sufficient because only a single byte can be transferred
-at a time. The `write()` method in the native `<Wire.h>` library always returns
-1 because all simply writes the data byte into a buffer. But in non-buffered
-implementations, the data is actually sent over the wire and this method returns
-the ACK/NACK response of the slave device.
+The `write()` method returns 1 upon success, 0 upon failure. This is the
+opposite convention of `beginTransmission()`, but it allows compatibility with
+the native `<Wire.h>` library which returns a `size_t` representing the number
+of bytes actually written. In this API, the return type is a `uint8_t` instead
+of `size_t`, but this is sufficient because only a single byte can be
+transferred by `write()` at a time. The `write()` method in the native
+`<Wire.h>` library always returns 1 because it simply writes the data byte into
+a buffer. But in non-buffered implementations, the data is actually sent over
+the wire and this method returns the ACK/NACK response of the slave device.
 
 The `endTransmission()` method returns 0 upon success. The native `<Wire.h>`
 library and a few other libraries return other non-zero error codes depending on
-the error condition. These error codes are poorly documented so it is not clear
-if other I2C libraries actually follow them:
+the error condition. These error codes are poorly documented so third party
+I2C libraries may not actually follow these codes:
 
 * 0: success
 * 1: length too long for buffer
@@ -257,10 +257,10 @@ On non-buffered implementations, the `endTransmission()` method always returns a
 and the `endTransmission()` method simply sends a STOP condition if requested.
 
 The `requestFrom()` method returns `quantity` if successful, or 0 if an error
-occurs. In buffered implementations, all of the data transfer happens in this
+occurs. In buffered I2C libraries, all of the data transfer happens in this
 method so a return value of `quantity` means the transfer was successful. But in
-unbuffered implementations, this method simply sends the `addr` byte, so a 0
-means that the slave device responded with a NACK.
+unbuffered I2C libraries, this method simply sends the `addr` byte, so a 0 means
+that the slave device responded with a NACK.
 
 The `read()` method returns the data byte from the slave. There is no ability to
 detect an error condition from the slave in this method, mostly because it is
@@ -275,32 +275,32 @@ compiler is able to optimize away the overhead of calling the methods in this
 library so that the function call is made directly to the underlying
 implementation. The reduction of flash memory consumption is especially large
 for classes that use the digitalWriteFast libraries which use compile-time
-constants for pin numbers. The disadvantage is that this library is harder to
-use because these classes require the downstream classes to be implemented using
-C++ templates.
+constants for pin numbers.
 
-Also note that unlike many I2C libraries, including `<Wire.h>`, AceWire does
+Also note that unlike many I2C libraries including `<Wire.h>`, AceWire does
 **not** provide an `available()` method. This is because the functionality of
 that method cannot be implemented within the I2C specification. When the master
 is reading from the slave, it is the master that sends the ACK/NACK bit to the
 slave. There is no mechanism for the slave to tell the master when no more
-bytes are available. If the slave happens to stop sending early, then the
-SDA line will passively pull to HIGH, and the master will read `0xFF`.
-
-In most I2C implementations, `available()` simply returns the number of bytes
-requested (`quantity`) minus the number of times `read()` was called. There is
-at least one implementation which instead returns the number of times that
-`read()` was called. I recommend users to ignore the `available()` method and
-always read `quantity` number of bytes. For additional information, see
+bytes are available. If the slave happens to stop sending early, then the SDA
+line will passively pull to HIGH, and the master will read `0xFF`. In most I2C
+implementations, `available()` simply returns the number of bytes requested
+(`quantity`) minus the number of times `read()` was called. But there is at
+least one implementation which instead returns the number of times that `read()`
+was called (which seems to be a bug). I recommend users to ignore the
+`available()` method and always read `quantity` number of bytes. For additional
+information, see
 [ArduinoCore-avr#384](https://github.com/arduino/ArduinoCore-avr/issues/384) and
 [ArduinoCore-avr#171](https://github.com/arduino/ArduinoCore-avr/issues/171).
 
-Two overloaded versions of `endTransmission()` and `requestFrom()` are defined,
-instead of defining a default value for the `sendStop` parameter. This allows
-the template class to be used with third party I2C libraries which do not
-provide a version of `endTransmission()` or `requestFrom()` methods with the
-`sendStop` parameter. (The template class will still compile as long as the
-non-existent third party method is not used at all by the calling code.)
+Two overloaded versions of `endTransmission()` and `requestFrom()` are defined
+in `TwoWireInterface`, instead of defining a default value with a `bool sendStop
+= bool` parameter. Having 2 separate versions of `endTransmission()` and
+`requestFrom()` allows `TwoWireInterface` to be used with third party I2C
+libraries which do not provide a version of `endTransmission()` or
+`requestFrom()` methods with the `sendStop` parameter. (The `TwoWireInterface`
+class will still compile as long as the non-existent third party method is not
+used at all by the calling code.)
 
 <a name="TwoWireInterface"></a>
 ### TwoWireInterface
