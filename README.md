@@ -1,5 +1,7 @@
 # AceWire
 
+[![Validation](https://github.com/bxparks/AceWire/actions/workflows/validation.yml/badge.svg)](https://github.com/bxparks/AceWire/actions/workflows/validation.yml)
+
 Wrapper classes that provide a simple, unified interface for different I2C
 implementations on Arduino platforms. The code was initially part of the
 [AceSegment](https://github.com/bxparks/AceSegment) library, but was extracted
@@ -68,7 +70,7 @@ The library currently supports only a limited set of I2C functionality:
 * repeated start seems to work
 * only 7-bit addresses are supported, 10-bit addresses are not supported
 
-**Version**: 0.3.1 (2021-08-10)
+**Version**: 0.3.2 (2021-08-17)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
