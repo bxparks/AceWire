@@ -309,6 +309,8 @@ The `TwoWireInterface` is a thin wrapper around the `TwoWire` class provided by
 the pre-installed `<Wire.h>` library. It looks like this:
 
 ```C++
+namespace ace_wire {
+
 template <typename T_WIRE>
 class TwoWireInterface {
   public:
@@ -326,6 +328,8 @@ class TwoWireInterface {
     uint8_t requestFrom(uint8_t addr, uint8_t quantity) {...}
     uint8_t read() {...}
 };
+
+}
 ```
 
 It is flexible enough to become a wrapper around any I2C implementation class
@@ -414,6 +418,8 @@ HT16K33 LED controller chip, or a DS3231 RTC chip. It currently supports just a
 master mode, with no clock stretching. It looks like this:
 
 ```C++
+namespace ace_wire {
+
 class SimpleWireInterface {
   public:
     explicit SimpleWireInterface(
@@ -436,6 +442,8 @@ class SimpleWireInterface {
     }
     uint8_t read() {...}
 };
+
+}
 ```
 It is configured and used by the calling code `MyClass` like this:
 
@@ -495,6 +503,8 @@ The `SimpleWireFastInterface` is the same as `SimpleWireInterface` but using the
 `digitalWriteFast()` function. It looks like this:
 
 ```C++
+namespace ace_wire {
+
 template <
     uint8_t T_DATA_PIN,
     uint8_t T_CLOCK_PIN,
@@ -516,6 +526,8 @@ class SimpleWireFastInterface {
     }
     uint8_t read() {...}
 };
+
+}
 ```
 
 It is configured and used by the calling code `MyClass` like this:
