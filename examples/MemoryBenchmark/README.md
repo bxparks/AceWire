@@ -100,7 +100,7 @@ I2C implementations:
 | TwoWireInterface<SoftwareWire>      |   1974/   72 |  1714/   61 |
 | TwoWireInterface<SWire>             |   1366/  157 |  1106/  146 |
 | TwoWireInterface<SlowSoftWire>      |   1660/   81 |  1400/   70 |
-| TwoWireInterface<SeeedSoftwareI2C>  |   1308/   21 |  1048/   10 |
+| TwoWireInterface<SeeedSoftwareI2C>  |   1318/   21 |  1058/   10 |
 +------------------------------------------------------------------+
 
 ```
@@ -124,7 +124,7 @@ I2C implementations:
 | TwoWireInterface<SoftwareWire>      |   2454/   72 |  1998/   61 |
 | TwoWireInterface<SWire>             |   1698/  157 |  1242/  146 |
 | TwoWireInterface<SlowSoftWire>      |   2008/   83 |  1552/   72 |
-| TwoWireInterface<SeeedSoftwareI2C>  |   1614/   21 |  1158/   10 |
+| TwoWireInterface<SeeedSoftwareI2C>  |   1626/   21 |  1170/   10 |
 +------------------------------------------------------------------+
 
 ```
@@ -148,7 +148,7 @@ I2C implementations:
 | TwoWireInterface<SoftwareWire>      |   5388/  212 |  1916/   61 |
 | TwoWireInterface<SWire>             |   4790/  297 |  1318/  146 |
 | TwoWireInterface<SlowSoftWire>      |   5070/  223 |  1598/   72 |
-| TwoWireInterface<SeeedSoftwareI2C>  |   4632/  161 |  1160/   10 |
+| TwoWireInterface<SeeedSoftwareI2C>  |   4644/  161 |  1172/   10 |
 +------------------------------------------------------------------+
 
 ```
@@ -163,14 +163,14 @@ I2C implementations:
 +------------------------------------------------------------------+
 | functionality                       |  flash/  ram |       delta |
 |-------------------------------------+--------------+-------------|
-| baseline                            |   9940/    0 |     0/    0 |
+| baseline                            |  10064/    0 |     0/    0 |
 |-------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>           |  11468/    0 |  1528/    0 |
-| SimpleWireInterface                 |  10448/    0 |   508/    0 |
+| TwoWireInterface<TwoWire>           |  11616/    0 |  1552/    0 |
+| SimpleWireInterface                 |  10592/    0 |   528/    0 |
 |-------------------------------------+--------------+-------------|
-| TwoWireInterface<SWire>             |  10888/    0 |   948/    0 |
-| TwoWireInterface<SlowSoftWire>      |  11084/    0 |  1144/    0 |
-| TwoWireInterface<SeeedSoftwareI2C>  |  10600/    0 |   660/    0 |
+| TwoWireInterface<SWire>             |  10992/    0 |   928/    0 |
+| TwoWireInterface<SlowSoftWire>      |  11224/    0 |  1160/    0 |
+| TwoWireInterface<SeeedSoftwareI2C>  |  10728/    0 |   664/    0 |
 +------------------------------------------------------------------+
 
 ```
@@ -190,9 +190,9 @@ I2C implementations:
 | TwoWireInterface<TwoWire>           |  28888/ 3744 |  7468/  208 |
 | SimpleWireInterface                 |  24148/ 3564 |  2728/   28 |
 |-------------------------------------+--------------+-------------|
-| TwoWireInterface<SWire>             |  24580/ 3704 |  3160/  168 |
+| TwoWireInterface<SWire>             |  24576/ 3704 |  3156/  168 |
 | TwoWireInterface<SlowSoftWire>      |  25016/ 3616 |  3596/   80 |
-| TwoWireInterface<SeeedSoftwareI2C>  |  24244/ 3576 |  2824/   40 |
+| TwoWireInterface<SeeedSoftwareI2C>  |  24252/ 3576 |  2832/   40 |
 +------------------------------------------------------------------+
 
 ```
@@ -214,7 +214,7 @@ I2C implementations:
 |-------------------------------------+--------------+-------------|
 | TwoWireInterface<SWire>             | 258408/26944 |  1708/  160 |
 | TwoWireInterface<SlowSoftWire>      | 259972/26884 |  3272/  100 |
-| TwoWireInterface<SeeedSoftwareI2C>  | 257904/26812 |  1204/   28 |
+| TwoWireInterface<SeeedSoftwareI2C>  | 257920/26812 |  1220/   28 |
 +------------------------------------------------------------------+
 
 ```
@@ -236,7 +236,7 @@ I2C implementations:
 |-------------------------------------+--------------+-------------|
 | TwoWireInterface<SWire>             | 200298/13408 |  2550/  324 |
 | TwoWireInterface<SlowSoftWire>      | 201634/13336 |  3886/  252 |
-| TwoWireInterface<SeeedSoftwareI2C>  | 200094/13288 |  2346/  204 |
+| TwoWireInterface<SeeedSoftwareI2C>  | 200090/13288 |  2342/  204 |
 +------------------------------------------------------------------+
 
 ```
@@ -252,14 +252,14 @@ I2C implementations:
 +------------------------------------------------------------------+
 | functionality                       |  flash/  ram |       delta |
 |-------------------------------------+--------------+-------------|
-| baseline                            |  10880/ 4152 |     0/    0 |
+| baseline                            |  10208/ 4152 |     0/    0 |
 |-------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>           |  14776/ 4824 |  3896/  672 |
-| SimpleWireInterface                 |  12400/ 4160 |  1520/    8 |
+| TwoWireInterface<TwoWire>           |  14220/ 4824 |  4012/  672 |
+| SimpleWireInterface                 |  11728/ 4160 |  1520/    8 |
 |-------------------------------------+--------------+-------------|
-| TwoWireInterface<SWire>             |  12512/ 4300 |  1632/  148 |
-| TwoWireInterface<SlowSoftWire>      |  12584/ 4212 |  1704/   60 |
-| TwoWireInterface<SeeedSoftwareI2C>  |  12388/ 4172 |  1508/   20 |
+| TwoWireInterface<SWire>             |  11840/ 4300 |  1632/  148 |
+| TwoWireInterface<SlowSoftWire>      |  11912/ 4212 |  1704/   60 |
+| TwoWireInterface<SeeedSoftwareI2C>  |  11792/ 4172 |  1584/   20 |
 +------------------------------------------------------------------+
 
 ```
