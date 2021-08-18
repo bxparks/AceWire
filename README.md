@@ -845,7 +845,7 @@ The Memory benchmark numbers can be seen in
 | TwoWireInterface<SoftwareWire>      |   2454/   72 |  1998/   61 |
 | TwoWireInterface<SWire>             |   1698/  157 |  1242/  146 |
 | TwoWireInterface<SlowSoftWire>      |   2008/   83 |  1552/   72 |
-| TwoWireInterface<SeeedSoftwareI2C>  |   1614/   21 |  1158/   10 |
+| TwoWireInterface<SeeedSoftwareI2C>  |   1626/   21 |  1170/   10 |
 +------------------------------------------------------------------+
 ```
 
@@ -862,7 +862,7 @@ The Memory benchmark numbers can be seen in
 |-------------------------------------+--------------+-------------|
 | TwoWireInterface<SWire>             | 258408/26944 |  1708/  160 |
 | TwoWireInterface<SlowSoftWire>      | 259972/26884 |  3272/  100 |
-| TwoWireInterface<SeeedSoftwareI2C>  | 257904/26812 |  1204/   28 |
+| TwoWireInterface<SeeedSoftwareI2C>  | 257920/26812 |  1220/   28 |
 +------------------------------------------------------------------+
 ```
 

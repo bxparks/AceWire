@@ -84,7 +84,7 @@ $ make README.md
 
 ## Library Size Changes
 
-**v0.3*
+**v0.3**
 
 * Initial iteration of MemoryBenchmarks.
 

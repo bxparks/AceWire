@@ -58,7 +58,7 @@ $ make README.md
 
 ## Library Size Changes
 
-**v0.3*
+**v0.3**
 
 * Initial iteration of MemoryBenchmarks.
 
@@ -168,7 +168,7 @@ I2C implementations:
 | TwoWireInterface<TwoWire>           |  11616/    0 |  1552/    0 |
 | SimpleWireInterface                 |  10592/    0 |   528/    0 |
 |-------------------------------------+--------------+-------------|
-| TwoWireInterface<SWire>             |  10992/    0 |   928/    0 |
+| TwoWireInterface<SWire>             |  11000/    0 |   936/    0 |
 | TwoWireInterface<SlowSoftWire>      |  11224/    0 |  1160/    0 |
 | TwoWireInterface<SeeedSoftwareI2C>  |  10728/    0 |   664/    0 |
 +------------------------------------------------------------------+
@@ -190,7 +190,7 @@ I2C implementations:
 | TwoWireInterface<TwoWire>           |  28888/ 3744 |  7468/  208 |
 | SimpleWireInterface                 |  24148/ 3564 |  2728/   28 |
 |-------------------------------------+--------------+-------------|
-| TwoWireInterface<SWire>             |  24576/ 3704 |  3156/  168 |
+| TwoWireInterface<SWire>             |  24580/ 3704 |  3160/  168 |
 | TwoWireInterface<SlowSoftWire>      |  25016/ 3616 |  3596/   80 |
 | TwoWireInterface<SeeedSoftwareI2C>  |  24252/ 3576 |  2832/   40 |
 +------------------------------------------------------------------+
