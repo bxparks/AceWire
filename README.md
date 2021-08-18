@@ -25,12 +25,14 @@ The library provides three I2C classes:
       chip and a DS3231 RTC chip.
     * It implements the `TwoWireInterface` directly using `digitalWrite()` and
       `pinMode()`.
+    * Capable of 50 kHz (AVR) to 200 kHz (Teensy 3.2) throughput.
 * `SimpleWireFastInterface.h`
     * Same as `SimpleWireInterface.h` using one of the `<digitalWriteFast.h>`
       libraries that's available on AVR processors.
     * Can be up to 4X faster than `SimpleWireInterface` on AVR processors.
     * Can reduce flash memory consumption by **10X** compared to `<Wire.h>`,
       about 250 bytes of flash compared to 2500 bytes.
+    * Capable of 500-600 kHz throughput on AVR.
 
 All 3 classes in this library implement the same API, but they do not use object
 inheritance nor virtual methods. They are meant to be used as template arguments
