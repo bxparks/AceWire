@@ -24,7 +24,7 @@ The library provides three I2C classes:
       and reading from simple I2C devices, such as an HT16K33 LED controller
       chip and a DS3231 RTC chip.
     * It implements the `TwoWireInterface` directly using `digitalWrite()` and
-      `pinMode().
+      `pinMode()`.
 * `SimpleWireFastInterface.h`
     * Same as `SimpleWireInterface.h` using one of the `<digitalWriteFast.h>`
       libraries that's available on AVR processors.
@@ -210,17 +210,17 @@ find a common API among these variations.
 ```C++
 class XxxInterface {
   public:
-    void begin();
-    void end();
+    void begin() const;
+    void end() const;
 
-    uint8_t beginTransmission(uint8_t addr);
-    uint8_t write(uint8_t data);
-    uint8_t endTransmission(bool sendStop);
-    uint8_t endTransmission();
+    uint8_t beginTransmission(uint8_t addr) const;
+    uint8_t write(uint8_t data) const;
+    uint8_t endTransmission(bool sendStop) const;
+    uint8_t endTransmission() const;
 
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop);
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity);
-    uint8_t read();
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop) const;
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity) const;
+    uint8_t read() const;
 };
 ```
 
@@ -280,7 +280,7 @@ for classes that use the digitalWriteFast libraries which use compile-time
 constants for pin numbers.
 
 Also note that unlike many I2C libraries including `<Wire.h>`, AceWire does
-**not** provide an `available()` method. This is because the functionality of
+*not* provide an `available()` method. This is because the functionality of
 that method cannot be implemented within the I2C specification. When the master
 is reading from the slave, it is the master that sends the ACK/NACK bit to the
 slave. There is no mechanism for the slave to tell the master when no more
@@ -316,19 +316,19 @@ namespace ace_wire {
 template <typename T_WIRE>
 class TwoWireInterface {
   public:
-    explicit TwoWireInterface(T_WIRE& wire) : mWire(wire) {}
+    explicit TwoWireInterface(T_WIRE& wire);
 
-    void begin() {...}
-    void end() {...}
+    void begin() const;
+    void end() const;
 
-    uint8_t beginTransmission(uint8_t addr) {...}
-    uint8_t write(uint8_t data) {...}
-    uint8_t endTransmission(bool sendStop) {...}
-    uint8_t endTransmission() {...}
+    uint8_t beginTransmission(uint8_t addr) const;
+    uint8_t write(uint8_t data) const;
+    uint8_t endTransmission(bool sendStop) const;
+    uint8_t endTransmission() const;
 
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop) {...}
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity) {...}
-    uint8_t read() {...}
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop) const;
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity) const;
+    uint8_t read() const;
 };
 
 }
@@ -426,23 +426,18 @@ class SimpleWireInterface {
   public:
     explicit SimpleWireInterface(
         uint8_t dataPin, uint8_t clockPin, uint8_t delayMicros
-    ) :
-        mDataPin(dataPin),
-        mClockPin(clockPin),
-        mDelayMicros(delayMicros)
-    {}
+    );
 
-    void begin() {...}
-    void end() {...}
+    void begin() const;
+    void end() const;
 
-    uint8_t beginTransmission(uint8_t addr) {...}
-    uint8_t write(uint8_t data) {...}
-    uint8_t endTransmission(bool sendStop = true) {...}
+    uint8_t beginTransmission(uint8_t addr) const;
+    uint8_t write(uint8_t data) const;
+    uint8_t endTransmission(bool sendStop = true) const;
 
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true) {
-      ...
-    }
-    uint8_t read() {...}
+    uint8_t requestFrom(
+        uint8_t addr, uint8_t quantity, bool sendStop = true) const;
+    uint8_t read() const;
 };
 
 }
@@ -516,17 +511,16 @@ class SimpleWireFastInterface {
   public:
     explicit SimpleWireFastInterface() = default;
 
-    void begin() {...}
-    void end() {...}
+    void begin() const;
+    void end() const;
 
-    uint8_t beginTransmission(uint8_t addr) {...}
-    uint8_t write(uint8_t data) {...}
-    uint8_t endTransmission(bool sendStop = true) {...}
+    uint8_t beginTransmission(uint8_t addr) const;
+    uint8_t write(uint8_t data) const;
+    uint8_t endTransmission(bool sendStop = true) const;
 
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true) {
-      ...
-    }
-    uint8_t read() {...}
+    uint8_t requestFrom(
+        uint8_t addr, uint8_t quantity, bool sendStop = true) const;
+    uint8_t read() const;
 };
 
 }

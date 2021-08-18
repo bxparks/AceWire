@@ -34,7 +34,7 @@ namespace ace_wire {
  * A software I2C implementation for sending LED segment patterns over I2C. This
  * has the same API has TwoWireInterface so it can be a drop-in replacement.
  *
- * The implementation is very similar to SoftTmiInterface because the TM1637
+ * The implementation is very similar to SimpleTmiInterface because the TM1637
  * protocol is very similar to I2C. To keep everything simple, all write and
  * read methods are *synchronous* (i.e. blocking) because interrupts are not
  * used. This means that we can eliminate the send and receive buffers, which
@@ -169,10 +169,11 @@ class SimpleWireInterface {
      * Prepare to read bytes by sending I2C START condition. If `sendStop` is
      * true, then a STOP condition will be sent by `read()` after the last byte.
      *
-     * @return 'quantity' if addr was written successfully and the the device
+     * @return 'quantity' if addr was written successfully and the device
      * responded with ACK, 0 if device responded with NACK
      */
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true) {
+    uint8_t requestFrom(
+        uint8_t addr, uint8_t quantity, bool sendStop = true) const {
       mQuantity = quantity;
       mSendStop = sendStop;
 
@@ -184,9 +185,9 @@ class SimpleWireInterface {
 
       // Send I2C addr (7 bits) and the R/W bit set to "read" (0x01).
       uint8_t effectiveAddr = (addr << 1) | 0x01;
-      uint8_t ack = write(effectiveAddr);
+      uint8_t status = write(effectiveAddr);
 
-      return (ack == 1) ? quantity : 0;
+      return (status == 0) ? 0 : quantity;
     }
 
     /**
@@ -202,8 +203,8 @@ class SimpleWireInterface {
      * happen if the calling program is correctly implemented), this method
      * returns immediately with a 0xff.
      */
-    uint8_t read() {
-      // Caller should not call when mQuantity is 0, but guard against it.
+    uint8_t read() const {
+      // Caller should not call when mQuantity is 0, but let's guard against it.
       if (! mQuantity) return 0xff;
 
       // Read one byte
@@ -223,9 +224,7 @@ class SimpleWireInterface {
         sendAck();
       } else {
         sendNack();
-        if (mSendStop) {
-          endTransmission();
-        }
+        endTransmission(mSendStop);
       }
 
       return data;
@@ -285,8 +284,9 @@ class SimpleWireInterface {
     uint8_t const mDataPin;
     uint8_t const mClockPin;
     uint8_t const mDelayMicros;
-    uint8_t mQuantity;
-    bool mSendStop;
+
+    mutable uint8_t mQuantity;
+    mutable bool mSendStop;
 };
 
 }

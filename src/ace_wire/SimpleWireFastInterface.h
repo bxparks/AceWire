@@ -148,10 +148,11 @@ class SimpleWireFastInterface {
      * Prepare to read bytes by sending I2C START condition. If `sendStop` is
      * true, then a STOP condition will be sent by `read()` after the last byte.
      *
-     * @return 'quantity' if addr was written successfully and the the device
+     * @return 'quantity' if addr was written successfully and the device
      * responded with ACK, 0 if device responded with NACK
      */
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true) {
+    uint8_t requestFrom(
+        uint8_t addr, uint8_t quantity, bool sendStop = true) const {
       mQuantity = quantity;
       mSendStop = sendStop;
 
@@ -163,9 +164,9 @@ class SimpleWireFastInterface {
 
       // Send I2C addr (7 bits) and the R/W bit set to "read" (0x01).
       uint8_t effectiveAddr = (addr << 1) | 0x01;
-      uint8_t ack = write(effectiveAddr);
+      uint8_t status = write(effectiveAddr);
 
-      return (ack == 1) ? quantity : 0;
+      return (status == 0) ? 0 : quantity;
     }
 
     /**
@@ -181,8 +182,8 @@ class SimpleWireFastInterface {
      * happen if the calling program is correctly implemented), this method
      * returns immediately with a 0xff.
      */
-    uint8_t read() {
-      // Caller should not call when mQuantity is 0, but guard against it.
+    uint8_t read() const {
+      // Caller should not call when mQuantity is 0, but let's guard against it.
       if (! mQuantity) return 0xff;
 
       // Read one byte
@@ -202,9 +203,7 @@ class SimpleWireFastInterface {
         sendAck();
       } else {
         sendNack();
-        if (mSendStop) {
-          endTransmission();
-        }
+        endTransmission(mSendStop);
       }
 
       return data;
@@ -262,8 +261,8 @@ class SimpleWireFastInterface {
     static void dataLow() { pinModeFast(T_DATA_PIN, OUTPUT); bitDelay(); }
 
   private:
-    bool mSendStop;
-    uint8_t mQuantity;
+    mutable bool mSendStop;
+    mutable uint8_t mQuantity;
 };
 
 }

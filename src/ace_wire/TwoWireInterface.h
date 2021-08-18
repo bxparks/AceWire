@@ -58,10 +58,10 @@ class TwoWireInterface {
     explicit TwoWireInterface(T_WIRE& wire) : mWire(wire) {}
 
     /** Initial the interface. Currently does nothing. */
-    void begin() {}
+    void begin() const {}
 
     /** End the interface. Currently does nothing. */
-    void end() {}
+    void end() const {}
 
     /**
      * Prepare the write buffer to accept a sequence of data, and save the addr
@@ -72,7 +72,7 @@ class TwoWireInterface {
      * @return always returns 0 to indicate success because the `addr` is simply
      *    written into a buffer
      */
-    uint8_t beginTransmission(uint8_t addr) {
+    uint8_t beginTransmission(uint8_t addr) const {
       mWire.beginTransmission(addr);
       return 0;
     }
@@ -85,7 +85,7 @@ class TwoWireInterface {
      * unbuffered implementations, 0 can be returned if the device responds with
      * a NACK
      */
-    uint8_t write(uint8_t data) {
+    uint8_t write(uint8_t data) const {
       return (uint8_t) mWire.write(data);
     }
 
@@ -103,12 +103,12 @@ class TwoWireInterface {
      *  * 3: data send, NACK received
      *  * 4: other twi error (lost bus arbitration, bus error, ..)
      */
-    uint8_t endTransmission(bool sendStop) {
+    uint8_t endTransmission(bool sendStop) const {
       return mWire.endTransmission(sendStop);
     }
 
     /** Same as endTransmission(bool) but always send STOP condition. */
-    uint8_t endTransmission() {
+    uint8_t endTransmission() const {
       return mWire.endTransmission();
     }
 
@@ -121,7 +121,7 @@ class TwoWireInterface {
      * particularly the unbuffered ones, will return 0 to indicate a NACK
      * response from the slave device.
      */
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop) {
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop) const {
       return mWire.requestFrom(addr, quantity, (uint8_t) sendStop);
     }
 
@@ -137,12 +137,12 @@ class TwoWireInterface {
      * method, which will normally be 'quantity' or 0 if an error is
      * encountered.
      */
-    uint8_t requestFrom(uint8_t addr, uint8_t quantity) {
+    uint8_t requestFrom(uint8_t addr, uint8_t quantity) const {
       return mWire.requestFrom(addr, quantity);
     }
 
     /** Read byte from buffer. */
-    uint8_t read() {
+    uint8_t read() const {
       return mWire.read();
     }
 
