@@ -9,7 +9,7 @@ into a separate library.
 
 The library provides three I2C classes:
 
-* `TwoWireInterface.h`
+* `TwoWireInterface`
     * A thin, C++ template, wrapper class around an underlying I2C
       implementation library which provides a unified interface to client
       applications.
@@ -19,14 +19,14 @@ The library provides three I2C classes:
       been verified to work with `TwoWireInterface`:
         * [Using Third Party I2C Libraries](#UsingThirdPartyI2CLibraries)
         * [Third Party Compatibility](#ThirdPartyCompatibility)
-* `SimpleWireInterface.h`
+* `SimpleWireInterface`
     * AceWire's own software bitbanging implementation that supports writing
       and reading from simple I2C devices, such as an HT16K33 LED controller
       chip and a DS3231 RTC chip.
     * It implements the `TwoWireInterface` directly using `digitalWrite()` and
       `pinMode()`.
     * Capable of 50 kHz (AVR) to 200 kHz (Teensy 3.2) throughput.
-* `SimpleWireFastInterface.h`
+* `SimpleWireFastInterface`
     * Same as `SimpleWireInterface.h` using one of the `<digitalWriteFast.h>`
       libraries that's available on AVR processors.
     * Can be up to 4X faster than `SimpleWireInterface` on AVR processors.
@@ -37,12 +37,13 @@ The library provides three I2C classes:
 All 3 classes in this library implement the same API, but they do not use object
 inheritance nor virtual methods. They are meant to be used as template arguments
 to the end-user's template class. This design was motivated by the fact that the
-`TwoWire` class in the pre-installed `<Wire.h>` library cannot be used
-polymorphically. In other words, subclasses cannot be used through a pointer (or
-reference) to the base `TwoWire` class. This library uses C++ templates to
-provide compile-time polymorphism instead of runtime polymorphism. This also
-means that the calling application code pays only a minimal runtime overhead for
-the abstraction by avoiding the `virtual` dispatch.
+`TwoWire` class in the pre-installed `<Wire.h>` library
+[cannot be used polymorphically](https://github.com/Testato/SoftwareWire/issues/28).
+In other words, subclasses cannot be used through a pointer (or reference) to
+the base `TwoWire` class. This library uses C++ templates to provide
+compile-time polymorphism instead of runtime polymorphism. This also means that
+the calling application code pays only a minimal runtime overhead for the
+abstraction by avoiding the `virtual` dispatch.
 
 Once the client application implements the API exposed by `TwoWireInterface`,
 it becomes easy to use alternative I2C libraries instead of being locked into
@@ -112,17 +113,16 @@ The library currently supports only a limited set of I2C functionality:
 <a name="Installation"></a>
 ## Installation
 
-The latest stable release will eventually be available in the Arduino IDE
-Library Manager. Search for "AceWire". Click install. (It is not there
-yet.)
+The latest stable release is available in the Arduino IDE Library Manager.
+Search for "AceWire". Click install.
 
 The development version can be installed by cloning the
 [GitHub repository](https://github.com/bxparks/AceWire), checking out the
-`develop` branch, then manually copying over the contents to the `./libraries`
-directory used by the Arduino IDE. (The result is a directory named
-`./libraries/AceWire`.)
+default `develop` branch, then manually copying over to or symlinking from the
+`./libraries` directory used by the Arduino IDE. (The result is a directory
+or link named `./libraries/AceWire`.)
 
-The `master` branch contains the stable release.
+The `master` branch contains the stable releases.
 
 <a name="SourceCode"></a>
 ### Source Code
