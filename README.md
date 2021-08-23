@@ -29,7 +29,7 @@ The library provides three I2C classes:
 * `SimpleWireFastInterface`
     * Same as `SimpleWireInterface.h` using one of the `<digitalWriteFast.h>`
       libraries that's available on AVR processors.
-    * Can be up to 4X faster than `SimpleWireInterface` on AVR processors.
+    * Can be **10X** faster than `SimpleWireInterface` on AVR processors.
     * Can reduce flash memory consumption by **10X** compared to `<Wire.h>`,
       about 250 bytes of flash compared to 2500 bytes.
     * Capable of 500-600 kHz throughput on AVR.
