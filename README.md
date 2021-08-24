@@ -649,21 +649,22 @@ previous example, and everything should just work.
 <a name="ThirdPartyCompatibility"></a>
 ### Third Party Compatibility
 
-The following third party I2C libraries (both hardware and software
-implementations) have been verified to work with the `TwoWireInterface` wrapper
-class:
+There are at least 15-20 third party I2C libraries for various platforms
+listed in the
+[Arduino-I2C-libraries](https://github.com/Testato/SoftwareWire/wiki/Arduino-I2C-libraries)
+wiki page. About half of them implement the `TwoWire` API. I have explicitly
+verified the following libraries to be compatible with `TwoWireInterface`:
 
 * https://github.com/Testato/SoftwareWire
 * https://github.com/RaemondBW/SWire
 * https://github.com/felias-fogg/SlowSoftWire
 * https://github.com/thexeno/HardWire-Arduino-Library
 * https://github.com/Seeed-Studio/Arduino_Software_I2C
+* https://github.com/stevemarple/SoftWire
 
 I could not get the following to work:
 
-* https://github.com/stevemarple/SoftWire
-    * Nothing happens.
-* https://github.com/felias-fogg/SoftI2CMaster, using its `SoftWire.h`
+* https://github.com/felias-fogg/SoftI2CMaster, using its `SoftWire.h` adapter
     * On a SparkFun Pro Micro, nothing happens.
     * On an Arduino Nano, the assembler fails with a fatal error:
       "Error: number must be positive and less than 8".
