@@ -95,7 +95,7 @@ The library currently supports only a limited set of I2C functionality:
     * [SimpleWireFastInterface](#SimpleWireFastInterface)
     * [Storing Interface Objects](#StoringInterfaceObjects)
     * [Using Third Party I2C Libraries](#UsingThirdPartyI2CLibraries)
-    * [ThirdPartyCompatibility](#ThirdPartyCompatibility)
+    * [Third Party Compatibility](#ThirdPartyCompatibility)
     * [Writing to I2C](#WritingToI2C)
     * [Reading from I2C](#ReadingFromI2C)
     * [Error Handling](#ErrorHandling)
