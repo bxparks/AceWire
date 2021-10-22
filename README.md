@@ -113,8 +113,8 @@ The library currently supports only a limited set of I2C functionality:
 <a name="Installation"></a>
 ## Installation
 
-The latest stable release is available in the Arduino IDE Library Manager.
-Search for "AceWire". Click install.
+The latest stable release is available from the Arduino Library Manager in the
+IDE. Search for "AceWire". Click install.
 
 The development version can be installed by cloning the
 [GitHub repository](https://github.com/bxparks/AceWire), checking out the
@@ -973,14 +973,14 @@ them.
 <a name="FeedbackAndSupport"></a>
 ## Feedback and Support
 
-If you have any questions, comments and other support questions about how to
-use this library, use the
-[GitHub Discussions](https://github.com/bxparks/AceWire/discussions)
-for this project. If you have bug reports or feature requests, file a ticket in
-[GitHub Issues](https://github.com/bxparks/AceWire/issues). I'd love to hear
-about how this software and its documentation can be improved. I can't promise
-that I will incorporate everything, but I will give your ideas serious
-consideration.
+If you have any questions, comments, or feature requests for this library,
+please use the [GitHub
+Discussions](https://github.com/bxparks/AceWire/discussions) for this project.
+If you have bug reports, please file a ticket in [GitHub
+Issues](https://github.com/bxparks/AceWire/issues). Feature requests should go
+into Discussions first because they often have alternative solutions which are
+useful to remain visible, instead of disappearing from the default view of the
+Issue tracker after the ticket is closed.
 
 Please refrain from emailing me directly unless the content is sensitive. The
 problem with email is that I cannot reference the email conversation when other
