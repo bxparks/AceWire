@@ -49,6 +49,13 @@ SOFTWARE.
 // Files exported by this main header file.
 #include "ace_wire/TwoWireInterface.h"
 #include "ace_wire/SimpleWireInterface.h"
+#include "ace_wire/MarpleWireInterface.h"
+#include "ace_wire/RaemondWireInterface.h"
+#include "ace_wire/SeeedWireInterface.h"
+#include "ace_wire/FeliasFoggWireInterface.h"
+#include "ace_wire/TestatoWireInterface.h"
+#include "ace_wire/ThexenoWireInterface.h"
+#include "ace_wire/TodbotWireInterface.h"
 
 // The following are commented out because they work only on AVR platforms with
 // a suitable <digitalWriteFast.h> library.

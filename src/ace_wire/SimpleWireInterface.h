@@ -34,11 +34,12 @@ namespace ace_wire {
  * A software I2C implementation for sending LED segment patterns over I2C. This
  * has the same API has TwoWireInterface so it can be a drop-in replacement.
  *
- * The implementation is very similar to SimpleTmiInterface because the TM1637
- * protocol is very similar to I2C. To keep everything simple, all write and
- * read methods are *synchronous* (i.e. blocking) because interrupts are not
- * used. This means that we can eliminate the send and receive buffers, which
- * saves both flash and static memory.
+ * The implementation is very similar to the SimpleTmiInterface class (in
+ * the https://github.com/bxparks/AceTMI project) because the TM1637 protocol is
+ * very similar to I2C. To keep everything simple, all write and read methods
+ * are *synchronous* (i.e. blocking) because interrupts are not used. This means
+ * that we can eliminate the TX and RX buffers, which saves both flash and
+ * static memory.
  *
  * During writing, beginTransmission() sends the START condition and the I2C
  * address (along with the 'write' bit 0x00) right away. Then each write() call

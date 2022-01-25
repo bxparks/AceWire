@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021 Brian T. Park
+Copyright (c) 2022 Brian T. Park
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,40 +22,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_WIRE_TWO_WIRE_INTERFACE_H
-#define ACE_WIRE_TWO_WIRE_INTERFACE_H
+#ifndef ACE_WIRE_TESTATO_WIRE_INTERFACE_H
+#define ACE_WIRE_TESTATO_WIRE_INTERFACE_H
 
 #include <stdint.h>
 
 namespace ace_wire {
 
 /**
- * A thin wrapper around the default `TwoWire` class and its `Wire` object
- * provided by most Arduino platforms. All `TwoWire` instances use a TX and RX
- * buffer of varying sizes.  For example:
+ * A thin wrapper around the `SoftwareWire` class provided by the
+ * https://github.com/Testato/SoftwareWire project so that it becomes compatible
+ * with the AceWire interface.
  *
- *  * The AVR version uses 32 bytes for each
- *  * The ESP8266 and ESP32 versions use 128 bytes.
- *  * The STM32 version uses 32 bytes.
- *  * The SAMD21 version uses 256 bytes.
- *
- * This is a template class to avoid including the `<Wire.h>` header file, which
- * increases flash memory on AVR by about 1000 byte even if the `Wire` object is
- * never used.
- *
- * @tparam T_WIRE underlying class that implements the I2C protocol which will
- *    always be `TwoWire`
+ * @tparam T_WIRE the template parameter for the I2C class which will always be
+ * `SoftwareWire`
  */
 template <typename T_WIRE>
-class TwoWireInterface {
+class TestatoWireInterface {
   public:
     /**
      * Constructor.
-     * @param wire instance of `TwoWire` which will always be the `Wire` object
+     * @param wire instance of `SoftwareWire`
      */
-    explicit TwoWireInterface(T_WIRE& wire) : mWire(wire) {}
+    explicit TestatoWireInterface(T_WIRE& wire) : mWire(wire) {}
 
-    /** Initialize the interface. Currently does nothing. */
+    /** Initial the interface. Currently does nothing. */
     void begin() const {}
 
     /** End the interface. Currently does nothing. */
@@ -63,10 +54,13 @@ class TwoWireInterface {
 
     /**
      * Prepare the write buffer to accept a sequence of data, and save the addr
-     * for transmission when `endTransmission()` is called.
+     * for transmission when `endTransmission()` is called. SoftwareWire
+     * uses no TX  buffer, so this method *should* return the ACK/NACK response
+     * from the device, but it actually returns void, so the only thing we can
+     * do is always return a 0 to indicate success.
      *
-     * @return always returns 0 to indicate success because the `addr` is simply
-     *    written into a buffer
+     * @return always returns 0 to indicate success because SoftwareWire does
+     * not have a TX buffer
      */
     uint8_t beginTransmission(uint8_t addr) const {
       mWire.beginTransmission(addr);
@@ -74,20 +68,23 @@ class TwoWireInterface {
     }
 
     /**
-     * Write data into the write buffer.
+     * Write data to the I2C bus. SoftwareWire uses *no* TX buffer, so this is
+     * written directly to the bus. SoftwareWire::write() returns a `size_t`,
+     * which is converted to a `uint8_t` for compatibility with AceWire.
      *
-     * @returns the number of bytes written into buffer, will always be 1.
+     * @returns 1 always to indicate success, since SoftwareWire::write() always
+     *    returns 1
      */
     uint8_t write(uint8_t data) const {
       return (uint8_t) mWire.write(data);
     }
 
     /**
-     * Send the data in the buffer, with a STOP condition if `sendStop` is true.
+     * Send a STOP condition if `sendStop` is true, or a REPEATED_START
+     * condition if `sendStop` is false.
      *
-     * Returns the value returned by the underlying TwoWire::endTransmission()
-     * method, which returns the values documented in the twi_writeTo()
-     * function:
+     * Returns a status value to indicate the success or failure of the previous
+     * write() statements.
      *
      *  * 0: success
      *  * 1: length too long for buffer
@@ -100,29 +97,27 @@ class TwoWireInterface {
     }
 
     /**
-     * Read bytes from the slave and store in buffer owned by TwoWire and
-     * send a STOP condition if `sendStop` is true.
+     * Prepare to read bytes from the device at the given address, and
+     * send a STOP condition if `sendStop` is true. The underlying SoftwareWire
+     * does not use a TX buffer, so the addr is immediately placed on the I2C
+     * bus.
      *
-     * @param addr I2C address
-     * @param quantity number of bytes to read
-     * @param sendStop whether the STOP condition should be sent at end
-     *
-     * @return the value returned by the underlying T_WIRE::requestFrom()
-     * method, which will normally be 'quantity'
+     * @return `quantity` if the device responded with an ACK, or 0 if the
+     * device responded with a NACK.
      */
     uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true)
         const {
-      return mWire.requestFrom(addr, quantity, (uint8_t) sendStop);
+      return mWire.requestFrom(addr, quantity, sendStop);
     }
 
-    /** Read byte from the TwoWire receive buffer. */
+    /** Read byte from buffer. */
     uint8_t read() const {
       return mWire.read();
     }
 
     // Use default copy constructor and assignment operator.
-    TwoWireInterface(const TwoWireInterface&) = default;
-    TwoWireInterface& operator=(const TwoWireInterface&) = default;
+    TestatoWireInterface(const TestatoWireInterface&) = default;
+    TestatoWireInterface& operator=(const TestatoWireInterface&) = default;
 
   private:
     T_WIRE& mWire;
