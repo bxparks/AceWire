@@ -12,8 +12,6 @@ nano_results = check_output(
     "./generate_table.awk < nano.txt", shell=True, text=True)
 micro_results = check_output(
     "./generate_table.awk < micro.txt", shell=True, text=True)
-samd_results = check_output(
-    "./generate_table.awk < samd.txt", shell=True, text=True)
 stm32_results = check_output(
     "./generate_table.awk < stm32.txt", shell=True, text=True)
 esp8266_results = check_output(
@@ -60,7 +58,6 @@ produces the following files:
 attiny.txt
 nano.txt
 micro.txt
-samd.txt
 stm32.txt
 esp8266.txt
 esp32.txt
@@ -110,7 +107,7 @@ I2C implementations:
 ### ATtiny85
 
 * 8MHz ATtiny85
-* Arduino IDE 1.8.13
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
 * SpenceKonde/ATTinyCore 1.5.2
 
 ```
@@ -120,8 +117,8 @@ I2C implementations:
 ### Arduino Nano
 
 * 16MHz ATmega328P
-* Arduino IDE 1.8.13
-* Arduino AVR Boards 1.8.3
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Arduino AVR Boards 1.8.4
 
 ```
 {nano_results}
@@ -130,28 +127,18 @@ I2C implementations:
 ### Sparkfun Pro Micro
 
 * 16 MHz ATmega32U4
-* Arduino IDE 1.8.13
+* Arduino IDE 1.8.13, Arduino CLI 0.19.2
 * SparkFun AVR Boards 1.1.13
 
 ```
 {micro_results}
 ```
 
-### SAMD21 M0 Mini
-
-* 48 MHz ARM Cortex-M0+
-* Arduino IDE 1.8.13
-* Sparkfun SAMD Core 1.8.3
-
-```
-{samd_results}
-```
-
 ### STM32 Blue Pill
 
 * STM32F103C8, 72 MHz ARM Cortex-M3
-* Arduino IDE 1.8.13
-* STM32duino 2.0.0
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* STM32duino 2.2.0
 
 ```
 {stm32_results}
@@ -160,8 +147,8 @@ I2C implementations:
 ### ESP8266
 
 * NodeMCU 1.0, 80MHz ESP8266
-* Arduino IDE 1.8.13
-* ESP8266 Boards 2.7.4
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* ESP8266 Boards 3.0.2
 
 ```
 {esp8266_results}
@@ -170,8 +157,8 @@ I2C implementations:
 ### ESP32
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
-* Arduino IDE 1.8.13
-* ESP32 Boards 1.0.6
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* ESP32 Boards 2.0.2
 
 ```
 {esp32_results}
@@ -180,8 +167,8 @@ I2C implementations:
 ### Teensy 3.2
 
 * 96 MHz ARM Cortex-M4
-* Arduino IDE 1.8.13
-* Teensyduino 1.53
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Teensyduino 1.56
 * Compiler options: "Faster"
 
 ```
