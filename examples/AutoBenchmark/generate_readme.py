@@ -10,14 +10,12 @@ nano_results = check_output(
     "./generate_table.awk < nano.txt", shell=True, text=True)
 micro_results = check_output(
     "./generate_table.awk < micro.txt", shell=True, text=True)
-samd_results = check_output(
-    "./generate_table.awk < samd.txt", shell=True, text=True)
 stm32_results = check_output(
     "./generate_table.awk < stm32.txt", shell=True, text=True)
 esp8266_results = check_output(
     "./generate_table.awk < esp8266.txt", shell=True, text=True)
 esp32_results = check_output(
-    "./generate_table.awk < esp32.txt", shell=True, text=True)
+    "./generate_table.awk -v USE_REMAP=1 < esp32.txt", shell=True, text=True)
 teensy32_results = check_output(
     "./generate_table.awk < teensy32.txt", shell=True, text=True)
 
@@ -29,7 +27,7 @@ the AceWire library. To obtain accurate results, an actual I2C device must exist
 on the bus. Currently, I use a DS3231 RTC chip because it is relatively small
 and inexpensive and I can install one on each of my development boards.
 
-**Version**: AceWire v0.3.2
+**Version**: AceWire v0.4.0
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -84,7 +82,17 @@ number of `TimingStats::update()` calls that were made.
 
 ## CPU Time Changes
 
-**v0.3**
+**v0.4**
+
+* Upgrade to ESP8266 v3.0.2 and ESP32 v2.0.2 seem to have made the
+  https://github.com/Seeed-Studio/Arduino_Software_I2C library significantly
+  slower.
+    * The Seeed I2C library does not use any `delayMicroseconds()` between
+      successive calls of `digitalWrite()` when transitioning bit levels.
+    * This indicates that these GPIO calls got slower.
+    * Other I2C libraries are not affected as much because the time consumed
+      `delayMicroseconds()` is probably greater than the time consumed by the
+      `digitalWrite()` function.
 
 ## Results
 
@@ -100,37 +108,31 @@ The following implementations are tested:
 * `TwoWireInterface<TwoWire>,100kHz`: The hardware `<Wire.h>` library set to 100
   kHz (default).
 * `TwoWireInterface<TwoWire>,400kHz`: The hardware `<Wire.h>` library at to 400
-  kHz (default).
+  kHz.
 * `SimpleWireInterface,1us`: AceWire's own Software I2C using `digitalWrite()`
   using a `delayMicros` of 1 micros.
 * `SimpleWireFastInterface,1us`: AceWire's own Software I2C using a
   `digitalWriteFast()` library and a `delayMicros` of 1 micros (compatible with
   AVR only).
 * Third party libraries
-    * `TwoWireInterface<SoftwareWire>,100kHz`: Software I2C using
-      https://github.com/Testato/SoftwareWire set to 100 kHz (compatible with
-      AVR only).
-    * `TwoWireInterface<SoftwareWire>,400kHz`: Software I2C using
-      https://github.com/Testato/SoftwareWire set to 400 kHz (compatible with
-      AVR only).
-    * `TwoWireInterface<SWire>`: Software I2C using
-      https://github.com/RaemondBW/SWire
-    * `TwoWireInterface<SlowSoftWire>`: Software I2C using
-      https://github.com/felias-fogg/SlowSoftWire
-    * `TwoWireInterface<SeeedSoftwareI2C>`: Software I2C using
-      https://github.com/Seeed-Studio/Arduino_Software_I2C
-        * [Seeed SoftwareI2C](https://github.com/Seeed-Studio/Arduino_Software_I2C)
-          does not insert any `delayMicroseconds()` between transitions of SDA
-          and SCL signals.
-        * On sufficiently fast 32-bit processors (e.g. ESP32 and Teensy32), the
-          clock rate of the signals becomes faster than the I2C specifications
-          and the slave device will not work.
+    * `FeliasFoggWireInterface<SlowSoftWire>`: Software I2C using
+      https://github.com/felias-fogg/SlowSoftWire (all platforms)
+    * `MarpleWireInterface<SoftWire>`: Software I2C using
+      https://github.com/stevemarple/SoftWire (all platforms)
+    * `RaemondWireInterface<SoftWire>`: Software I2C using
+      https://github.com/RaemondBW/SWire (all platforms)
+    * `SeeedWireInterface<SoftwareI2C>`: Software I2C using
+      https://github.com/Seeed-Studio/Arduino_Software_I2C (all platforms)
+    * `TestatoWireInterface<SoftwareWire>,100kHz`: Software I2C using
+      https://github.com/Testato/SoftwareWire set to 100 kHz (AVR only).
+    * `TestatoWireInterface<SoftwareWire>,400kHz`: Software I2C using
+      https://github.com/Testato/SoftwareWire set to 400 kHz (AVR only).
 
 ### Arduino Nano
 
 * 16MHz ATmega328P
-* Arduino IDE 1.8.13
-* Arduino AVR Boards 1.8.3
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Arduino AVR Boards 1.8.4
 * `micros()` has a resolution of 4 microseconds
 
 ```
@@ -140,7 +142,7 @@ The following implementations are tested:
 ### SparkFun Pro Micro
 
 * 16 MHz ATmega32U4
-* Arduino IDE 1.8.13
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
 * SparkFun AVR Boards 1.1.13
 * `micros()` has a resolution of 4 microseconds
 
@@ -148,21 +150,11 @@ The following implementations are tested:
 {micro_results}
 ```
 
-### SAMD21 M0 Mini
+### STM32 Blue Pill
 
-* 48 MHz ARM Cortex-M0+
-* Arduino IDE 1.8.13
-* Sparkfun SAMD Core 1.8.3
-
-```
-{samd_results}
-```
-
-### STM32
-
-* STM32 "Blue Pill", STM32F103C8, 72 MHz ARM Cortex-M3
-* Arduino IDE 1.8.13
-* STM32duino 2.0.0
+* STM32F103C8, 72 MHz ARM Cortex-M3
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* STM32duino 2.2.0
 
 ```
 {stm32_results}
@@ -171,8 +163,8 @@ The following implementations are tested:
 ### ESP8266
 
 * NodeMCU 1.0 clone, 80MHz ESP8266
-* Arduino IDE 1.8.13
-* ESP8266 Boards 2.7.4
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* ESP8266 Boards 3.0.2
 
 ```
 {esp8266_results}
@@ -181,8 +173,8 @@ The following implementations are tested:
 ### ESP32
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
-* Arduino IDE 1.8.13
-* ESP32 Boards 1.0.6
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* ESP32 Boards 2.0.2
 
 ```
 {esp32_results}
@@ -191,8 +183,8 @@ The following implementations are tested:
 ### Teensy 3.2
 
 * 96 MHz ARM Cortex-M4
-* Arduino IDE 1.8.13
-* Teensyduino 1.53
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Teensyduino 1.56
 * Compiler options: "Faster"
 
 ```
