@@ -26,6 +26,22 @@ SOFTWARE.
  * A sketch that writes and reads from a DS3231 using TwoWireInterace,
  * SimpleWireInterface, and SimpleWireFastInterface (on AVR processors).
  * Requires an actual DS3231 device on the I2C bus.
+ *
+ * Should print the following:
+ *
+ * AVR:
+ *    runTwoWire()
+ *    runSimpleWire()
+ *    runSimpleWireFast()
+ *    Done
+ * ESP8266:
+ *    runTwoWire()
+ *    runSimpleWire()
+ *    Done
+ * ESP32
+ *    runSimpleWire()
+ *    runTwoWire()
+ *    Done
  */
 
 #include <Arduino.h>
@@ -131,30 +147,17 @@ void readData(T_WIREI& wireInterface) {
 void runTwoWire() {
   SERIAL_PORT_MONITOR.println(F("runTwoWire()"));
 
-#if defined(ESP32)
-  // Create our own instance of TwoWire instead of using the pre-defined Wire or
-  // Wire1 instances on ESP32 because we need to release the I2C bus at the end
-  // of this function, but the ESP32 version of TwoWire does not expose an end()
-  // method. Instead, it uses the destructor to perform the cleanup, which we
-  // cannot trigger when using the pre-defined Wire or Wire1 instances. By using
-  // our own instance, the compiler will automatically trigger the destructor at
-  // the end of the scope.
-  TwoWire wire(0);
-#else
-  TwoWire& wire = Wire;
-#endif
-
   using WireInterface = TwoWireInterface<TwoWire>;
-  WireInterface wireInterface(wire);
+  WireInterface wireInterface(Wire);
 
-  wire.begin();
+  Wire.begin();
   wireInterface.begin();
   sendData(wireInterface);
   readData(wireInterface);
   wireInterface.end();
 
-#if ! defined(ESP32) && ! defined(ESP8266)
-  wire.end();
+#if ! defined(ESP8266)
+  Wire.end();
 #endif
 }
 
@@ -194,14 +197,23 @@ void setup() {
   SERIAL_PORT_MONITOR.begin(115200);
   while (!SERIAL_PORT_MONITOR); // Wait for Leonardo/Micro
 
+#if ! defined(ESP32)
+  // Run TwoWire at the end on ESP32, because it prevents any other I2C library
+  // from working on those pins once Wire setup.
   runTwoWire();
   yield();
+#endif
 
   runSimpleWire();
   yield();
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runSimpleWireFast();
+  yield();
+#endif
+
+#if defined(ESP32)
+  runTwoWire();
   yield();
 #endif
 

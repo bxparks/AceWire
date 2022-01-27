@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021 Brian T. Park
+Copyright (c) 2022 Brian T. Park
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,38 +22,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_WIRE_TWO_WIRE_INTERFACE_H
-#define ACE_WIRE_TWO_WIRE_INTERFACE_H
+#ifndef ACE_WIRE_THEXENO_WIRE_INTERFACE_H
+#define ACE_WIRE_THEXENO_WIRE_INTERFACE_H
 
 #include <stdint.h>
 
 namespace ace_wire {
 
 /**
- * A thin wrapper around the default `TwoWire` class and its `Wire` object
- * provided by most Arduino platforms. All `TwoWire` instances use a TX and RX
- * buffer of varying sizes.  For example:
+ * A thin wrapper around the `TwoWire` class from the
+ * https://github.com/thexeno/HardWire-Arduino-Library project so that it
+ * becomes compatible with the AceWire API. The HardWire library uses a TX
+ * buffer and an RX buffer of 32 bytes each.
  *
- *  * The AVR version uses 32 bytes for each
- *  * The ESP8266 and ESP32 versions use 128 bytes.
- *  * The STM32 version uses 32 bytes.
- *  * The SAMD21 version uses 256 bytes.
- *
- * This is a template class to avoid including the `<Wire.h>` header file, which
- * increases flash memory on AVR by about 1000 byte even if the `Wire` object is
- * never used.
- *
- * @tparam T_WIRE underlying class that implements the I2C protocol which will
- *    always be `TwoWire`
+ * @tparam T_WIRE underlying I2C class which will always be `TwoWire`
  */
 template <typename T_WIRE>
-class TwoWireInterface {
+class ThexenoWireInterface {
   public:
     /**
      * Constructor.
-     * @param wire instance of `TwoWire` which will always be the `Wire` object
+     * @param wire instance of `HardWire`
      */
-    explicit TwoWireInterface(T_WIRE& wire) : mWire(wire) {}
+    explicit ThexenoWireInterface(T_WIRE& wire) : mWire(wire) {}
 
     /** Initialize the interface. Currently does nothing. */
     void begin() const {}
@@ -121,8 +112,8 @@ class TwoWireInterface {
     }
 
     // Use default copy constructor and assignment operator.
-    TwoWireInterface(const TwoWireInterface&) = default;
-    TwoWireInterface& operator=(const TwoWireInterface&) = default;
+    ThexenoWireInterface(const ThexenoWireInterface&) = default;
+    ThexenoWireInterface& operator=(const ThexenoWireInterface&) = default;
 
   private:
     T_WIRE& mWire;

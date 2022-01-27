@@ -56,12 +56,6 @@ SOFTWARE.
   #include <ace_wire/SimpleWireFastInterface.h>
 #endif
 
-using ace_wire::TwoWireInterface;
-using ace_wire::SimpleWireInterface;
-#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-using ace_wire::SimpleWireFastInterface;
-#endif
-
 using ace_common::TimingStats;
 
 #if ! defined(SERIAL_PORT_MONITOR)
@@ -149,58 +143,37 @@ void runBenchmark(
 
 // Use built-in <Wire.h> at 100 kHz
 void runTwoWire100() {
-#if defined(ESP32)
-  // Create our own instance of TwoWire instead of using the pre-defined Wire or
-  // Wire1 instances on ESP32 because we need to release the I2C bus at the end
-  // of this function, but the ESP32 version of TwoWire does not expose an end()
-  // method. Instead, it uses the destructor to perform the cleanup, which we
-  // cannot trigger when using the pre-defined Wire or Wire1 instances. By using
-  // our own instance, the compiler will automatically trigger the destructor at
-  // the end of the scope.
-  TwoWire wire(0);
-#else
-  TwoWire& wire = Wire;
-#endif
+  using WireInterface = ace_wire::TwoWireInterface<TwoWire>;
+  WireInterface wireInterface(Wire);
 
-  using WireInterface = TwoWireInterface<TwoWire>;
-  WireInterface wireInterface(wire);
-
-  wire.begin();
-  wire.setClock(100000L);
+  Wire.begin();
+  Wire.setClock(100000L);
   wireInterface.begin();
   runBenchmark(F("TwoWireInterface<TwoWire>,100kHz"), wireInterface);
   wireInterface.end();
-
-#if ! defined(ESP32) && ! defined(ESP8266)
-  wire.end();
+#if ! defined(ESP8266)
+  Wire.end();
 #endif
 }
 
 // Use built-in <Wire.h> at 400 kHz
 void runTwoWire400() {
-#if defined(ESP32)
-  TwoWire wire(0);
-#else
-  TwoWire& wire = Wire;
-#endif
+  using WireInterface = ace_wire::TwoWireInterface<TwoWire>;
+  WireInterface wireInterface(Wire);
 
-  using WireInterface = TwoWireInterface<TwoWire>;
-  WireInterface wireInterface(wire);
-
-  wire.begin();
-  wire.setClock(400000L);
+  Wire.begin();
+  Wire.setClock(400000L);
   wireInterface.begin();
   runBenchmark(F("TwoWireInterface<TwoWire>,400kHz"), wireInterface);
   wireInterface.end();
-
-#if ! defined(ESP32) && ! defined(ESP8266)
-  wire.end();
+#if ! defined(ESP8266)
+  Wire.end();
 #endif
 }
 
 // Use AceWire/SimpleWireInterface
 void runSimpleWire() {
-  using WireInterface = SimpleWireInterface;
+  using WireInterface = ace_wire::SimpleWireInterface;
   WireInterface wireInterface(SDA_PIN, SCL_PIN, DELAY_MICROS);
 
   wireInterface.begin();
@@ -211,7 +184,8 @@ void runSimpleWire() {
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 // Use AceWire/SimpleWireFastInterface
 void runSimpleWireFast() {
-  using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, DELAY_MICROS>;
+  using WireInterface = ace_wire::SimpleWireFastInterface<
+      SDA_PIN, SCL_PIN, DELAY_MICROS>;
   WireInterface wireInterface;
 
   wireInterface.begin();
@@ -222,29 +196,29 @@ void runSimpleWireFast() {
 
 #if defined(ARDUINO_ARCH_AVR)
 // Use https://github.com/Testato/SoftwareWire at 100 kHz
-void runSoftwareWire100() {
+void runTestatoWire100() {
   SoftwareWire softwareWire(SDA_PIN, SCL_PIN);
-  using WireInterface = TwoWireInterface<SoftwareWire>;
+  using WireInterface = ace_wire::TestatoWireInterface<SoftwareWire>;
   WireInterface wireInterface(softwareWire);
 
   softwareWire.begin();
   softwareWire.setClock(100000L);
   wireInterface.begin();
-  runBenchmark(F("TwoWireInterface<SoftwareWire>,100kHz"), wireInterface);
+  runBenchmark(F("TestatoWireInterface<SoftwareWire>,100kHz"), wireInterface);
   wireInterface.end();
   softwareWire.end();
 }
 
 // Use https://github.com/Testato/SoftwareWire at 400 kHz
-void runSoftwareWire400() {
+void runTestatoWire400() {
   SoftwareWire softwareWire(SDA_PIN, SCL_PIN);
-  using WireInterface = TwoWireInterface<SoftwareWire>;
+  using WireInterface = ace_wire::TestatoWireInterface<SoftwareWire>;
   WireInterface wireInterface(softwareWire);
 
   softwareWire.begin();
   softwareWire.setClock(400000L);
   wireInterface.begin();
-  runBenchmark(F("TwoWireInterface<SoftwareWire>,400kHz"), wireInterface);
+  runBenchmark(F("TestatoWireInterface<SoftwareWire>,400kHz"), wireInterface);
   wireInterface.end();
   softwareWire.end();
 }
@@ -253,40 +227,40 @@ void runSoftwareWire400() {
 #if ! defined(EPOXY_DUINO)
 
 // Use https://github.com/RaemondBW/SWire
-void runSWire() {
+void runRaemondWire() {
   SoftWire swire;
-  using WireInterface = TwoWireInterface<SoftWire>;
+  using WireInterface = ace_wire::RaemondWireInterface<SoftWire>;
   WireInterface wireInterface(swire);
 
   swire.begin(SDA_PIN, SCL_PIN);
   wireInterface.begin();
-  runBenchmark(F("TwoWireInterface<SWire>"), wireInterface);
+  runBenchmark(F("RaemondWireInterface<SoftWire>"), wireInterface);
   wireInterface.end();
   // no swire.end() defined
 }
 
 // Use https://github.com/felias-fogg/SlowSoftWire
-void runSlowSoftWire() {
+void runFeliasFoggWire() {
   SlowSoftWire slowSoftWire(SDA_PIN, SCL_PIN);
-  using WireInterface = TwoWireInterface<SlowSoftWire>;
+  using WireInterface = ace_wire::FeliasFoggWireInterface<SlowSoftWire>;
   WireInterface wireInterface(slowSoftWire);
 
   slowSoftWire.begin();
   wireInterface.begin();
-  runBenchmark(F("TwoWireInterface<SlowSoftWire>"), wireInterface);
+  runBenchmark(F("FeliasFoggWireInterface<SlowSoftWire>"), wireInterface);
   wireInterface.end();
   // no slowSoftWire.end() (but is declared in header file)
 }
 
 // Use https://github.com/Seeed-Studio/Arduino_Software_I2C
-void runSeeedSoftwareI2C() {
+void runSeeedWire() {
   SoftwareI2C seeedWire;
-  using WireInterface = TwoWireInterface<SoftwareI2C>;
+  using WireInterface = ace_wire::SeeedWireInterface<SoftwareI2C>;
   WireInterface wireInterface(seeedWire);
 
   seeedWire.begin(SDA_PIN, SCL_PIN);
   wireInterface.begin();
-  runBenchmark(F("TwoWireInterface<SeeedSoftwareI2C>"), wireInterface);
+  runBenchmark(F("SeeedWireInterface<SoftwareI2C>"), wireInterface);
   wireInterface.end();
 }
 
@@ -296,25 +270,49 @@ void runSeeedSoftwareI2C() {
 // runBenchmarks()
 //-----------------------------------------------------------------------------
 
+// On the ESP32, runTwoWire100() and runTwoWire400() must be done last, because
+// it seems that once the Wire object is initialized, normal GPIO operations on
+// the SDA and SCL pins fail, so all other software I2C libraries fail. I tried
+// various things to fix this without success:
+//
+// * Calling Wire.end() doesn't work.
+// * Calling detachInterrupt(SDA) and detachInterrupt(SCL) does not work.
+// * Calling pinMode(SDA, INPUT) and pinMode(SCL, INPUT) does not work.
+//
+// For display purposes, I always want the TwoWire benchmarks to appear first,
+// even on the ESP32. So I modified the generate_table.awk script with a
+// special mode which is activated by a '-v USE_REMAP=1' flag to move the
+// TwoWireInterface<> records to the front.
 void runBenchmarks() {
+
+#if ! defined(ESP32)
   runTwoWire100();
   runTwoWire400();
+#endif
 
   runSimpleWire();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runSimpleWireFast();
 #endif
 
-#if defined(ARDUINO_ARCH_AVR)
-  runSoftwareWire100();
-  runSoftwareWire400();
+#if ! defined(EPOXY_DUINO)
+  runFeliasFoggWire();
+  runRaemondWire();
+  runSeeedWire();
 #endif
 
-#if ! defined(EPOXY_DUINO)
-  runSWire();
-  runSlowSoftWire();
-  runSeeedSoftwareI2C();
+#if defined(ARDUINO_ARCH_AVR)
+  runTestatoWire100();
+  runTestatoWire400();
 #endif
+
+#if defined(ESP32)
+  // On ESP32, these must run last because the Wire object seems to break all
+  // other 3rd party I2C libraries from working on those pins.
+  runTwoWire100();
+  runTwoWire400();
+#endif
+
 }
 
 //-----------------------------------------------------------------------------
@@ -323,14 +321,15 @@ void runBenchmarks() {
 
 void printSizeOf() {
   SERIAL_PORT_MONITOR.print(F("sizeof(TwoWireInterface): "));
-  SERIAL_PORT_MONITOR.println(sizeof(TwoWireInterface<TwoWire>));
+  SERIAL_PORT_MONITOR.println(sizeof(ace_wire::TwoWireInterface<TwoWire>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(SimpleWireInterface): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SimpleWireInterface));
+  SERIAL_PORT_MONITOR.println(sizeof(ace_wire::SimpleWireInterface));
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   SERIAL_PORT_MONITOR.print(F("sizeof(SimpleWireFastInterface<2, 3, 10>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SimpleWireFastInterface<2, 3, 10>));
+  SERIAL_PORT_MONITOR.println(
+      sizeof(ace_wire::SimpleWireFastInterface<2, 3, 10>));
 #endif
 }
 

@@ -1,8 +1,29 @@
 # Changelog
 
 * Unreleased
+* 0.4.0 (2022-01-26)
+    * Write custom wrapper classes for various third party I2C libraries.
+        * `src/ace_wire/FeliasFoggWireInterface.h`
+        * `src/ace_wire/SeeedWireInterface.h`
+        * `src/ace_wire/TestatoWireInterface.h`
+        * `src/ace_wire/MarpleWireInterface.h`
+        * `src/ace_wire/ThexenoWireInterface.h`
+        * `src/ace_wire/RaemondWireInterface.h`
+        * `src/ace_wire/TodbotWireInterface.h`
+    * Update various tool chains
+        * Arduino IDE from 1.8.13 to 1.8.19
+        * Arduino AVR from 1.8.3 to 1.8.4
+        * STM32duino from 2.0.0 to 2.2.0
+        * ESP32 from 1.0.6 to 2.0.2
+        * Teensyduino from 1.55 to 1.56
+    * Downgrade SAMD21 to "Tier 3: May work, but not supported".
+    * Major rewrite of README.md.
+        * Better organization.
+        * More usage info on each XxxWireInterface class.
+        * Better documentation of error handling.
 * 0.3.2 (2021-08-17)
     * Minor documentation updates.
+    * First public release.
 * 0.3.1 (2021-08-10)
     * Update documentation of `T_WIRE` versus `T_WIREI`.
     * No functional change in this release.

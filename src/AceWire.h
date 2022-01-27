@@ -37,8 +37,8 @@ SOFTWARE.
 #define ACE_WIRE_H
 
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_WIRE_VERSION 302
-#define ACE_WIRE_VERSION_STRING "0.3.2"
+#define ACE_WIRE_VERSION 400
+#define ACE_WIRE_VERSION_STRING "0.4.0"
 
 // Blacklist platforms using https://github.com/arduino/ArduinoCore-api due to
 // incompatibilities.
@@ -49,6 +49,13 @@ SOFTWARE.
 // Files exported by this main header file.
 #include "ace_wire/TwoWireInterface.h"
 #include "ace_wire/SimpleWireInterface.h"
+#include "ace_wire/MarpleWireInterface.h"
+#include "ace_wire/RaemondWireInterface.h"
+#include "ace_wire/SeeedWireInterface.h"
+#include "ace_wire/FeliasFoggWireInterface.h"
+#include "ace_wire/TestatoWireInterface.h"
+#include "ace_wire/ThexenoWireInterface.h"
+#include "ace_wire/TodbotWireInterface.h"
 
 // The following are commented out because they work only on AVR platforms with
 // a suitable <digitalWriteFast.h> library.
