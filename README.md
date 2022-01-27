@@ -620,7 +620,7 @@ may be a bit confusing so I hope the following explanation helps:
       `SimpleWireFastInterface`, etc.
 
 See the [Writing to I2C](#WritingToI2C) and [Reading from I2C](#ReadingFromI2C)
-sections below for documentation about the `beginTransmission()`,
+sections above for documentation about the `beginTransmission()`,
 `endTransmission()`, and `requestFrom()`.
 
 <a name="FeliasFoggWireInterface"></a>
@@ -904,8 +904,8 @@ void setup() {
 #### SimpleWireInterface
 
 The `SimpleWireInterface` is a software implementation of I2C using
-`digitalWrite()` and `pinMode()` to implement the AceWire API directly. It is
-configured and used like this:
+`digitalWrite()` and `pinMode()`. It is not a wrapper class, it implements the
+AceWire API directly. It is configured and used like this:
 
 ```C++
 #include <Arduino.h>
@@ -960,8 +960,17 @@ never used.
 #### SimpleWireFastInterface
 
 The `SimpleWireFastInterface` is the same as `SimpleWireInterface` but using the
-`digitalWriteFast()` and `pinModeFast()` functions. It is configured and used
-like this:
+`digitalWriteFast()` and `pinModeFast()` functions. These functions are provided
+by at least 2 third party libraries which must be pulled in manually:
+
+* https://github.com/watterott/Arduino-Libs/tree/master/digitalWriteFast
+* https://github.com/NicksonYap/digitalWriteFast
+
+It is configured as shown below with an explicit `#if defined(ARDUINO_ARCH_AVR)`
+conditional. The `<ace_wire/SimpleWireFastInterface.h>` file must be pulled in
+manually because it is not included in the `<AceWire.h>` file by default. It
+would trigger compiler errors if the user was not compiling on an AVR processor,
+or if the user did not have one of the `digitalWriteFast` libraries installed.
 
 ```C++
 #include <Arduino.h>
@@ -1134,7 +1143,6 @@ The CPU benchmark numbers can be seen in
 
 * Arduino Nano (16 MHz ATmega328P)
 * SparkFun Pro Micro (16 MHz ATmega32U4)
-* SAMD21 M0 Mini (48 MHz ARM Cortex-M0+)
 * STM32 Blue Pill (STM32F103C8, 72 MHz ARM Cortex-M3)
 * NodeMCU 1.0 (ESP-12E module, 80MHz ESP8266)
 * WeMos D1 Mini (ESP-12E module, 80 MHz ESP8266)
