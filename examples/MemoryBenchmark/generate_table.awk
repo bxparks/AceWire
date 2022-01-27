@@ -10,10 +10,12 @@ BEGIN {
   labels[1] = "TwoWireInterface<TwoWire>";
   labels[2] = "SimpleWireInterface";
   labels[3] = "SimpleWireFastInterface";
-  labels[4] = "TwoWireInterface<SoftwareWire>";
-  labels[5] = "TwoWireInterface<SWire>";
-  labels[6] = "TwoWireInterface<SlowSoftWire>";
-  labels[7] = "TwoWireInterface<SeeedSoftwareI2C>";
+  labels[4] = "FeliasFoggWireInterface<SlowSoftWire>";
+  labels[5] = "MarpleWireInterface<SoftWire>";
+  labels[6] = "RaemondWireInterface<SWire>";
+  labels[7] = "SeeedWireInterface<SoftwareI2C>";
+  labels[8] = "TestatoWireInterface<SoftwareWire>";
+  labels[9] = "ThexenoWireInterface<TwoWire>";
   record_index = 0
 }
 {
@@ -37,30 +39,22 @@ END {
     }
   }
 
-  printf("+------------------------------------------------------------------+\n")
-  printf("| functionality                       |  flash/  ram |       delta |\n")
-  printf("|-------------------------------------+--------------+-------------|\n")
-  printf("| %-35s | %6d/%5d | %5d/%5d |\n",
-    labels[0], u[0]["flash"], u[0]["ram"], u[0]["d_flash"], u[0]["d_ram"])
-
-  for (i = 1 ; i < NUM_ENTRIES; i++) {
+  printf("+--------------------------------------------------------------------+\n")
+  printf("| functionality                         |  flash/  ram |       delta |\n")
+  for (i = 0 ; i < NUM_ENTRIES; i++) {
     if (u[i]["flash"] == "-1") continue
     name = labels[i]
 
-    if (name ~ /^TwoWireInterface<TwoWire>/) {
+    if (name ~ /^baseline/ \
+        || name ~ /^TwoWireInterface/ \
+        || name ~ /^FeliasFoggWireInterface/ \
+        || name ~ /^TestatoWireInterface/) {
       printf(\
-        "|-------------------------------------+--------------+-------------|\n")
-    # Insert a divider between AceWire and 3rd party implementations.
-    } else if (name ~ /^TwoWireInterface</ \
-        && ! (name ~ /^TwoWireInterface<TwoWire/) \
-        && dividerPrinted == 0) {
-      printf(\
-        "|-------------------------------------+--------------+-------------|\n")
-      dividerPrinted = 1
+        "|---------------------------------------+--------------+-------------|\n")
     }
 
-    printf("| %-35s | %6d/%5d | %5d/%5d |\n",
+    printf("| %-37s | %6d/%5d | %5d/%5d |\n",
         name, u[i]["flash"], u[i]["ram"], u[i]["d_flash"], u[i]["d_ram"])
   }
-  printf("+------------------------------------------------------------------+\n")
+  printf("+--------------------------------------------------------------------+\n")
 }

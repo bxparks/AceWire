@@ -14,7 +14,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceWire v0.3.2
+**Version**: AceWire v0.4.0
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -34,7 +34,6 @@ produces the following files:
 attiny.txt
 nano.txt
 micro.txt
-samd.txt
 stm32.txt
 esp8266.txt
 esp32.txt
@@ -58,7 +57,11 @@ $ make README.md
 
 ## Library Size Changes
 
-**v0.3**
+**v0.4**
+
+* Reduce memory consumption for some third party libraries by reusing the
+  pre-defined instances of various I2C classes. Analogous to the `Wire` instance
+  for the `TwoWire` class.
 
 * Initial iteration of MemoryBenchmarks.
 
@@ -72,195 +75,189 @@ I2C implementations:
 * `SimpleWireFastInterface`: AceWire's own Software I2C using a
   `digitalWriteFast()` library. (AVR only)
 * Third party libraries
-    * `TwoWireInterface<SoftwareWire>`: Software I2C using
-    https://github.com/Testato/SoftwareWire. (AVR only)
-    * `TwoWireInterface<SWire>`: Software I2C using
-    https://github.com/RaemondBW/SWire
-    * `TwoWireInterface<SlowSoftWire>`: Software I2C using
-    https://github.com/felias-fogg/SlowSoftWire
-    * `TwoWireInterface<SeeedSoftwareI2C>`: Software I2C using
-    https://github.com/Seeed-Studio/Arduino_Software_I2C
+    * `RaemondWireInterface<SoftWare>`: Software I2C using
+      https://github.com/RaemondBW/SWire
+    * `FeliasFoggWireInterface<SlowSoftWire>`: Software I2C using
+      https://github.com/felias-fogg/SlowSoftWire
+    * `SeeedWireInterface<SoftwareI2C>`: Software I2C using
+      https://github.com/Seeed-Studio/Arduino_Software_I2C
+    * `TestatoWireInterface<SoftwareWire>,100kHz`: Software I2C using
+      https://github.com/Testato/SoftwareWire set to 100 kHz (compatible with
+      AVR only).
+    * `TestatoWireInterface<SoftwareWire>,400kHz`: Software I2C using
+      https://github.com/Testato/SoftwareWire set to 400 kHz (compatible with
+      AVR only).
 
 ### ATtiny85
 
 * 8MHz ATtiny85
-* Arduino IDE 1.8.13
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
 * SpenceKonde/ATTinyCore 1.5.2
 
 ```
-+------------------------------------------------------------------+
-| functionality                       |  flash/  ram |       delta |
-|-------------------------------------+--------------+-------------|
-| baseline                            |    260/   11 |     0/    0 |
-|-------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>           |   1026/   55 |   766/   44 |
-| SimpleWireInterface                 |   1020/   16 |   760/    5 |
-| SimpleWireFastInterface             |    444/   13 |   184/    2 |
-|-------------------------------------+--------------+-------------|
-| TwoWireInterface<SoftwareWire>      |   1974/   72 |  1714/   61 |
-| TwoWireInterface<SWire>             |   1366/  157 |  1106/  146 |
-| TwoWireInterface<SlowSoftWire>      |   1660/   81 |  1400/   70 |
-| TwoWireInterface<SeeedSoftwareI2C>  |   1318/   21 |  1058/   10 |
-+------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| functionality                         |  flash/  ram |       delta |
+|---------------------------------------+--------------+-------------|
+| baseline                              |    260/   11 |     0/    0 |
+|---------------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>             |   1026/   55 |   766/   44 |
+| SimpleWireInterface                   |   1020/   16 |   760/    5 |
+| SimpleWireFastInterface               |    444/   13 |   184/    2 |
+|---------------------------------------+--------------+-------------|
+| FeliasFoggWireInterface<SlowSoftWire> |   1660/   81 |  1400/   70 |
+| MarpleWireInterface<SoftWire>         |   2610/  133 |  2350/  122 |
+| RaemondWireInterface<SWire>           |   1342/   85 |  1082/   74 |
+| SeeedWireInterface<SoftwareI2C>       |   1318/   21 |  1058/   10 |
+|---------------------------------------+--------------+-------------|
+| TestatoWireInterface<SoftwareWire>    |   2230/   72 |  1970/   61 |
++--------------------------------------------------------------------+
 
 ```
 
 ### Arduino Nano
 
 * 16MHz ATmega328P
-* Arduino IDE 1.8.13
-* Arduino AVR Boards 1.8.3
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Arduino AVR Boards 1.8.4
 
 ```
-+------------------------------------------------------------------+
-| functionality                       |  flash/  ram |       delta |
-|-------------------------------------+--------------+-------------|
-| baseline                            |    456/   11 |     0/    0 |
-|-------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>           |   2926/  229 |  2470/  218 |
-| SimpleWireInterface                 |   1336/   16 |   880/    5 |
-| SimpleWireFastInterface             |    714/   13 |   258/    2 |
-|-------------------------------------+--------------+-------------|
-| TwoWireInterface<SoftwareWire>      |   2454/   72 |  1998/   61 |
-| TwoWireInterface<SWire>             |   1698/  157 |  1242/  146 |
-| TwoWireInterface<SlowSoftWire>      |   2008/   83 |  1552/   72 |
-| TwoWireInterface<SeeedSoftwareI2C>  |   1626/   21 |  1170/   10 |
-+------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| functionality                         |  flash/  ram |       delta |
+|---------------------------------------+--------------+-------------|
+| baseline                              |    456/   11 |     0/    0 |
+|---------------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>             |   2926/  229 |  2470/  218 |
+| SimpleWireInterface                   |   1336/   16 |   880/    5 |
+| SimpleWireFastInterface               |    714/   13 |   258/    2 |
+|---------------------------------------+--------------+-------------|
+| FeliasFoggWireInterface<SlowSoftWire> |   2008/   83 |  1552/   72 |
+| MarpleWireInterface<SoftWire>         |   2936/  135 |  2480/  124 |
+| RaemondWireInterface<SWire>           |   1674/   85 |  1218/   74 |
+| SeeedWireInterface<SoftwareI2C>       |   1626/   21 |  1170/   10 |
+|---------------------------------------+--------------+-------------|
+| TestatoWireInterface<SoftwareWire>    |   2454/   72 |  1998/   61 |
+| ThexenoWireInterface<TwoWire>         |   2264/  477 |  1808/  466 |
++--------------------------------------------------------------------+
 
 ```
 
 ### Sparkfun Pro Micro
 
 * 16 MHz ATmega32U4
-* Arduino IDE 1.8.13
+* Arduino IDE 1.8.13, Arduino CLI 0.19.2
 * SparkFun AVR Boards 1.1.13
 
 ```
-+------------------------------------------------------------------+
-| functionality                       |  flash/  ram |       delta |
-|-------------------------------------+--------------+-------------|
-| baseline                            |   3472/  151 |     0/    0 |
-|-------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>           |   5910/  369 |  2438/  218 |
-| SimpleWireInterface                 |   4428/  156 |   956/    5 |
-| SimpleWireFastInterface             |   3728/  153 |   256/    2 |
-|-------------------------------------+--------------+-------------|
-| TwoWireInterface<SoftwareWire>      |   5388/  212 |  1916/   61 |
-| TwoWireInterface<SWire>             |   4790/  297 |  1318/  146 |
-| TwoWireInterface<SlowSoftWire>      |   5070/  223 |  1598/   72 |
-| TwoWireInterface<SeeedSoftwareI2C>  |   4644/  161 |  1172/   10 |
-+------------------------------------------------------------------+
-
-```
-
-### SAMD21 M0 Mini
-
-* 48 MHz ARM Cortex-M0+
-* Arduino IDE 1.8.13
-* Sparkfun SAMD Core 1.8.3
-
-```
-+------------------------------------------------------------------+
-| functionality                       |  flash/  ram |       delta |
-|-------------------------------------+--------------+-------------|
-| baseline                            |  10064/    0 |     0/    0 |
-|-------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>           |  11616/    0 |  1552/    0 |
-| SimpleWireInterface                 |  10592/    0 |   528/    0 |
-|-------------------------------------+--------------+-------------|
-| TwoWireInterface<SWire>             |  11000/    0 |   936/    0 |
-| TwoWireInterface<SlowSoftWire>      |  11224/    0 |  1160/    0 |
-| TwoWireInterface<SeeedSoftwareI2C>  |  10728/    0 |   664/    0 |
-+------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| functionality                         |  flash/  ram |       delta |
+|---------------------------------------+--------------+-------------|
+| baseline                              |   3472/  151 |     0/    0 |
+|---------------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>             |   5910/  369 |  2438/  218 |
+| SimpleWireInterface                   |   4428/  156 |   956/    5 |
+| SimpleWireFastInterface               |   3728/  153 |   256/    2 |
+|---------------------------------------+--------------+-------------|
+| FeliasFoggWireInterface<SlowSoftWire> |   5070/  223 |  1598/   72 |
+| MarpleWireInterface<SoftWire>         |   5924/  275 |  2452/  124 |
+| RaemondWireInterface<SWire>           |   4766/  225 |  1294/   74 |
+| SeeedWireInterface<SoftwareI2C>       |   4644/  161 |  1172/   10 |
+|---------------------------------------+--------------+-------------|
+| TestatoWireInterface<SoftwareWire>    |   5388/  212 |  1916/   61 |
+| ThexenoWireInterface<TwoWire>         |   5322/  617 |  1850/  466 |
++--------------------------------------------------------------------+
 
 ```
 
 ### STM32 Blue Pill
 
 * STM32F103C8, 72 MHz ARM Cortex-M3
-* Arduino IDE 1.8.13
-* STM32duino 2.0.0
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* STM32duino 2.2.0
 
 ```
-+------------------------------------------------------------------+
-| functionality                       |  flash/  ram |       delta |
-|-------------------------------------+--------------+-------------|
-| baseline                            |  21420/ 3536 |     0/    0 |
-|-------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>           |  28888/ 3744 |  7468/  208 |
-| SimpleWireInterface                 |  24148/ 3564 |  2728/   28 |
-|-------------------------------------+--------------+-------------|
-| TwoWireInterface<SWire>             |  24580/ 3704 |  3160/  168 |
-| TwoWireInterface<SlowSoftWire>      |  25016/ 3616 |  3596/   80 |
-| TwoWireInterface<SeeedSoftwareI2C>  |  24252/ 3576 |  2832/   40 |
-+------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| functionality                         |  flash/  ram |       delta |
+|---------------------------------------+--------------+-------------|
+| baseline                              |  21880/ 3540 |     0/    0 |
+|---------------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>             |  29164/ 3752 |  7284/  212 |
+| SimpleWireInterface                   |  24672/ 3568 |  2792/   28 |
+|---------------------------------------+--------------+-------------|
+| FeliasFoggWireInterface<SlowSoftWire> |  25552/ 3620 |  3672/   80 |
+| MarpleWireInterface<SoftWire>         |  25880/ 3692 |  4000/  152 |
+| RaemondWireInterface<SWire>           |  25088/ 3636 |  3208/   96 |
+| SeeedWireInterface<SoftwareI2C>       |  24780/ 3580 |  2900/   40 |
++--------------------------------------------------------------------+
 
 ```
 
 ### ESP8266
 
 * NodeMCU 1.0, 80MHz ESP8266
-* Arduino IDE 1.8.13
-* ESP8266 Boards 2.7.4
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* ESP8266 Boards 3.0.2
 
 ```
-+------------------------------------------------------------------+
-| functionality                       |  flash/  ram |       delta |
-|-------------------------------------+--------------+-------------|
-| baseline                            | 256700/26784 |     0/    0 |
-|-------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>           | 261404/27268 |  4704/  484 |
-| SimpleWireInterface                 | 257780/26804 |  1080/   20 |
-|-------------------------------------+--------------+-------------|
-| TwoWireInterface<SWire>             | 258408/26944 |  1708/  160 |
-| TwoWireInterface<SlowSoftWire>      | 259972/26884 |  3272/  100 |
-| TwoWireInterface<SeeedSoftwareI2C>  | 257920/26812 |  1220/   28 |
-+------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| functionality                         |  flash/  ram |       delta |
+|---------------------------------------+--------------+-------------|
+| baseline                              | 260089/27892 |     0/    0 |
+|---------------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>             | 264485/28384 |  4396/  492 |
+| SimpleWireInterface                   | 261521/28000 |  1432/  108 |
+|---------------------------------------+--------------+-------------|
+| FeliasFoggWireInterface<SlowSoftWire> | 263513/28056 |  3424/  164 |
+| MarpleWireInterface<SoftWire>         | 263753/28128 |  3664/  236 |
+| RaemondWireInterface<SWire>           | 262133/28076 |  2044/  184 |
+| SeeedWireInterface<SoftwareI2C>       | 261693/28008 |  1604/  116 |
++--------------------------------------------------------------------+
 
 ```
 
 ### ESP32
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
-* Arduino IDE 1.8.13
-* ESP32 Boards 1.0.6
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* ESP32 Boards 2.0.2
 
 ```
-+------------------------------------------------------------------+
-| functionality                       |  flash/  ram |       delta |
-|-------------------------------------+--------------+-------------|
-| baseline                            | 197748/13084 |     0/    0 |
-|-------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>           | 208766/13992 | 11018/  908 |
-| SimpleWireInterface                 | 199338/13264 |  1590/  180 |
-|-------------------------------------+--------------+-------------|
-| TwoWireInterface<SWire>             | 200298/13408 |  2550/  324 |
-| TwoWireInterface<SlowSoftWire>      | 201634/13336 |  3886/  252 |
-| TwoWireInterface<SeeedSoftwareI2C>  | 200090/13288 |  2342/  204 |
-+------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| functionality                         |  flash/  ram |       delta |
+|---------------------------------------+--------------+-------------|
+| baseline                              | 204501/16060 |     0/    0 |
+|---------------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>             | 231965/16940 | 27464/  880 |
+| SimpleWireInterface                   | 207621/16236 |  3120/  176 |
+|---------------------------------------+--------------+-------------|
+| FeliasFoggWireInterface<SlowSoftWire> | 209825/16308 |  5324/  248 |
+| MarpleWireInterface<SoftWire>         | 209989/16372 |  5488/  312 |
+| RaemondWireInterface<SWire>           | 208561/16308 |  4060/  248 |
+| SeeedWireInterface<SoftwareI2C>       | 208357/16260 |  3856/  200 |
++--------------------------------------------------------------------+
 
 ```
 
 ### Teensy 3.2
 
 * 96 MHz ARM Cortex-M4
-* Arduino IDE 1.8.13
-* Teensyduino 1.53
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Teensyduino 1.56
 * Compiler options: "Faster"
 
 ```
-+------------------------------------------------------------------+
-| functionality                       |  flash/  ram |       delta |
-|-------------------------------------+--------------+-------------|
-| baseline                            |  10208/ 4152 |     0/    0 |
-|-------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>           |  14220/ 4824 |  4012/  672 |
-| SimpleWireInterface                 |  11728/ 4160 |  1520/    8 |
-|-------------------------------------+--------------+-------------|
-| TwoWireInterface<SWire>             |  11840/ 4300 |  1632/  148 |
-| TwoWireInterface<SlowSoftWire>      |  11912/ 4212 |  1704/   60 |
-| TwoWireInterface<SeeedSoftwareI2C>  |  11792/ 4172 |  1584/   20 |
-+------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| functionality                         |  flash/  ram |       delta |
+|---------------------------------------+--------------+-------------|
+| baseline                              |  10216/ 4152 |     0/    0 |
+|---------------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>             |  14400/ 4984 |  4184/  832 |
+| SimpleWireInterface                   |  11736/ 4160 |  1520/    8 |
+|---------------------------------------+--------------+-------------|
+| FeliasFoggWireInterface<SlowSoftWire> |  11932/ 4212 |  1716/   60 |
+| MarpleWireInterface<SoftWire>         |  12248/ 4280 |  2032/  128 |
+| RaemondWireInterface<SWire>           |  11796/ 4228 |  1580/   76 |
+| SeeedWireInterface<SoftwareI2C>       |  11800/ 4172 |  1584/   20 |
++--------------------------------------------------------------------+
 
 ```
 

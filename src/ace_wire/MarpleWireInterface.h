@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021 Brian T. Park
+Copyright (c) 2022 Brian T. Park
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,40 +22,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_WIRE_TWO_WIRE_INTERFACE_H
-#define ACE_WIRE_TWO_WIRE_INTERFACE_H
+#ifndef ACE_WIRE_MARPLE_WIRE_INTERFACE_H
+#define ACE_WIRE_MARPLE_WIRE_INTERFACE_H
 
 #include <stdint.h>
 
 namespace ace_wire {
 
 /**
- * A thin wrapper around the default `TwoWire` class and its `Wire` object
- * provided by most Arduino platforms. All `TwoWire` instances use a TX and RX
- * buffer of varying sizes.  For example:
+ * A thin wrapper around the `SoftWire` class provided by the
+ * https://github.com/stevemarple/SoftWire project so that it becomes compatible
+ * with the AceWire interface. The `SoftWire` class uses an RX buffer and a TX
+ * buffer whose sizes are defined by the end-user.
  *
- *  * The AVR version uses 32 bytes for each
- *  * The ESP8266 and ESP32 versions use 128 bytes.
- *  * The STM32 version uses 32 bytes.
- *  * The SAMD21 version uses 256 bytes.
- *
- * This is a template class to avoid including the `<Wire.h>` header file, which
- * increases flash memory on AVR by about 1000 byte even if the `Wire` object is
- * never used.
- *
- * @tparam T_WIRE underlying class that implements the I2C protocol which will
- *    always be `TwoWire`
+ * @tparam T_WIRE underlying I2C class which will always be `SoftWire`
  */
 template <typename T_WIRE>
-class TwoWireInterface {
+class MarpleWireInterface {
   public:
     /**
      * Constructor.
-     * @param wire instance of `TwoWire` which will always be the `Wire` object
+     * @param wire instance of `SoftWire`
      */
-    explicit TwoWireInterface(T_WIRE& wire) : mWire(wire) {}
+    explicit MarpleWireInterface(T_WIRE& wire) : mWire(wire) {}
 
-    /** Initialize the interface. Currently does nothing. */
+    /** Initial the interface. Currently does nothing. */
     void begin() const {}
 
     /** End the interface. Currently does nothing. */
@@ -76,53 +67,51 @@ class TwoWireInterface {
     /**
      * Write data into the write buffer.
      *
-     * @returns the number of bytes written into buffer, will always be 1.
+     * @returns the number of bytes written into buffer, which will always be 1
      */
     uint8_t write(uint8_t data) const {
       return (uint8_t) mWire.write(data);
     }
 
     /**
-     * Send the data in the buffer, with a STOP condition if `sendStop` is true.
-     *
-     * Returns the value returned by the underlying TwoWire::endTransmission()
-     * method, which returns the values documented in the twi_writeTo()
-     * function:
+     * Send the data in the buffer, and return the following status code:
      *
      *  * 0: success
      *  * 1: length too long for buffer
      *  * 2: address send, NACK received
      *  * 3: data send, NACK received
      *  * 4: other twi error (lost bus arbitration, bus error, ..)
+     *
+     * @param sendStop controls whether or not a STOP condition is sent at the
+     * end of the buffer
      */
     uint8_t endTransmission(bool sendStop = true) const {
       return mWire.endTransmission(sendStop);
     }
 
     /**
-     * Read bytes from the slave and store in buffer owned by TwoWire and
-     * send a STOP condition if `sendStop` is true.
+     * Read bytes from the slave and store in buffer owned by SoftWire
      *
      * @param addr I2C address
      * @param quantity number of bytes to read
      * @param sendStop whether the STOP condition should be sent at end
      *
-     * @return the value returned by the underlying T_WIRE::requestFrom()
-     * method, which will normally be 'quantity'
+     * @return the value returned by the underlying SoftWire::requestFrom()
+     * method, which will normally be 'quantity'.
      */
     uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true)
         const {
       return mWire.requestFrom(addr, quantity, (uint8_t) sendStop);
     }
 
-    /** Read byte from the TwoWire receive buffer. */
+    /** Read byte from buffer. */
     uint8_t read() const {
       return mWire.read();
     }
 
     // Use default copy constructor and assignment operator.
-    TwoWireInterface(const TwoWireInterface&) = default;
-    TwoWireInterface& operator=(const TwoWireInterface&) = default;
+    MarpleWireInterface(const MarpleWireInterface&) = default;
+    MarpleWireInterface& operator=(const MarpleWireInterface&) = default;
 
   private:
     T_WIRE& mWire;

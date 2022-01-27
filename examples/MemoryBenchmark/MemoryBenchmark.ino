@@ -17,26 +17,32 @@
 // List of features of AceWire that we want to gather memory usage numbers.
 #define FEATURE_BASELINE 0
 
-// TwoWireInterface w/ <Wire.h>
+// TwoWireInterface from <Wire.h> (all platforms)
 #define FEATURE_TWO_WIRE 1
 
-// SimpleWireInterface
+// SimpleWireInterface (all platforms)
 #define FEATURE_SIMPLE_WIRE 2
 
 // SimpleWireFastInterface (AVR only)
 #define FEATURE_SIMPLE_WIRE_FAST 3
 
+// https://github.com/felias-fogg/SlowSoftWire (all platforms)
+#define FEATURE_FELIAS_FOGG_WIRE 4
+
+// https://github.com/stevemarple/SoftWire (all platforms)
+#define FEATURE_MARPLE_WIRE 5
+
+// https://github.com/RaemondBW/SWire (all platforms)
+#define FEATURE_RAEMOND_WIRE 6
+
+// https://github.com/Seeed-Studio/Arduino_Software_I2C (all platforms)
+#define FEATURE_SEEED_WIRE 7
+
 // https://github.com/Testato/SoftwareWire (AVR only)
-#define FEATURE_SOFTWARE_WIRE 4
+#define FEATURE_TESTATO_WIRE 8
 
-// https://github.com/RaemondBW/SWire
-#define FEATURE_SWIRE 5
-
-// https://github.com/felias-fogg/SlowSoftWire
-#define FEATURE_SLOW_SOFT_WIRE 6
-
-// https://github.com/Seeed-Studio/Arduino_Software_I2C
-#define FEATURE_SEEED_SOFTWARE_I2C 7
+// https://github.com/thexeno/HardWire-Arduino-Library (AVR, but not ATTINY)
+#define FEATURE_THEXENO_WIRE 9
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -74,33 +80,52 @@ volatile int disableCompilerOptimization = 0;
         SDA_PIN, SCL_PIN, DELAY_MICROS>;
     WireInterface wireInterface;
 
-  #elif FEATURE == FEATURE_SOFTWARE_WIRE
-    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
+  #elif FEATURE == FEATURE_FELIAS_FOGG_WIRE
+    #include <SlowSoftWire.h>
+    SlowSoftWire slowSoftWire(SDA_PIN, SCL_PIN);
+    using WireInterface = FeliasFoggWireInterface<SlowSoftWire>;
+    WireInterface wireInterface(slowSoftWire);
+
+  #elif FEATURE == FEATURE_MARPLE_WIRE
+    #include <SoftWire.h>
+    const uint8_t SOFT_WIRE_BUFFER_SIZE = 32;
+    uint8_t rxBuffer[SOFT_WIRE_BUFFER_SIZE];
+    uint8_t txBuffer[SOFT_WIRE_BUFFER_SIZE];
+    SoftWire softWire(SDA_PIN, SCL_PIN);
+    using WireInterface = MarpleWireInterface<SoftWire>;
+    WireInterface wireInterface(softWire);
+
+  #elif FEATURE == FEATURE_RAEMOND_WIRE
+    #include <SWire.h>
+    using WireInterface = RaemondWireInterface<SoftWire>;
+    WireInterface wireInterface(SWire);
+
+  #elif FEATURE == FEATURE_SEEED_WIRE
+    #include <SoftwareI2C.h>
+    SoftwareI2C seeedWire;
+    using WireInterface = SeeedWireInterface<SoftwareI2C>;
+    WireInterface wireInterface(seeedWire);
+
+  #elif FEATURE == FEATURE_TESTATO_WIRE
+    // AVR only
+    #if defined(ARDUINO_ARCH_AVR)
+      #include <SoftwareWire.h>
+      SoftwareWire softwareWire(SDA_PIN, SCL_PIN);
+      using WireInterface = TestatoWireInterface<SoftwareWire>;
+      WireInterface wireInterface(softwareWire);
+    #else
       #error Unsupported FEATURE on this platform
     #endif
 
-    #include <SoftwareWire.h>
-    SoftwareWire softwareWire(SDA_PIN, SCL_PIN);
-    using WireInterface = TwoWireInterface<SoftwareWire>;
-    WireInterface wireInterface(softwareWire);
-
-  #elif FEATURE == FEATURE_SWIRE
-    #include <SWire.h>
-    SoftWire swire;
-    using WireInterface = TwoWireInterface<SoftWire>;
-    WireInterface wireInterface(swire);
-
-  #elif FEATURE == FEATURE_SLOW_SOFT_WIRE
-    #include <SlowSoftWire.h>
-    SlowSoftWire slowSoftWire(SDA_PIN, SCL_PIN);
-    using WireInterface = TwoWireInterface<SlowSoftWire>;
-    WireInterface wireInterface(slowSoftWire);
-
-  #elif FEATURE == FEATURE_SEEED_SOFTWARE_I2C
-    #include <SoftwareI2C.h>
-    SoftwareI2C seeedWire;
-    using WireInterface = TwoWireInterface<SoftwareI2C>;
-    WireInterface wireInterface(seeedWire);
+  #elif FEATURE == FEATURE_THEXENO_WIRE
+    // AVR only, but not ATTINYX5
+    #if defined(ARDUINO_ARCH_AVR) && ! defined(ARDUINO_AVR_ATTINYX5)
+      #include <HardWire.h>
+      using WireInterface = ThexenoWireInterface<TwoWire>;
+      WireInterface wireInterface(Wire);
+    #else
+      #error Unsupported FEATURE on this platform
+    #endif
 
   #else
     #error Unknown FEATURE
@@ -147,20 +172,30 @@ disableCompilerOptimization = 3;
 #elif FEATURE == FEATURE_SIMPLE_WIRE_FAST
   wireInterface.begin();
 
-#elif FEATURE == FEATURE_SOFTWARE_WIRE
-  softwareWire.begin();
-  wireInterface.begin();
-
-#elif FEATURE == FEATURE_SWIRE
-  swire.begin(SDA_PIN, SCL_PIN);
-  wireInterface.begin();
-
-#elif FEATURE == FEATURE_SLOW_SOFT_WIRE
+#elif FEATURE == FEATURE_FELIAS_FOGG_WIRE
   slowSoftWire.begin();
   wireInterface.begin();
 
-#elif FEATURE == FEATURE_SEEED_SOFTWARE_I2C
+#elif FEATURE == FEATURE_MARPLE_WIRE
+  softWire.setRxBuffer(rxBuffer, SOFT_WIRE_BUFFER_SIZE);
+  softWire.setTxBuffer(txBuffer, SOFT_WIRE_BUFFER_SIZE);
+  softWire.begin();
+  wireInterface.begin();
+
+#elif FEATURE == FEATURE_RAEMOND_WIRE
+  SWire.begin(SDA_PIN, SCL_PIN);
+  wireInterface.begin();
+
+#elif FEATURE == FEATURE_SEEED_WIRE
   seeedWire.begin(SDA_PIN, SCL_PIN);
+  wireInterface.begin();
+
+#elif FEATURE == FEATURE_TESTATO_WIRE
+  softwareWire.begin();
+  wireInterface.begin();
+
+#elif FEATURE == FEATURE_THEXENO_WIRE
+  Wire.begin();
   wireInterface.begin();
 
 #else
@@ -180,10 +215,12 @@ void loop() {
 #elif FEATURE == FEATURE_TWO_WIRE \
     || FEATURE == FEATURE_SIMPLE_WIRE \
     || FEATURE == FEATURE_SIMPLE_WIRE_FAST \
-    || FEATURE == FEATURE_SOFTWARE_WIRE \
-    || FEATURE == FEATURE_SWIRE \
-    || FEATURE == FEATURE_SLOW_SOFT_WIRE \
-    || FEATURE == FEATURE_SEEED_SOFTWARE_I2C
+    || FEATURE == FEATURE_RAEMOND_WIRE \
+    || FEATURE == FEATURE_FELIAS_FOGG_WIRE \
+    || FEATURE == FEATURE_SEEED_WIRE \
+    || FEATURE == FEATURE_MARPLE_WIRE \
+    || FEATURE == FEATURE_TESTATO_WIRE \
+    || FEATURE == FEATURE_THEXENO_WIRE
   wireInterface.beginTransmission(DS3231_I2C_ADDRESS);
   wireInterface.write(0x00);
   wireInterface.endTransmission();
