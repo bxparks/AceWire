@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceWire
-   &#160;<span id="projectnumber">0.3.2</span>
+   &#160;<span id="projectnumber">0.4.0</span>
    </div>
    <div id="projectbrief">Unified interface for selecting different I2C implementations on Arduino platforms</div>
   </td>
@@ -171,113 +171,112 @@ $(function() {
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;      <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    }</div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160; </div>
-<div class="line"><a name="l00154"></a><span class="lineno"><a class="line" href="classace__wire_1_1SimpleWireFastInterface.html#aef17a948357a5259435a6ef95d1e4b28">  154</a></span>&#160;    uint8_t <a class="code" href="classace__wire_1_1SimpleWireFastInterface.html#aef17a948357a5259435a6ef95d1e4b28">requestFrom</a>(uint8_t addr, uint8_t quantity, <span class="keywordtype">bool</span> sendStop = <span class="keyword">true</span>) {</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;      mQuantity = quantity;</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;      mSendStop = sendStop;</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;      clockHigh();</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;      dataHigh();</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      dataLow();</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;      clockLow();</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;      <span class="comment">// Send I2C addr (7 bits) and the R/W bit set to &quot;read&quot; (0x01).</span></div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      uint8_t effectiveAddr = (addr &lt;&lt; 1) | 0x01;</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      uint8_t ack = <a class="code" href="classace__wire_1_1SimpleWireFastInterface.html#a6fce64dbf641b21c3eadcb87017e02d5">write</a>(effectiveAddr);</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;      <span class="keywordflow">return</span> (ack == 1) ? quantity : 0;</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    }</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160; </div>
-<div class="line"><a name="l00184"></a><span class="lineno"><a class="line" href="classace__wire_1_1SimpleWireFastInterface.html#a2ac5ed2f4adaf9a3fc55459153d0117f">  184</a></span>&#160;    uint8_t <a class="code" href="classace__wire_1_1SimpleWireFastInterface.html#a2ac5ed2f4adaf9a3fc55459153d0117f">read</a>() {</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;      <span class="comment">// Caller should not call when mQuantity is 0, but guard against it.</span></div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;      <span class="keywordflow">if</span> (! mQuantity) <span class="keywordflow">return</span> 0xff;</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160; </div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;      <span class="comment">// Read one byte</span></div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;      dataHigh();</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;      uint8_t data = 0;</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      <span class="keywordflow">for</span> (uint8_t i = 0; i &lt; 8; ++i) {</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        clockHigh();</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;        data &lt;&lt;= 1;</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        uint8_t bit = digitalReadFast(T_DATA_PIN);</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;        data |= (bit &amp; 0x1);</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;        clockLow();</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;      }</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;      <span class="comment">// Decrement quantity to determine if NACK or ACK should be sent.</span></div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;      mQuantity--;</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      <span class="keywordflow">if</span> (mQuantity) {</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        sendAck();</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        sendNack();</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        <span class="keywordflow">if</span> (mSendStop) {</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;          <a class="code" href="classace__wire_1_1SimpleWireFastInterface.html#aefa3a536f5789dd64e8af2eb29ab5e1b">endTransmission</a>();</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;        }</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;      }</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160; </div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;      <span class="keywordflow">return</span> data;</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    }</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160; </div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="comment">// Use default copy constructor and assignment operator.</span></div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <a class="code" href="classace__wire_1_1SimpleWireFastInterface.html#accd53bbb3bc2c03c22fb78b026748f07">SimpleWireFastInterface</a>(<span class="keyword">const</span> <a class="code" href="classace__wire_1_1SimpleWireFastInterface.html">SimpleWireFastInterface</a>&amp;) = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <a class="code" href="classace__wire_1_1SimpleWireFastInterface.html">SimpleWireFastInterface</a>&amp; operator=(<span class="keyword">const</span> <a class="code" href="classace__wire_1_1SimpleWireFastInterface.html">SimpleWireFastInterface</a>&amp;) =</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="keyword">static</span> uint8_t readAck() {</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;      <span class="comment">// Go into INPUT mode, reusing dataHigh(), saving 10 flash bytes on AVR.</span></div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;      dataHigh();</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160; </div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;      <span class="comment">// Set the clock HIGH, because the I2C protocol says that SDA will not</span></div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;      <span class="comment">// change when SCL is HIGH and we expect the slave to abide by that.</span></div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;      clockHigh();</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160; </div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;      uint8_t ack = digitalReadFast(T_DATA_PIN);</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160; </div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;      <span class="comment">// Device releases SDA upon falling edge of the 9th CLK.</span></div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;      clockLow();</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;      <span class="keywordflow">return</span> ack;</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    }</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> sendAck() {</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;      dataLow();</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;      clockHigh();</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;      clockLow();</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    }</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160; </div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> sendNack() {</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;      dataHigh();</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;      clockHigh();</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;      clockLow();</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    }</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160; </div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> bitDelay() { delayMicroseconds(T_DELAY_MICROS); }</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160; </div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> clockHigh() { pinModeFast(T_CLOCK_PIN, INPUT); bitDelay(); }</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160; </div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> clockLow() { pinModeFast(T_CLOCK_PIN, OUTPUT); bitDelay(); }</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160; </div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> dataHigh() { pinModeFast(T_DATA_PIN, INPUT); bitDelay(); }</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160; </div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> dataLow() { pinModeFast(T_DATA_PIN, OUTPUT); bitDelay(); }</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160; </div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    <span class="keywordtype">bool</span> mSendStop;</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    uint8_t mQuantity;</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;};</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160; </div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;}</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160; </div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00154"></a><span class="lineno"><a class="line" href="classace__wire_1_1SimpleWireFastInterface.html#ae5c58429d22916ac25527efaddab3175">  154</a></span>&#160;    uint8_t <a class="code" href="classace__wire_1_1SimpleWireFastInterface.html#ae5c58429d22916ac25527efaddab3175">requestFrom</a>(</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        uint8_t addr, uint8_t quantity, <span class="keywordtype">bool</span> sendStop = <span class="keyword">true</span>)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;      mQuantity = quantity;</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      mSendStop = sendStop;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160; </div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;      clockHigh();</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;      dataHigh();</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; </div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;      dataLow();</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      clockLow();</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160; </div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      <span class="comment">// Send I2C addr (7 bits) and the R/W bit set to &quot;read&quot; (0x01).</span></div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      uint8_t effectiveAddr = (addr &lt;&lt; 1) | 0x01;</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      uint8_t status = <a class="code" href="classace__wire_1_1SimpleWireFastInterface.html#a6fce64dbf641b21c3eadcb87017e02d5">write</a>(effectiveAddr);</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160; </div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      <span class="keywordflow">return</span> (status == 0) ? 0 : quantity;</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    }</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160; </div>
+<div class="line"><a name="l00185"></a><span class="lineno"><a class="line" href="classace__wire_1_1SimpleWireFastInterface.html#a2751a6592d265770774a6c22cb97caf7">  185</a></span>&#160;    uint8_t <a class="code" href="classace__wire_1_1SimpleWireFastInterface.html#a2751a6592d265770774a6c22cb97caf7">read</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;      <span class="comment">// Caller should not call when mQuantity is 0, but let&#39;s guard against it.</span></div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;      <span class="keywordflow">if</span> (! mQuantity) <span class="keywordflow">return</span> 0xff;</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;      <span class="comment">// Read one byte</span></div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;      dataHigh();</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      uint8_t data = 0;</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;      <span class="keywordflow">for</span> (uint8_t i = 0; i &lt; 8; ++i) {</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;        clockHigh();</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        data &lt;&lt;= 1;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;        uint8_t bit = digitalReadFast(T_DATA_PIN);</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;        data |= (bit &amp; 0x1);</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        clockLow();</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;      }</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160; </div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;      <span class="comment">// Decrement quantity to determine if NACK or ACK should be sent.</span></div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      mQuantity--;</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;      <span class="keywordflow">if</span> (mQuantity) {</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        sendAck();</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;      } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        sendNack();</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        <a class="code" href="classace__wire_1_1SimpleWireFastInterface.html#aefa3a536f5789dd64e8af2eb29ab5e1b">endTransmission</a>(mSendStop);</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;      }</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      <span class="keywordflow">return</span> data;</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    }</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160; </div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="comment">// Use default copy constructor and assignment operator.</span></div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <a class="code" href="classace__wire_1_1SimpleWireFastInterface.html#accd53bbb3bc2c03c22fb78b026748f07">SimpleWireFastInterface</a>(<span class="keyword">const</span> <a class="code" href="classace__wire_1_1SimpleWireFastInterface.html">SimpleWireFastInterface</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <a class="code" href="classace__wire_1_1SimpleWireFastInterface.html">SimpleWireFastInterface</a>&amp; operator=(<span class="keyword">const</span> <a class="code" href="classace__wire_1_1SimpleWireFastInterface.html">SimpleWireFastInterface</a>&amp;) =</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;        <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160; </div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="keyword">static</span> uint8_t readAck() {</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;      <span class="comment">// Go into INPUT mode, reusing dataHigh(), saving 10 flash bytes on AVR.</span></div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;      dataHigh();</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160; </div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;      <span class="comment">// Set the clock HIGH, because the I2C protocol says that SDA will not</span></div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;      <span class="comment">// change when SCL is HIGH and we expect the slave to abide by that.</span></div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;      clockHigh();</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160; </div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;      uint8_t ack = digitalReadFast(T_DATA_PIN);</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160; </div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;      <span class="comment">// Device releases SDA upon falling edge of the 9th CLK.</span></div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;      clockLow();</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;      <span class="keywordflow">return</span> ack;</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    }</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160; </div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> sendAck() {</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;      dataLow();</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;      clockHigh();</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;      clockLow();</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    }</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160; </div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> sendNack() {</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;      dataHigh();</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;      clockHigh();</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;      clockLow();</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    }</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160; </div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> bitDelay() { delayMicroseconds(T_DELAY_MICROS); }</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160; </div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> clockHigh() { pinModeFast(T_CLOCK_PIN, INPUT); bitDelay(); }</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160; </div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> clockLow() { pinModeFast(T_CLOCK_PIN, OUTPUT); bitDelay(); }</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160; </div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> dataHigh() { pinModeFast(T_DATA_PIN, INPUT); bitDelay(); }</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160; </div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> dataLow() { pinModeFast(T_DATA_PIN, OUTPUT); bitDelay(); }</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160; </div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    <span class="keyword">mutable</span> <span class="keywordtype">bool</span> mSendStop;</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    <span class="keyword">mutable</span> uint8_t mQuantity;</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;};</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160; </div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;}</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160; </div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="aclassace__wire_1_1SimpleWireFastInterface_html_a8cfd382e5ee0c42825ce19dfc1e388f4"><div class="ttname"><a href="classace__wire_1_1SimpleWireFastInterface.html#a8cfd382e5ee0c42825ce19dfc1e388f4">ace_wire::SimpleWireFastInterface::beginTransmission</a></div><div class="ttdeci">uint8_t beginTransmission(uint8_t addr) const</div><div class="ttdoc">Send I2C START condition.</div><div class="ttdef"><b>Definition:</b> <a href="SimpleWireFastInterface_8h_source.html#l00087">SimpleWireFastInterface.h:87</a></div></div>
+<div class="ttc" id="aclassace__wire_1_1SimpleWireFastInterface_html_a2751a6592d265770774a6c22cb97caf7"><div class="ttname"><a href="classace__wire_1_1SimpleWireFastInterface.html#a2751a6592d265770774a6c22cb97caf7">ace_wire::SimpleWireFastInterface::read</a></div><div class="ttdeci">uint8_t read() const</div><div class="ttdoc">Read byte.</div><div class="ttdef"><b>Definition:</b> <a href="SimpleWireFastInterface_8h_source.html#l00185">SimpleWireFastInterface.h:185</a></div></div>
 <div class="ttc" id="aclassace__wire_1_1SimpleWireFastInterface_html_aa9bd38babd4ff86d24fa1cc431bc550b"><div class="ttname"><a href="classace__wire_1_1SimpleWireFastInterface.html#aa9bd38babd4ff86d24fa1cc431bc550b">ace_wire::SimpleWireFastInterface::begin</a></div><div class="ttdeci">void begin() const</div><div class="ttdoc">Initialize the clock and data pins.</div><div class="ttdef"><b>Definition:</b> <a href="SimpleWireFastInterface_8h_source.html#l00066">SimpleWireFastInterface.h:66</a></div></div>
 <div class="ttc" id="aclassace__wire_1_1SimpleWireFastInterface_html_a6fce64dbf641b21c3eadcb87017e02d5"><div class="ttname"><a href="classace__wire_1_1SimpleWireFastInterface.html#a6fce64dbf641b21c3eadcb87017e02d5">ace_wire::SimpleWireFastInterface::write</a></div><div class="ttdeci">uint8_t write(uint8_t data) const</div><div class="ttdoc">Send the data byte on the data bus, with MSB first as specified by I2C.</div><div class="ttdef"><b>Definition:</b> <a href="SimpleWireFastInterface_8h_source.html#l00110">SimpleWireFastInterface.h:110</a></div></div>
-<div class="ttc" id="aclassace__wire_1_1SimpleWireFastInterface_html_aef17a948357a5259435a6ef95d1e4b28"><div class="ttname"><a href="classace__wire_1_1SimpleWireFastInterface.html#aef17a948357a5259435a6ef95d1e4b28">ace_wire::SimpleWireFastInterface::requestFrom</a></div><div class="ttdeci">uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop=true)</div><div class="ttdoc">Prepare to read bytes by sending I2C START condition.</div><div class="ttdef"><b>Definition:</b> <a href="SimpleWireFastInterface_8h_source.html#l00154">SimpleWireFastInterface.h:154</a></div></div>
 <div class="ttc" id="aclassace__wire_1_1SimpleWireFastInterface_html_aefa3a536f5789dd64e8af2eb29ab5e1b"><div class="ttname"><a href="classace__wire_1_1SimpleWireFastInterface.html#aefa3a536f5789dd64e8af2eb29ab5e1b">ace_wire::SimpleWireFastInterface::endTransmission</a></div><div class="ttdeci">uint8_t endTransmission(bool sendStop=true) const</div><div class="ttdoc">Send the I2C STOP condition.</div><div class="ttdef"><b>Definition:</b> <a href="SimpleWireFastInterface_8h_source.html#l00136">SimpleWireFastInterface.h:136</a></div></div>
 <div class="ttc" id="aclassace__wire_1_1SimpleWireFastInterface_html"><div class="ttname"><a href="classace__wire_1_1SimpleWireFastInterface.html">ace_wire::SimpleWireFastInterface</a></div><div class="ttdoc">A version of SimpleWireInterface that uses one of the &lt;digitalWriteFast.h&gt; libraries.</div><div class="ttdef"><b>Definition:</b> <a href="SimpleWireFastInterface_8h_source.html#l00052">SimpleWireFastInterface.h:52</a></div></div>
-<div class="ttc" id="aclassace__wire_1_1SimpleWireFastInterface_html_a2ac5ed2f4adaf9a3fc55459153d0117f"><div class="ttname"><a href="classace__wire_1_1SimpleWireFastInterface.html#a2ac5ed2f4adaf9a3fc55459153d0117f">ace_wire::SimpleWireFastInterface::read</a></div><div class="ttdeci">uint8_t read()</div><div class="ttdoc">Read byte.</div><div class="ttdef"><b>Definition:</b> <a href="SimpleWireFastInterface_8h_source.html#l00184">SimpleWireFastInterface.h:184</a></div></div>
 <div class="ttc" id="aclassace__wire_1_1SimpleWireFastInterface_html_accd53bbb3bc2c03c22fb78b026748f07"><div class="ttname"><a href="classace__wire_1_1SimpleWireFastInterface.html#accd53bbb3bc2c03c22fb78b026748f07">ace_wire::SimpleWireFastInterface::SimpleWireFastInterface</a></div><div class="ttdeci">SimpleWireFastInterface()=default</div><div class="ttdoc">Constructor.</div></div>
 <div class="ttc" id="aclassace__wire_1_1SimpleWireFastInterface_html_a2551d70487c270e925dc56009f59dacb"><div class="ttname"><a href="classace__wire_1_1SimpleWireFastInterface.html#a2551d70487c270e925dc56009f59dacb">ace_wire::SimpleWireFastInterface::end</a></div><div class="ttdeci">void end() const</div><div class="ttdoc">Set clock and data pins to INPUT mode.</div><div class="ttdef"><b>Definition:</b> <a href="SimpleWireFastInterface_8h_source.html#l00076">SimpleWireFastInterface.h:76</a></div></div>
+<div class="ttc" id="aclassace__wire_1_1SimpleWireFastInterface_html_ae5c58429d22916ac25527efaddab3175"><div class="ttname"><a href="classace__wire_1_1SimpleWireFastInterface.html#ae5c58429d22916ac25527efaddab3175">ace_wire::SimpleWireFastInterface::requestFrom</a></div><div class="ttdeci">uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop=true) const</div><div class="ttdoc">Prepare to read bytes by sending I2C START condition.</div><div class="ttdef"><b>Definition:</b> <a href="SimpleWireFastInterface_8h_source.html#l00154">SimpleWireFastInterface.h:154</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
