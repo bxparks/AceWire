@@ -151,7 +151,9 @@ void runTwoWire100() {
   wireInterface.begin();
   runBenchmark(F("TwoWireInterface<TwoWire>,100kHz"), wireInterface);
   wireInterface.end();
+#if ! defined(ESP8266)
   Wire.end();
+#endif
 }
 
 // Use built-in <Wire.h> at 400 kHz
@@ -164,7 +166,9 @@ void runTwoWire400() {
   wireInterface.begin();
   runBenchmark(F("TwoWireInterface<TwoWire>,400kHz"), wireInterface);
   wireInterface.end();
+#if ! defined(ESP8266)
   Wire.end();
+#endif
 }
 
 // Use AceWire/SimpleWireInterface
