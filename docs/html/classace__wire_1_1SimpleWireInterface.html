@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceWire
-   &#160;<span id="projectnumber">0.3.2</span>
+   &#160;<span id="projectnumber">0.4.0</span>
    </div>
    <div id="projectbrief">Unified interface for selecting different I2C implementations on Arduino platforms</div>
   </td>
@@ -101,12 +101,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a8b642163e4a334d698ee1294340f5170"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1SimpleWireInterface.html#a8b642163e4a334d698ee1294340f5170">endTransmission</a> (bool sendStop=true) const</td></tr>
 <tr class="memdesc:a8b642163e4a334d698ee1294340f5170"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send the I2C STOP condition.  <a href="classace__wire_1_1SimpleWireInterface.html#a8b642163e4a334d698ee1294340f5170">More...</a><br /></td></tr>
 <tr class="separator:a8b642163e4a334d698ee1294340f5170"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9681ea8de3f75c96e8dde0253eb02438"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1SimpleWireInterface.html#a9681ea8de3f75c96e8dde0253eb02438">requestFrom</a> (uint8_t addr, uint8_t quantity, bool sendStop=true)</td></tr>
-<tr class="memdesc:a9681ea8de3f75c96e8dde0253eb02438"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare to read bytes by sending I2C START condition.  <a href="classace__wire_1_1SimpleWireInterface.html#a9681ea8de3f75c96e8dde0253eb02438">More...</a><br /></td></tr>
-<tr class="separator:a9681ea8de3f75c96e8dde0253eb02438"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89e65017bdd8bc93108d29e7566ea406"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1SimpleWireInterface.html#a89e65017bdd8bc93108d29e7566ea406">read</a> ()</td></tr>
-<tr class="memdesc:a89e65017bdd8bc93108d29e7566ea406"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read byte.  <a href="classace__wire_1_1SimpleWireInterface.html#a89e65017bdd8bc93108d29e7566ea406">More...</a><br /></td></tr>
-<tr class="separator:a89e65017bdd8bc93108d29e7566ea406"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6dacc886aa5f7a344c759c62e86451c2"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1SimpleWireInterface.html#a6dacc886aa5f7a344c759c62e86451c2">requestFrom</a> (uint8_t addr, uint8_t quantity, bool sendStop=true) const</td></tr>
+<tr class="memdesc:a6dacc886aa5f7a344c759c62e86451c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare to read bytes by sending I2C START condition.  <a href="classace__wire_1_1SimpleWireInterface.html#a6dacc886aa5f7a344c759c62e86451c2">More...</a><br /></td></tr>
+<tr class="separator:a6dacc886aa5f7a344c759c62e86451c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc08aec3d51e9d020c7fba5b9d55b72c"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1SimpleWireInterface.html#abc08aec3d51e9d020c7fba5b9d55b72c">read</a> () const</td></tr>
+<tr class="memdesc:abc08aec3d51e9d020c7fba5b9d55b72c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read byte.  <a href="classace__wire_1_1SimpleWireInterface.html#abc08aec3d51e9d020c7fba5b9d55b72c">More...</a><br /></td></tr>
+<tr class="separator:abc08aec3d51e9d020c7fba5b9d55b72c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10a39514b82aa3e8b972b38a04a628ac"><td class="memItemLeft" align="right" valign="top"><a id="a10a39514b82aa3e8b972b38a04a628ac"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>SimpleWireInterface</b> (const <a class="el" href="classace__wire_1_1SimpleWireInterface.html">SimpleWireInterface</a> &amp;)=default</td></tr>
 <tr class="separator:a10a39514b82aa3e8b972b38a04a628ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -116,12 +116,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A software I2C implementation for sending LED segment patterns over I2C. </p>
-<p>This has the same API has <a class="el" href="classace__wire_1_1TwoWireInterface.html" title="A thin wrapper around an I2C TwoWire class and its Wire object.">TwoWireInterface</a> so it can be a drop-in replacement.</p>
-<p>The implementation is very similar to SoftTmiInterface because the TM1637 protocol is very similar to I2C. To keep everything simple, all write and read methods are <em>synchronous</em> (i.e. blocking) because interrupts are not used. This means that we can eliminate the send and receive buffers, which saves both flash and static memory.</p>
+<p>This has the same API has <a class="el" href="classace__wire_1_1TwoWireInterface.html" title="A thin wrapper around the default TwoWire class and its Wire object provided by most Arduino platform...">TwoWireInterface</a> so it can be a drop-in replacement.</p>
+<p>The implementation is very similar to the SimpleTmiInterface class (in the <a href="https://github.com/bxparks/AceTMI">https://github.com/bxparks/AceTMI</a> project) because the TM1637 protocol is very similar to I2C. To keep everything simple, all write and read methods are <em>synchronous</em> (i.e. blocking) because interrupts are not used. This means that we can eliminate the TX and RX buffers, which saves both flash and static memory.</p>
 <p>During writing, <a class="el" href="classace__wire_1_1SimpleWireInterface.html#addf9e2d2a46b8f8ac156ca7c6a3f130c" title="Send the I2C START condition.">beginTransmission()</a> sends the START condition and the I2C address (along with the 'write' bit 0x00) right away. Then each <a class="el" href="classace__wire_1_1SimpleWireInterface.html#a6c5a9cb8042d43bc86069fa950128687" title="Send the data byte on the data bus, with MSB first as specified by I2C.">write()</a> call sends each byte immediately. The <a class="el" href="classace__wire_1_1SimpleWireInterface.html#a8b642163e4a334d698ee1294340f5170" title="Send the I2C STOP condition.">endTransmission()</a> sends the STOP condition. There is no buffering of the data byte passed into the <a class="el" href="classace__wire_1_1SimpleWireInterface.html#a6c5a9cb8042d43bc86069fa950128687" title="Send the data byte on the data bus, with MSB first as specified by I2C.">write()</a> method.</p>
-<p>During reading, the <a class="el" href="classace__wire_1_1SimpleWireInterface.html#a9681ea8de3f75c96e8dde0253eb02438" title="Prepare to read bytes by sending I2C START condition.">requestFrom()</a> sends the START condition and the I2C address (along with the 'read' bit 0x01) right away. Then each call to <a class="el" href="classace__wire_1_1SimpleWireInterface.html#a89e65017bdd8bc93108d29e7566ea406" title="Read byte.">read()</a> returns the data byte from the slave. Before returning from <a class="el" href="classace__wire_1_1SimpleWireInterface.html#a89e65017bdd8bc93108d29e7566ea406" title="Read byte.">read()</a>, the master sends a NACK if total number of bytes read is not 'quantity', or an ACK if 'quantity' has just been read. A STOP condition is also sent after the last byte, if the 'sendStop' flag of <a class="el" href="classace__wire_1_1SimpleWireInterface.html#a9681ea8de3f75c96e8dde0253eb02438" title="Prepare to read bytes by sending I2C START condition.">requestFrom()</a> was set to be true (default). </p>
+<p>During reading, the <a class="el" href="classace__wire_1_1SimpleWireInterface.html#a6dacc886aa5f7a344c759c62e86451c2" title="Prepare to read bytes by sending I2C START condition.">requestFrom()</a> sends the START condition and the I2C address (along with the 'read' bit 0x01) right away. Then each call to <a class="el" href="classace__wire_1_1SimpleWireInterface.html#abc08aec3d51e9d020c7fba5b9d55b72c" title="Read byte.">read()</a> returns the data byte from the slave. Before returning from <a class="el" href="classace__wire_1_1SimpleWireInterface.html#abc08aec3d51e9d020c7fba5b9d55b72c" title="Read byte.">read()</a>, the master sends a NACK if total number of bytes read is not 'quantity', or an ACK if 'quantity' has just been read. A STOP condition is also sent after the last byte, if the 'sendStop' flag of <a class="el" href="classace__wire_1_1SimpleWireInterface.html#a6dacc886aa5f7a344c759c62e86451c2" title="Prepare to read bytes by sending I2C START condition.">requestFrom()</a> was set to be true (default). </p>
 
-<p class="definition">Definition at line <a class="el" href="SimpleWireInterface_8h_source.html#l00056">56</a> of file <a class="el" href="SimpleWireInterface_8h_source.html">SimpleWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SimpleWireInterface_8h_source.html#l00057">57</a> of file <a class="el" href="SimpleWireInterface_8h_source.html">SimpleWireInterface.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a59dcb827cd546ad319bfdc3d12eb30dd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a59dcb827cd546ad319bfdc3d12eb30dd">&#9670;&nbsp;</a></span>SimpleWireInterface()</h2>
@@ -174,7 +174,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="SimpleWireInterface_8h_source.html#l00071">71</a> of file <a class="el" href="SimpleWireInterface_8h_source.html">SimpleWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SimpleWireInterface_8h_source.html#l00072">72</a> of file <a class="el" href="SimpleWireInterface_8h_source.html">SimpleWireInterface.h</a>.</p>
 
 </div>
 </div>
@@ -205,7 +205,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>Initialize the clock and data pins. </p>
 <p>These are open-drain lines, with pull-up resistors. We must not drive them HIGH actively since that could damage the transitor at the other end of the line pulling LOW. Instead, we go into INPUT mode to let the line to HIGH through the pullup resistor, then go to OUTPUT mode only to pull down. </p>
 
-<p class="definition">Definition at line <a class="el" href="SimpleWireInterface_8h_source.html#l00087">87</a> of file <a class="el" href="SimpleWireInterface_8h_source.html">SimpleWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SimpleWireInterface_8h_source.html#l00088">88</a> of file <a class="el" href="SimpleWireInterface_8h_source.html">SimpleWireInterface.h</a>.</p>
 
 </div>
 </div>
@@ -242,7 +242,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 if ACK, 1 if NACK </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="SimpleWireInterface_8h_source.html#l00108">108</a> of file <a class="el" href="SimpleWireInterface_8h_source.html">SimpleWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SimpleWireInterface_8h_source.html#l00109">109</a> of file <a class="el" href="SimpleWireInterface_8h_source.html">SimpleWireInterface.h</a>.</p>
 
 </div>
 </div>
@@ -273,12 +273,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>Send the I2C STOP condition. </p>
 <dl class="section return"><dt>Returns</dt><dd>always returns 0 to indicate success </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="SimpleWireInterface_8h_source.html#l00157">157</a> of file <a class="el" href="SimpleWireInterface_8h_source.html">SimpleWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SimpleWireInterface_8h_source.html#l00158">158</a> of file <a class="el" href="SimpleWireInterface_8h_source.html">SimpleWireInterface.h</a>.</p>
 
 </div>
 </div>
-<a id="a89e65017bdd8bc93108d29e7566ea406"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89e65017bdd8bc93108d29e7566ea406">&#9670;&nbsp;</a></span>read()</h2>
+<a id="abc08aec3d51e9d020c7fba5b9d55b72c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc08aec3d51e9d020c7fba5b9d55b72c">&#9670;&nbsp;</a></span>read()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -290,7 +290,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
           <td class="memname">uint8_t ace_wire::SimpleWireInterface::read </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -302,15 +302,15 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 <p>Read byte. </p>
 <p>After reading 8 bits, an ACK or NACK will be sent by the master to the slave. ACK means the slave will be asked to send more bytes so can hold control of the data line. NACK means no more bytes will be read from the slave and the slave should release the data line.</p>
-<p>If <a class="el" href="classace__wire_1_1SimpleWireInterface.html#a9681ea8de3f75c96e8dde0253eb02438" title="Prepare to read bytes by sending I2C START condition.">requestFrom()</a> was called with <code>sendStop = true</code>, a STOP condition will be sent after reading the final byte.</p>
+<p>If <a class="el" href="classace__wire_1_1SimpleWireInterface.html#a6dacc886aa5f7a344c759c62e86451c2" title="Prepare to read bytes by sending I2C START condition.">requestFrom()</a> was called with <code>sendStop = true</code>, a STOP condition will be sent after reading the final byte.</p>
 <p>If called when the number of remaining bytes is 0 (which should not happen if the calling program is correctly implemented), this method returns immediately with a 0xff. </p>
 
-<p class="definition">Definition at line <a class="el" href="SimpleWireInterface_8h_source.html#l00205">205</a> of file <a class="el" href="SimpleWireInterface_8h_source.html">SimpleWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SimpleWireInterface_8h_source.html#l00207">207</a> of file <a class="el" href="SimpleWireInterface_8h_source.html">SimpleWireInterface.h</a>.</p>
 
 </div>
 </div>
-<a id="a9681ea8de3f75c96e8dde0253eb02438"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9681ea8de3f75c96e8dde0253eb02438">&#9670;&nbsp;</a></span>requestFrom()</h2>
+<a id="a6dacc886aa5f7a344c759c62e86451c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6dacc886aa5f7a344c759c62e86451c2">&#9670;&nbsp;</a></span>requestFrom()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -339,7 +339,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td> const</td>
         </tr>
       </table>
   </td>
@@ -350,10 +350,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </div><div class="memdoc">
 
 <p>Prepare to read bytes by sending I2C START condition. </p>
-<p>If <code>sendStop</code> is true, then a STOP condition will be sent by <code><a class="el" href="classace__wire_1_1SimpleWireInterface.html#a89e65017bdd8bc93108d29e7566ea406" title="Read byte.">read()</a></code> after the last byte.</p>
-<dl class="section return"><dt>Returns</dt><dd>'quantity' if addr was written successfully and the the device responded with ACK, 0 if device responded with NACK </dd></dl>
+<p>If <code>sendStop</code> is true, then a STOP condition will be sent by <code><a class="el" href="classace__wire_1_1SimpleWireInterface.html#abc08aec3d51e9d020c7fba5b9d55b72c" title="Read byte.">read()</a></code> after the last byte.</p>
+<dl class="section return"><dt>Returns</dt><dd>'quantity' if addr was written successfully and the device responded with ACK, 0 if device responded with NACK </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="SimpleWireInterface_8h_source.html#l00175">175</a> of file <a class="el" href="SimpleWireInterface_8h_source.html">SimpleWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SimpleWireInterface_8h_source.html#l00176">176</a> of file <a class="el" href="SimpleWireInterface_8h_source.html">SimpleWireInterface.h</a>.</p>
 
 </div>
 </div>
@@ -385,7 +385,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>This loop generates slightly asymmetric logic signals because clockLow() lasts for 2*bitDelay(), but clockHigh() lasts for only 1*bitDelay(). This does not seem to cause any problems with the LED modules that I have tested.</p>
 <dl class="section return"><dt>Returns</dt><dd>1 if successful with ACK, 0 for NACK. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="SimpleWireInterface_8h_source.html#l00131">131</a> of file <a class="el" href="SimpleWireInterface_8h_source.html">SimpleWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SimpleWireInterface_8h_source.html#l00132">132</a> of file <a class="el" href="SimpleWireInterface_8h_source.html">SimpleWireInterface.h</a>.</p>
 
 </div>
 </div>

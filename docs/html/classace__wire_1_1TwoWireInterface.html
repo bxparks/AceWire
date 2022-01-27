@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceWire
-   &#160;<span id="projectnumber">0.3.2</span>
+   &#160;<span id="projectnumber">0.4.0</span>
    </div>
    <div id="projectbrief">Unified interface for selecting different I2C implementations on Arduino platforms</div>
   </td>
@@ -75,7 +75,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>A thin wrapper around an I2C <code>TwoWire</code> class and its <code>Wire</code> object.  
+<p>A thin wrapper around the default <code>TwoWire</code> class and its <code>Wire</code> object provided by most Arduino platforms.  
  <a href="classace__wire_1_1TwoWireInterface.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>&gt;</code></p>
@@ -85,35 +85,28 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8bd43efe7644927f55afd805c854976b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#a8bd43efe7644927f55afd805c854976b">TwoWireInterface</a> (T_WIRE &amp;wire)</td></tr>
 <tr class="memdesc:a8bd43efe7644927f55afd805c854976b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__wire_1_1TwoWireInterface.html#a8bd43efe7644927f55afd805c854976b">More...</a><br /></td></tr>
 <tr class="separator:a8bd43efe7644927f55afd805c854976b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a494ad44b23a2f5638ffd471fc01428c8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#a494ad44b23a2f5638ffd471fc01428c8">begin</a> ()</td></tr>
-<tr class="memdesc:a494ad44b23a2f5638ffd471fc01428c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initial the interface.  <a href="classace__wire_1_1TwoWireInterface.html#a494ad44b23a2f5638ffd471fc01428c8">More...</a><br /></td></tr>
-<tr class="separator:a494ad44b23a2f5638ffd471fc01428c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d5f1c8a9f0bf3bb07d2891d6781521e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#a2d5f1c8a9f0bf3bb07d2891d6781521e">end</a> ()</td></tr>
-<tr class="memdesc:a2d5f1c8a9f0bf3bb07d2891d6781521e"><td class="mdescLeft">&#160;</td><td class="mdescRight">End the interface.  <a href="classace__wire_1_1TwoWireInterface.html#a2d5f1c8a9f0bf3bb07d2891d6781521e">More...</a><br /></td></tr>
-<tr class="separator:a2d5f1c8a9f0bf3bb07d2891d6781521e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf3ab9ab6c4dbf5e7b2741d1ab980788"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#aaf3ab9ab6c4dbf5e7b2741d1ab980788">beginTransmission</a> (uint8_t addr)</td></tr>
-<tr class="memdesc:aaf3ab9ab6c4dbf5e7b2741d1ab980788"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare the write buffer to accept a sequence of data, and save the addr for transmission when <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#a4053895317558317d9c428669cac1476" title="Same as endTransmission(bool) but always send STOP condition.">endTransmission()</a></code> is called.  <a href="classace__wire_1_1TwoWireInterface.html#aaf3ab9ab6c4dbf5e7b2741d1ab980788">More...</a><br /></td></tr>
-<tr class="separator:aaf3ab9ab6c4dbf5e7b2741d1ab980788"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4263936c9bff1c092855ea49bcd12e85"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#a4263936c9bff1c092855ea49bcd12e85">write</a> (uint8_t data)</td></tr>
-<tr class="memdesc:a4263936c9bff1c092855ea49bcd12e85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write data into the write buffer.  <a href="classace__wire_1_1TwoWireInterface.html#a4263936c9bff1c092855ea49bcd12e85">More...</a><br /></td></tr>
-<tr class="separator:a4263936c9bff1c092855ea49bcd12e85"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02b957264362b8c7a1d44d7779cacacd"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#a02b957264362b8c7a1d44d7779cacacd">endTransmission</a> (bool sendStop)</td></tr>
-<tr class="memdesc:a02b957264362b8c7a1d44d7779cacacd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send the data in the buffer, with a STOP condition if <code>sendStop</code> is true.  <a href="classace__wire_1_1TwoWireInterface.html#a02b957264362b8c7a1d44d7779cacacd">More...</a><br /></td></tr>
-<tr class="separator:a02b957264362b8c7a1d44d7779cacacd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4053895317558317d9c428669cac1476"><td class="memItemLeft" align="right" valign="top"><a id="a4053895317558317d9c428669cac1476"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#a4053895317558317d9c428669cac1476">endTransmission</a> ()</td></tr>
-<tr class="memdesc:a4053895317558317d9c428669cac1476"><td class="mdescLeft">&#160;</td><td class="mdescRight">Same as <a class="el" href="classace__wire_1_1TwoWireInterface.html#a02b957264362b8c7a1d44d7779cacacd" title="Send the data in the buffer, with a STOP condition if sendStop is true.">endTransmission(bool)</a> but always send STOP condition. <br /></td></tr>
-<tr class="separator:a4053895317558317d9c428669cac1476"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3fcbcf640b29eb0ff53d2d23edbdab66"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#a3fcbcf640b29eb0ff53d2d23edbdab66">requestFrom</a> (uint8_t addr, uint8_t quantity, bool sendStop)</td></tr>
-<tr class="memdesc:a3fcbcf640b29eb0ff53d2d23edbdab66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read bytes from the slave and store in buffer owned by T_WIRE and send a STOP condition if <code>sendStop</code> is true.  <a href="classace__wire_1_1TwoWireInterface.html#a3fcbcf640b29eb0ff53d2d23edbdab66">More...</a><br /></td></tr>
-<tr class="separator:a3fcbcf640b29eb0ff53d2d23edbdab66"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70d161da6178c32657c40017ac8ac0c9"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#a70d161da6178c32657c40017ac8ac0c9">requestFrom</a> (uint8_t addr, uint8_t quantity)</td></tr>
-<tr class="memdesc:a70d161da6178c32657c40017ac8ac0c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read bytes from the slave and store in buffer owned by T_WIRE, and always send a STOP condition.  <a href="classace__wire_1_1TwoWireInterface.html#a70d161da6178c32657c40017ac8ac0c9">More...</a><br /></td></tr>
-<tr class="separator:a70d161da6178c32657c40017ac8ac0c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5e95776e675f4eb865b12ddb6676df3"><td class="memItemLeft" align="right" valign="top"><a id="af5e95776e675f4eb865b12ddb6676df3"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#af5e95776e675f4eb865b12ddb6676df3">read</a> ()</td></tr>
-<tr class="memdesc:af5e95776e675f4eb865b12ddb6676df3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read byte from buffer. <br /></td></tr>
-<tr class="separator:af5e95776e675f4eb865b12ddb6676df3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05786235ad81ff39f4b96b71983bd9ef"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#a05786235ad81ff39f4b96b71983bd9ef">begin</a> () const</td></tr>
+<tr class="memdesc:a05786235ad81ff39f4b96b71983bd9ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the interface.  <a href="classace__wire_1_1TwoWireInterface.html#a05786235ad81ff39f4b96b71983bd9ef">More...</a><br /></td></tr>
+<tr class="separator:a05786235ad81ff39f4b96b71983bd9ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a5335943f1af0c5cb3cb6ba7ed4b5c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#a9a5335943f1af0c5cb3cb6ba7ed4b5c6">end</a> () const</td></tr>
+<tr class="memdesc:a9a5335943f1af0c5cb3cb6ba7ed4b5c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">End the interface.  <a href="classace__wire_1_1TwoWireInterface.html#a9a5335943f1af0c5cb3cb6ba7ed4b5c6">More...</a><br /></td></tr>
+<tr class="separator:a9a5335943f1af0c5cb3cb6ba7ed4b5c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adec23031ce77068ecaccb600de792cf2"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#adec23031ce77068ecaccb600de792cf2">beginTransmission</a> (uint8_t addr) const</td></tr>
+<tr class="memdesc:adec23031ce77068ecaccb600de792cf2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare the write buffer to accept a sequence of data, and save the addr for transmission when <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#a7f5d4df4be62c9b8b44c778a68f16256" title="Send the data in the buffer, with a STOP condition if sendStop is true.">endTransmission()</a></code> is called.  <a href="classace__wire_1_1TwoWireInterface.html#adec23031ce77068ecaccb600de792cf2">More...</a><br /></td></tr>
+<tr class="separator:adec23031ce77068ecaccb600de792cf2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2d509f10ede2dfcd63d50bd46b7cf89"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#aa2d509f10ede2dfcd63d50bd46b7cf89">write</a> (uint8_t data) const</td></tr>
+<tr class="memdesc:aa2d509f10ede2dfcd63d50bd46b7cf89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write data into the write buffer.  <a href="classace__wire_1_1TwoWireInterface.html#aa2d509f10ede2dfcd63d50bd46b7cf89">More...</a><br /></td></tr>
+<tr class="separator:aa2d509f10ede2dfcd63d50bd46b7cf89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f5d4df4be62c9b8b44c778a68f16256"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#a7f5d4df4be62c9b8b44c778a68f16256">endTransmission</a> (bool sendStop=true) const</td></tr>
+<tr class="memdesc:a7f5d4df4be62c9b8b44c778a68f16256"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send the data in the buffer, with a STOP condition if <code>sendStop</code> is true.  <a href="classace__wire_1_1TwoWireInterface.html#a7f5d4df4be62c9b8b44c778a68f16256">More...</a><br /></td></tr>
+<tr class="separator:a7f5d4df4be62c9b8b44c778a68f16256"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c446a7afe6828fc8d32ea73126b5e5d"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#a7c446a7afe6828fc8d32ea73126b5e5d">requestFrom</a> (uint8_t addr, uint8_t quantity, bool sendStop=true) const</td></tr>
+<tr class="memdesc:a7c446a7afe6828fc8d32ea73126b5e5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read bytes from the slave and store in buffer owned by TwoWire and send a STOP condition if <code>sendStop</code> is true.  <a href="classace__wire_1_1TwoWireInterface.html#a7c446a7afe6828fc8d32ea73126b5e5d">More...</a><br /></td></tr>
+<tr class="separator:a7c446a7afe6828fc8d32ea73126b5e5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af81c8853e739e8e523cb8a187578366a"><td class="memItemLeft" align="right" valign="top"><a id="af81c8853e739e8e523cb8a187578366a"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__wire_1_1TwoWireInterface.html#af81c8853e739e8e523cb8a187578366a">read</a> () const</td></tr>
+<tr class="memdesc:af81c8853e739e8e523cb8a187578366a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read byte from the TwoWire receive buffer. <br /></td></tr>
+<tr class="separator:af81c8853e739e8e523cb8a187578366a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a13d282afe9157357d47590eabd1c7576"><td class="memItemLeft" align="right" valign="top"><a id="a13d282afe9157357d47590eabd1c7576"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>TwoWireInterface</b> (const <a class="el" href="classace__wire_1_1TwoWireInterface.html">TwoWireInterface</a> &amp;)=default</td></tr>
 <tr class="separator:a13d282afe9157357d47590eabd1c7576"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -125,12 +118,18 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div class="textblock"><h3>template&lt;typename T_WIRE&gt;<br />
 class ace_wire::TwoWireInterface&lt; T_WIRE &gt;</h3>
 
-<p>A thin wrapper around an I2C <code>TwoWire</code> class and its <code>Wire</code> object. </p>
+<p>A thin wrapper around the default <code>TwoWire</code> class and its <code>Wire</code> object provided by most Arduino platforms. </p>
+<p>All <code>TwoWire</code> instances use a TX and RX buffer of varying sizes. For example:</p>
+<ul>
+<li>The AVR version uses 32 bytes for each</li>
+<li>The ESP8266 and ESP32 versions use 128 bytes.</li>
+<li>The STM32 version uses 32 bytes.</li>
+<li>The SAMD21 version uses 256 bytes.</li>
+</ul>
 <p>This is a template class to avoid including the <code>&lt;Wire.h&gt;</code> header file, which increases flash memory on AVR by about 1000 byte even if the <code>Wire</code> object is never used.</p>
-<p>This wrapper can also be used with alternative implementations of I2C (software or hardware) so long as they implement some basic API of the <code>TwoWire</code> class: specifically the <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#aaf3ab9ab6c4dbf5e7b2741d1ab980788" title="Prepare the write buffer to accept a sequence of data, and save the addr for transmission when endTra...">beginTransmission()</a></code>, <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#a4263936c9bff1c092855ea49bcd12e85" title="Write data into the write buffer.">write()</a></code> and <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#a4053895317558317d9c428669cac1476" title="Same as endTransmission(bool) but always send STOP condition.">endTransmission()</a> methods. Since</code>TwoWireInterface` is a template, the alternative implementation classes do <em>not</em> need to inherit from the <code>TwoWire</code> class.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T_WIRE</td><td>underlying class that implements the I2C protocol, usually <code>TwoWire</code> from the pre-installed Wire library, but can be used with other third party libraries that look like <code>TwoWire</code> </td></tr>
+    <tr><td class="paramname">T_WIRE</td><td>underlying class that implements the I2C protocol which will always be <code>TwoWire</code> </td></tr>
   </table>
   </dd>
 </dl>
@@ -166,18 +165,18 @@ template&lt;typename T_WIRE &gt; </div>
 <p>Constructor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">wire</td><td>instance of <code>T_WIRE</code>. If the pre-installed Wire.h is used, then T_WIRE is <code>TwoWire</code> and <code>wire</code> is the precreated <code>Wire</code> object </td></tr>
+    <tr><td class="paramname">wire</td><td>instance of <code>TwoWire</code> which will always be the <code>Wire</code> object </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00058">58</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00056">56</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a494ad44b23a2f5638ffd471fc01428c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a494ad44b23a2f5638ffd471fc01428c8">&#9670;&nbsp;</a></span>begin()</h2>
+<a id="a05786235ad81ff39f4b96b71983bd9ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05786235ad81ff39f4b96b71983bd9ef">&#9670;&nbsp;</a></span>begin()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -191,7 +190,7 @@ template&lt;typename T_WIRE &gt; </div>
           <td class="memname">void <a class="el" href="classace__wire_1_1TwoWireInterface.html">ace_wire::TwoWireInterface</a>&lt; T_WIRE &gt;::begin </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -201,15 +200,15 @@ template&lt;typename T_WIRE &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Initial the interface. </p>
+<p>Initialize the interface. </p>
 <p>Currently does nothing. </p>
 
-<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00061">61</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00059">59</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 
 </div>
 </div>
-<a id="aaf3ab9ab6c4dbf5e7b2741d1ab980788"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaf3ab9ab6c4dbf5e7b2741d1ab980788">&#9670;&nbsp;</a></span>beginTransmission()</h2>
+<a id="adec23031ce77068ecaccb600de792cf2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adec23031ce77068ecaccb600de792cf2">&#9670;&nbsp;</a></span>beginTransmission()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -224,7 +223,7 @@ template&lt;typename T_WIRE &gt; </div>
           <td>(</td>
           <td class="paramtype">uint8_t&#160;</td>
           <td class="paramname"><em>addr</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -234,16 +233,15 @@ template&lt;typename T_WIRE &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Prepare the write buffer to accept a sequence of data, and save the addr for transmission when <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#a4053895317558317d9c428669cac1476" title="Same as endTransmission(bool) but always send STOP condition.">endTransmission()</a></code> is called. </p>
-<p>For unbuffered implementations, immediately send the address byte on the I2C bus with the Write bit set.</p>
+<p>Prepare the write buffer to accept a sequence of data, and save the addr for transmission when <code><a class="el" href="classace__wire_1_1TwoWireInterface.html#a7f5d4df4be62c9b8b44c778a68f16256" title="Send the data in the buffer, with a STOP condition if sendStop is true.">endTransmission()</a></code> is called. </p>
 <dl class="section return"><dt>Returns</dt><dd>always returns 0 to indicate success because the <code>addr</code> is simply written into a buffer </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00075">75</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00071">71</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 
 </div>
 </div>
-<a id="a2d5f1c8a9f0bf3bb07d2891d6781521e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2d5f1c8a9f0bf3bb07d2891d6781521e">&#9670;&nbsp;</a></span>end()</h2>
+<a id="a9a5335943f1af0c5cb3cb6ba7ed4b5c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a5335943f1af0c5cb3cb6ba7ed4b5c6">&#9670;&nbsp;</a></span>end()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -257,7 +255,7 @@ template&lt;typename T_WIRE &gt; </div>
           <td class="memname">void <a class="el" href="classace__wire_1_1TwoWireInterface.html">ace_wire::TwoWireInterface</a>&lt; T_WIRE &gt;::end </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -270,12 +268,12 @@ template&lt;typename T_WIRE &gt; </div>
 <p>End the interface. </p>
 <p>Currently does nothing. </p>
 
-<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00064">64</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00062">62</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 
 </div>
 </div>
-<a id="a02b957264362b8c7a1d44d7779cacacd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a02b957264362b8c7a1d44d7779cacacd">&#9670;&nbsp;</a></span>endTransmission()</h2>
+<a id="a7f5d4df4be62c9b8b44c778a68f16256"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f5d4df4be62c9b8b44c778a68f16256">&#9670;&nbsp;</a></span>endTransmission()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -289,8 +287,8 @@ template&lt;typename T_WIRE &gt; </div>
           <td class="memname">uint8_t <a class="el" href="classace__wire_1_1TwoWireInterface.html">ace_wire::TwoWireInterface</a>&lt; T_WIRE &gt;::endTransmission </td>
           <td>(</td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>sendStop</em></td><td>)</td>
-          <td></td>
+          <td class="paramname"><em>sendStop</em> = <code>true</code></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -301,8 +299,7 @@ template&lt;typename T_WIRE &gt; </div>
 </div><div class="memdoc">
 
 <p>Send the data in the buffer, with a STOP condition if <code>sendStop</code> is true. </p>
-<p>For unbuffered implementations, just send the STOP condition.</p>
-<p>Returns the value returned by the underlying T_WIRE::endTransmission() method. For the preinstalled Wire library, the status value definitions are buried in the twi_writeTo() function:</p>
+<p>Returns the value returned by the underlying TwoWire::endTransmission() method, which returns the values documented in the twi_writeTo() function:</p>
 <ul>
 <li>0: success</li>
 <li>1: length too long for buffer</li>
@@ -311,56 +308,12 @@ template&lt;typename T_WIRE &gt; </div>
 <li>4: other twi error (lost bus arbitration, bus error, ..) </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00106">106</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00098">98</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 
 </div>
 </div>
-<a id="a70d161da6178c32657c40017ac8ac0c9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a70d161da6178c32657c40017ac8ac0c9">&#9670;&nbsp;</a></span>requestFrom() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename T_WIRE &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint8_t <a class="el" href="classace__wire_1_1TwoWireInterface.html">ace_wire::TwoWireInterface</a>&lt; T_WIRE &gt;::requestFrom </td>
-          <td>(</td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>addr</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>quantity</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read bytes from the slave and store in buffer owned by T_WIRE, and always send a STOP condition. </p>
-<p>Some I2C implementations do not provide a 3-argument version of <a class="el" href="classace__wire_1_1TwoWireInterface.html#a3fcbcf640b29eb0ff53d2d23edbdab66" title="Read bytes from the slave and store in buffer owned by T_WIRE and send a STOP condition if sendStop i...">requestFrom()</a>, so we need to provide an explicit 2-argument versions instead of using a default argument of <code>sendStop = true</code>.</p>
-<dl class="section return"><dt>Returns</dt><dd>the value returned by the underlying T_WIRE::requestFrom() method, which will normally be 'quantity' or 0 if an error is encountered. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00140">140</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
-
-</div>
-</div>
-<a id="a3fcbcf640b29eb0ff53d2d23edbdab66"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3fcbcf640b29eb0ff53d2d23edbdab66">&#9670;&nbsp;</a></span>requestFrom() <span class="overload">[2/2]</span></h2>
+<a id="a7c446a7afe6828fc8d32ea73126b5e5d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c446a7afe6828fc8d32ea73126b5e5d">&#9670;&nbsp;</a></span>requestFrom()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -386,12 +339,12 @@ template&lt;typename T_WIRE &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>sendStop</em>&#160;</td>
+          <td class="paramname"><em>sendStop</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td> const</td>
         </tr>
       </table>
   </td>
@@ -401,15 +354,23 @@ template&lt;typename T_WIRE &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Read bytes from the slave and store in buffer owned by T_WIRE and send a STOP condition if <code>sendStop</code> is true. </p>
-<dl class="section return"><dt>Returns</dt><dd>the value returned by the underlying T_WIRE::requestFrom() method, which will normally be 'quantity'. Some implementations, particularly the unbuffered ones, will return 0 to indicate a NACK response from the slave device. </dd></dl>
+<p>Read bytes from the slave and store in buffer owned by TwoWire and send a STOP condition if <code>sendStop</code> is true. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">addr</td><td>I2C address </td></tr>
+    <tr><td class="paramname">quantity</td><td>number of bytes to read </td></tr>
+    <tr><td class="paramname">sendStop</td><td>whether the STOP condition should be sent at end</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the value returned by the underlying T_WIRE::requestFrom() method, which will normally be 'quantity' </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00124">124</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00113">113</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 
 </div>
 </div>
-<a id="a4263936c9bff1c092855ea49bcd12e85"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4263936c9bff1c092855ea49bcd12e85">&#9670;&nbsp;</a></span>write()</h2>
+<a id="aa2d509f10ede2dfcd63d50bd46b7cf89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2d509f10ede2dfcd63d50bd46b7cf89">&#9670;&nbsp;</a></span>write()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -424,7 +385,7 @@ template&lt;typename T_WIRE &gt; </div>
           <td>(</td>
           <td class="paramtype">uint8_t&#160;</td>
           <td class="paramname"><em>data</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -435,10 +396,9 @@ template&lt;typename T_WIRE &gt; </div>
 </div><div class="memdoc">
 
 <p>Write data into the write buffer. </p>
-<p>For unbuffered implementations, immediately send the address byte on the I2C bus with the Write bit set.</p>
-<dl class="section return"><dt>Returns</dt><dd>the number of bytes written into buffer, will always be 1. For unbuffered implementations, 0 can be returned if the device responds with a NACK </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the number of bytes written into buffer, will always be 1. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00088">88</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TwoWireInterface_8h_source.html#l00081">81</a> of file <a class="el" href="TwoWireInterface_8h_source.html">TwoWireInterface.h</a>.</p>
 
 </div>
 </div>
