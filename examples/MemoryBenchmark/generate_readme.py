@@ -38,7 +38,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceWire v0.3.2
+**Version**: AceWire v0.4.0
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -81,7 +81,11 @@ $ make README.md
 
 ## Library Size Changes
 
-**v0.3**
+**v0.4**
+
+* Reduce memory consumption for some third party libraries by reusing the
+  pre-defined instances of various I2C classes. Analogous to the `Wire` instance
+  for the `TwoWire` class.
 
 * Initial iteration of MemoryBenchmarks.
 
@@ -95,14 +99,18 @@ I2C implementations:
 * `SimpleWireFastInterface`: AceWire's own Software I2C using a
   `digitalWriteFast()` library. (AVR only)
 * Third party libraries
-    * `TwoWireInterface<SoftwareWire>`: Software I2C using
-    https://github.com/Testato/SoftwareWire. (AVR only)
-    * `TwoWireInterface<SWire>`: Software I2C using
-    https://github.com/RaemondBW/SWire
-    * `TwoWireInterface<SlowSoftWire>`: Software I2C using
-    https://github.com/felias-fogg/SlowSoftWire
-    * `TwoWireInterface<SeeedSoftwareI2C>`: Software I2C using
-    https://github.com/Seeed-Studio/Arduino_Software_I2C
+    * `RaemondWireInterface<SoftWare>`: Software I2C using
+      https://github.com/RaemondBW/SWire
+    * `FeliasFoggWireInterface<SlowSoftWire>`: Software I2C using
+      https://github.com/felias-fogg/SlowSoftWire
+    * `SeeedWireInterface<SoftwareI2C>`: Software I2C using
+      https://github.com/Seeed-Studio/Arduino_Software_I2C
+    * `TestatoWireInterface<SoftwareWire>,100kHz`: Software I2C using
+      https://github.com/Testato/SoftwareWire set to 100 kHz (compatible with
+      AVR only).
+    * `TestatoWireInterface<SoftwareWire>,400kHz`: Software I2C using
+      https://github.com/Testato/SoftwareWire set to 400 kHz (compatible with
+      AVR only).
 
 ### ATtiny85
 

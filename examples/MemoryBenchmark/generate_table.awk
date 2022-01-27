@@ -10,10 +10,10 @@ BEGIN {
   labels[1] = "TwoWireInterface<TwoWire>";
   labels[2] = "SimpleWireInterface";
   labels[3] = "SimpleWireFastInterface";
-  labels[4] = "RaemondWireInterface<SWire>";
-  labels[5] = "FeliasFoggWireInterface<SlowSoftWire>";
-  labels[6] = "SeeedWireInterface<SoftwareI2C>";
-  labels[7] = "MarpleWireInterface<SoftWire>";
+  labels[4] = "FeliasFoggWireInterface<SlowSoftWire>";
+  labels[5] = "MarpleWireInterface<SoftWire>";
+  labels[6] = "RaemondWireInterface<SWire>";
+  labels[7] = "SeeedWireInterface<SoftwareI2C>";
   labels[8] = "TestatoWireInterface<SoftwareWire>";
   labels[9] = "ThexenoWireInterface<TwoWire>";
   record_index = 0
@@ -47,7 +47,7 @@ END {
 
     if (name ~ /^baseline/ \
         || name ~ /^TwoWireInterface/ \
-        || name ~ /^RaemondWireInterface/ \
+        || name ~ /^FeliasFoggWireInterface/ \
         || name ~ /^TestatoWireInterface/) {
       printf(\
         "|---------------------------------------+--------------+-------------|\n")

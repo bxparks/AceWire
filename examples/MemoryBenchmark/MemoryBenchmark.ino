@@ -17,32 +17,31 @@
 // List of features of AceWire that we want to gather memory usage numbers.
 #define FEATURE_BASELINE 0
 
-// TwoWireInterface w/ <Wire.h>
+// TwoWireInterface from <Wire.h> (all platforms)
 #define FEATURE_TWO_WIRE 1
 
-// SimpleWireInterface
+// SimpleWireInterface (all platforms)
 #define FEATURE_SIMPLE_WIRE 2
 
 // SimpleWireFastInterface (AVR only)
 #define FEATURE_SIMPLE_WIRE_FAST 3
 
-// https://github.com/RaemondBW/SWire
-#define FEATURE_RAEMOND_WIRE 4
+// https://github.com/felias-fogg/SlowSoftWire (all platforms)
+#define FEATURE_FELIAS_FOGG_WIRE 4
 
-// https://github.com/felias-fogg/SlowSoftWire
-#define FEATURE_FELIAS_FOGG_WIRE 5
+// https://github.com/stevemarple/SoftWire (all platforms)
+#define FEATURE_MARPLE_WIRE 5
 
-// https://github.com/Seeed-Studio/Arduino_Software_I2C
-#define FEATURE_SEEED_WIRE 6
+// https://github.com/RaemondBW/SWire (all platforms)
+#define FEATURE_RAEMOND_WIRE 6
 
-// https://github.com/stevemarple/SoftWire
-#define FEATURE_MARPLE_WIRE 7
+// https://github.com/Seeed-Studio/Arduino_Software_I2C (all platforms)
+#define FEATURE_SEEED_WIRE 7
 
 // https://github.com/Testato/SoftwareWire (AVR only)
 #define FEATURE_TESTATO_WIRE 8
 
-// https://github.com/thexeno/HardWire-Arduino-Library (AVR only, but not
-// ATTINY)
+// https://github.com/thexeno/HardWire-Arduino-Library (AVR, but not ATTINY)
 #define FEATURE_THEXENO_WIRE 9
 
 // A volatile integer to prevent the compiler from optimizing away the entire
@@ -81,23 +80,11 @@ volatile int disableCompilerOptimization = 0;
         SDA_PIN, SCL_PIN, DELAY_MICROS>;
     WireInterface wireInterface;
 
-  #elif FEATURE == FEATURE_RAEMOND_WIRE
-    #include <SWire.h>
-    SoftWire swire;
-    using WireInterface = RaemondWireInterface<SoftWire>;
-    WireInterface wireInterface(swire);
-
   #elif FEATURE == FEATURE_FELIAS_FOGG_WIRE
     #include <SlowSoftWire.h>
     SlowSoftWire slowSoftWire(SDA_PIN, SCL_PIN);
     using WireInterface = FeliasFoggWireInterface<SlowSoftWire>;
     WireInterface wireInterface(slowSoftWire);
-
-  #elif FEATURE == FEATURE_SEEED_WIRE
-    #include <SoftwareI2C.h>
-    SoftwareI2C seeedWire;
-    using WireInterface = SeeedWireInterface<SoftwareI2C>;
-    WireInterface wireInterface(seeedWire);
 
   #elif FEATURE == FEATURE_MARPLE_WIRE
     #include <SoftWire.h>
@@ -107,6 +94,17 @@ volatile int disableCompilerOptimization = 0;
     SoftWire softWire(SDA_PIN, SCL_PIN);
     using WireInterface = MarpleWireInterface<SoftWire>;
     WireInterface wireInterface(softWire);
+
+  #elif FEATURE == FEATURE_RAEMOND_WIRE
+    #include <SWire.h>
+    using WireInterface = RaemondWireInterface<SoftWire>;
+    WireInterface wireInterface(SWire);
+
+  #elif FEATURE == FEATURE_SEEED_WIRE
+    #include <SoftwareI2C.h>
+    SoftwareI2C seeedWire;
+    using WireInterface = SeeedWireInterface<SoftwareI2C>;
+    WireInterface wireInterface(seeedWire);
 
   #elif FEATURE == FEATURE_TESTATO_WIRE
     // AVR only
@@ -123,9 +121,8 @@ volatile int disableCompilerOptimization = 0;
     // AVR only, but not ATTINYX5
     #if defined(ARDUINO_ARCH_AVR) && ! defined(ARDUINO_AVR_ATTINYX5)
       #include <HardWire.h>
-      TwoWire hardWire;
       using WireInterface = ThexenoWireInterface<TwoWire>;
-      WireInterface wireInterface(hardWire);
+      WireInterface wireInterface(Wire);
     #else
       #error Unsupported FEATURE on this platform
     #endif
@@ -175,16 +172,8 @@ disableCompilerOptimization = 3;
 #elif FEATURE == FEATURE_SIMPLE_WIRE_FAST
   wireInterface.begin();
 
-#elif FEATURE == FEATURE_RAEMOND_WIRE
-  swire.begin(SDA_PIN, SCL_PIN);
-  wireInterface.begin();
-
 #elif FEATURE == FEATURE_FELIAS_FOGG_WIRE
   slowSoftWire.begin();
-  wireInterface.begin();
-
-#elif FEATURE == FEATURE_SEEED_WIRE
-  seeedWire.begin(SDA_PIN, SCL_PIN);
   wireInterface.begin();
 
 #elif FEATURE == FEATURE_MARPLE_WIRE
@@ -193,12 +182,20 @@ disableCompilerOptimization = 3;
   softWire.begin();
   wireInterface.begin();
 
+#elif FEATURE == FEATURE_RAEMOND_WIRE
+  SWire.begin(SDA_PIN, SCL_PIN);
+  wireInterface.begin();
+
+#elif FEATURE == FEATURE_SEEED_WIRE
+  seeedWire.begin(SDA_PIN, SCL_PIN);
+  wireInterface.begin();
+
 #elif FEATURE == FEATURE_TESTATO_WIRE
   softwareWire.begin();
   wireInterface.begin();
 
 #elif FEATURE == FEATURE_THEXENO_WIRE
-  hardWire.begin();
+  Wire.begin();
   wireInterface.begin();
 
 #else
