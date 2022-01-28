@@ -285,22 +285,26 @@ void runSeeedWire() {
 // TwoWireInterface<> records to the front.
 void runBenchmarks() {
 
-#if ! defined(ESP32)
-  runTwoWire100();
-  runTwoWire400();
-#endif
-
+  // AceWire implementations
   runSimpleWire();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runSimpleWireFast();
 #endif
 
+  // Native <Wire.h>
+#if ! defined(ESP32)
+  runTwoWire100();
+  runTwoWire400();
+#endif
+
+  // All platforms
 #if ! defined(EPOXY_DUINO)
   runFeliasFoggWire();
   runRaemondWire();
   runSeeedWire();
 #endif
 
+  // AVR only
 #if defined(ARDUINO_ARCH_AVR)
   runTestatoWire100();
   runTestatoWire400();

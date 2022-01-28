@@ -18,16 +18,17 @@ BEGIN {
   # third party I2C library on the same pins after the native Wire object
   # initialized. But for display purposes, we want to see the numbers for the
   # native TwoWireInterface at the beginning. So use this REMAP array to map
-  # the incoming array indexes to their display indexes, so tha the
-  # TwoWireInterface records are shown at the beginning.
+  # the incoming array indexes to their display indexes, so that the
+  # TwoWireInterface records are shown just after the Simple*WireInterface
+  # records.
   #
   # Format: REMAP[incoming_index] = display_index
-  REMAP[0] = 2
+  REMAP[0] = 0
   REMAP[1] = 3
   REMAP[2] = 4
   REMAP[3] = 5
-  REMAP[4] = 0
-  REMAP[5] = 1
+  REMAP[4] = 1
+  REMAP[5] = 2
 }
 
 /^SIZEOF/ {
@@ -81,7 +82,8 @@ END {
   printf("| Functionality                             |   min/  avg/  max | eff kbps |\n")
   for (i = 0; i < TOTAL_BENCHMARKS; i++) {
     name = u[i]["name"]
-    if (name ~ /^TwoWireInterface<TwoWire>,100kHz/ \
+    if (name ~ /^SimpleWireInterface/ \
+        || name ~ /^TwoWireInterface<TwoWire>,100kHz/ \
         || name ~ /^FeliasFoggWireInterface<SlowSoftWire>/ \
         || name ~ /^TestatoWireInterface<SoftwareWire>,100kHz/) {
       printf("|-------------------------------------------+-------------------+----------|\n")

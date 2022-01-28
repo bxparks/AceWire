@@ -27,7 +27,7 @@ the AceWire library. To obtain accurate results, an actual I2C device must exist
 on the bus. Currently, I use a DS3231 RTC chip because it is relatively small
 and inexpensive and I can install one on each of my development boards.
 
-**Version**: AceWire v0.4.0
+**Version**: AceWire v0.4.1
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -94,6 +94,14 @@ number of `TimingStats::update()` calls that were made.
       `delayMicroseconds()` is probably greater than the time consumed by the
       `digitalWrite()` function.
 
+**v0.4.1**
+
+* Rearrange grouping in the order of:
+    * AceWire implementations (SimpleWire*Interface)
+    * k`<Wire.h>`
+    * third party general
+    * third party AVR only
+
 ## Results
 
 The following tables show the number of microseconds taken to send 11 bytes to
@@ -105,16 +113,18 @@ overhead of the START and STOP conditions.
 
 The following implementations are tested:
 
-* `TwoWireInterface<TwoWire>,100kHz`: The hardware `<Wire.h>` library set to 100
-  kHz (default).
-* `TwoWireInterface<TwoWire>,400kHz`: The hardware `<Wire.h>` library at to 400
-  kHz.
-* `SimpleWireInterface,1us`: AceWire's own Software I2C using `digitalWrite()`
-  using a `delayMicros` of 1 micros.
-* `SimpleWireFastInterface,1us`: AceWire's own Software I2C using a
-  `digitalWriteFast()` library and a `delayMicros` of 1 micros (compatible with
-  AVR only).
-* Third party libraries
+* AceWire I2C implementations
+    * `SimpleWireInterface,1us`: AceWire's own Software I2C using
+      `digitalWrite()` using a `delayMicros` of 1 micros.
+    * `SimpleWireFastInterface,1us`: AceWire's own Software I2C using a
+      `digitalWriteFast()` library and a `delayMicros` of 1 micros (compatible
+      with AVR only).
+* Native `<Wire.h>` (all platforms)
+    * `TwoWireInterface<TwoWire>,100kHz`: The hardware `<Wire.h>` library set to
+      100 kHz (default).
+    * `TwoWireInterface<TwoWire>,400kHz`: The hardware `<Wire.h>` library at to
+      400 kHz.
+* Third party libraries (all platforms)
     * `FeliasFoggWireInterface<SlowSoftWire>`: Software I2C using
       https://github.com/felias-fogg/SlowSoftWire (all platforms)
     * `MarpleWireInterface<SoftWire>`: Software I2C using
@@ -123,6 +133,7 @@ The following implementations are tested:
       https://github.com/RaemondBW/SWire (all platforms)
     * `SeeedWireInterface<SoftwareI2C>`: Software I2C using
       https://github.com/Seeed-Studio/Arduino_Software_I2C (all platforms)
+* Third party libraries (AVR only)
     * `TestatoWireInterface<SoftwareWire>,100kHz`: Software I2C using
       https://github.com/Testato/SoftwareWire set to 100 kHz (AVR only).
     * `TestatoWireInterface<SoftwareWire>,400kHz`: Software I2C using
