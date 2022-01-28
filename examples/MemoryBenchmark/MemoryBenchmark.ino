@@ -17,14 +17,14 @@
 // List of features of AceWire that we want to gather memory usage numbers.
 #define FEATURE_BASELINE 0
 
-// TwoWireInterface from <Wire.h> (all platforms)
-#define FEATURE_TWO_WIRE 1
-
 // SimpleWireInterface (all platforms)
-#define FEATURE_SIMPLE_WIRE 2
+#define FEATURE_SIMPLE_WIRE 1
 
 // SimpleWireFastInterface (AVR only)
-#define FEATURE_SIMPLE_WIRE_FAST 3
+#define FEATURE_SIMPLE_WIRE_FAST 2
+
+// TwoWireInterface from <Wire.h> (all platforms)
+#define FEATURE_TWO_WIRE 3
 
 // https://github.com/felias-fogg/SlowSoftWire (all platforms)
 #define FEATURE_FELIAS_FOGG_WIRE 4
@@ -44,6 +44,9 @@
 // https://github.com/thexeno/HardWire-Arduino-Library (AVR, but not ATTINY)
 #define FEATURE_THEXENO_WIRE 9
 
+// https://github.com/todbot/SoftI2CMaster (AVR, but not ATTINY)
+#define FEATURE_TODBOT_WIRE 10
+
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
 volatile int disableCompilerOptimization = 0;
@@ -60,12 +63,7 @@ volatile int disableCompilerOptimization = 0;
   const uint8_t DELAY_MICROS = 1;
   const uint8_t DS3231_I2C_ADDRESS = 0x68;
 
-  #if FEATURE == FEATURE_TWO_WIRE
-    #include <Wire.h>
-    using WireInterface = TwoWireInterface<TwoWire>;
-    WireInterface wireInterface(Wire);
-
-  #elif FEATURE == FEATURE_SIMPLE_WIRE
+  #if FEATURE == FEATURE_SIMPLE_WIRE
     using WireInterface = SimpleWireInterface;
     WireInterface wireInterface(SDA_PIN, SCL_PIN, DELAY_MICROS);
 
@@ -79,6 +77,11 @@ volatile int disableCompilerOptimization = 0;
     using WireInterface = SimpleWireFastInterface<
         SDA_PIN, SCL_PIN, DELAY_MICROS>;
     WireInterface wireInterface;
+
+  #elif FEATURE == FEATURE_TWO_WIRE
+    #include <Wire.h>
+    using WireInterface = TwoWireInterface<TwoWire>;
+    WireInterface wireInterface(Wire);
 
   #elif FEATURE == FEATURE_FELIAS_FOGG_WIRE
     #include <SlowSoftWire.h>
@@ -127,6 +130,18 @@ volatile int disableCompilerOptimization = 0;
       #error Unsupported FEATURE on this platform
     #endif
 
+  #elif FEATURE == FEATURE_TODBOT_WIRE
+    // AVR only, but not ATTINYX5
+    #if defined(ARDUINO_ARCH_AVR) && ! defined(ARDUINO_AVR_ATTINYX5)
+      #include <SoftI2CMaster.h>
+      SoftI2CMaster todbotWire(SCL_PIN, SDA_PIN);
+      using WireInterface = TodbotWireInterface<SoftI2CMaster>;
+      WireInterface wireInterface(todbotWire);
+    #else
+      #error Unsupported FEATURE on this platform
+    #endif
+
+
   #else
     #error Unknown FEATURE
 
@@ -162,14 +177,14 @@ disableCompilerOptimization = 3;
 #if FEATURE == FEATURE_BASELINE
   // Do nothing
 
-#elif FEATURE == FEATURE_TWO_WIRE
-  Wire.begin();
-  wireInterface.begin();
-
 #elif FEATURE == FEATURE_SIMPLE_WIRE
   wireInterface.begin();
 
 #elif FEATURE == FEATURE_SIMPLE_WIRE_FAST
+  wireInterface.begin();
+
+#elif FEATURE == FEATURE_TWO_WIRE
+  Wire.begin();
   wireInterface.begin();
 
 #elif FEATURE == FEATURE_FELIAS_FOGG_WIRE
@@ -198,6 +213,10 @@ disableCompilerOptimization = 3;
   Wire.begin();
   wireInterface.begin();
 
+#elif FEATURE == FEATURE_TODBOT_WIRE
+  Wire.begin();
+  wireInterface.begin();
+
 #else
   #error Unknown FEATURE
 
@@ -212,15 +231,16 @@ void loop() {
 #if FEATURE == FEATURE_BASELINE
   // do nothing
 
-#elif FEATURE == FEATURE_TWO_WIRE \
-    || FEATURE == FEATURE_SIMPLE_WIRE \
+#elif FEATURE == FEATURE_SIMPLE_WIRE \
     || FEATURE == FEATURE_SIMPLE_WIRE_FAST \
+    || FEATURE == FEATURE_TWO_WIRE \
     || FEATURE == FEATURE_RAEMOND_WIRE \
     || FEATURE == FEATURE_FELIAS_FOGG_WIRE \
     || FEATURE == FEATURE_SEEED_WIRE \
     || FEATURE == FEATURE_MARPLE_WIRE \
     || FEATURE == FEATURE_TESTATO_WIRE \
-    || FEATURE == FEATURE_THEXENO_WIRE
+    || FEATURE == FEATURE_THEXENO_WIRE \
+    || FEATURE == FEATURE_TODBOT_WIRE
   wireInterface.beginTransmission(DS3231_I2C_ADDRESS);
   wireInterface.write(0x00);
   wireInterface.endTransmission();

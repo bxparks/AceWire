@@ -14,7 +14,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceWire v0.4.0
+**Version**: AceWire v0.4.1
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -63,30 +63,37 @@ $ make README.md
   pre-defined instances of various I2C classes. Analogous to the `Wire` instance
   for the `TwoWire` class.
 
-* Initial iteration of MemoryBenchmarks.
+**v0.4.1**
+
+* Add `TodbotWireInterface` to support https://github.com/todbot/SoftI2CMaster.
 
 ## Results
 
 The following shows the flash and static memory sizes of the following 
 I2C implementations:
 
-* `TwoWireInterface<TwoWire>`: The hardware `<Wire.h>` library.
-* `SimpleWireInterface`: AceWire's own Software I2C using `digitalWrite()`.
-* `SimpleWireFastInterface`: AceWire's own Software I2C using a
-  `digitalWriteFast()` library. (AVR only)
-* Third party libraries
-    * `RaemondWireInterface<SoftWare>`: Software I2C using
-      https://github.com/RaemondBW/SWire
+* AceWire I2C implementations
+    * `SimpleWireInterface`: AceWire's own Software I2C using `digitalWrite()`.
+    * `SimpleWireFastInterface`: AceWire's own Software I2C using a
+    `digitalWriteFast()` library. (AVR only)
+* Native `<Wire.h>` (all platforms)
+    * `TwoWireInterface<TwoWire>`: Hardware I2C using preinstalled `<Wire.h>`.
+* Third party libraries (all platforms)
     * `FeliasFoggWireInterface<SlowSoftWire>`: Software I2C using
       https://github.com/felias-fogg/SlowSoftWire
+    * `MarpleWireInterface<SoftWire>`: Software I2C using
+      https://github.com/stevemarple/SoftWire library.
+    * `RaemondWireInterface<SoftWare>`: Software I2C using
+      https://github.com/RaemondBW/SWire
     * `SeeedWireInterface<SoftwareI2C>`: Software I2C using
       https://github.com/Seeed-Studio/Arduino_Software_I2C
-    * `TestatoWireInterface<SoftwareWire>,100kHz`: Software I2C using
-      https://github.com/Testato/SoftwareWire set to 100 kHz (compatible with
-      AVR only).
-    * `TestatoWireInterface<SoftwareWire>,400kHz`: Software I2C using
-      https://github.com/Testato/SoftwareWire set to 400 kHz (compatible with
-      AVR only).
+* Third party libraries (AVR only)
+    * `TestatoWireInterface<SoftwareWire>`: Software I2C using
+      https://github.com/Testato/SoftwareWire
+    * `ThexenoWireInterface<TwoWire>`: Software I2C using
+      https://github.com/thexeno/HardWire-Arduino-Library
+    * `TodbotWireInterface<SoftI2CMaster>`: Software I2C using
+      https://github.com/todbot/SoftI2CMaster
 
 ### ATtiny85
 
@@ -100,9 +107,10 @@ I2C implementations:
 |---------------------------------------+--------------+-------------|
 | baseline                              |    260/   11 |     0/    0 |
 |---------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>             |   1026/   55 |   766/   44 |
 | SimpleWireInterface                   |   1020/   16 |   760/    5 |
 | SimpleWireFastInterface               |    444/   13 |   184/    2 |
+|---------------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>             |   1026/   55 |   766/   44 |
 |---------------------------------------+--------------+-------------|
 | FeliasFoggWireInterface<SlowSoftWire> |   1660/   81 |  1400/   70 |
 | MarpleWireInterface<SoftWire>         |   2610/  133 |  2350/  122 |
@@ -126,9 +134,10 @@ I2C implementations:
 |---------------------------------------+--------------+-------------|
 | baseline                              |    456/   11 |     0/    0 |
 |---------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>             |   2926/  229 |  2470/  218 |
 | SimpleWireInterface                   |   1336/   16 |   880/    5 |
 | SimpleWireFastInterface               |    714/   13 |   258/    2 |
+|---------------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>             |   2926/  229 |  2470/  218 |
 |---------------------------------------+--------------+-------------|
 | FeliasFoggWireInterface<SlowSoftWire> |   2008/   83 |  1552/   72 |
 | MarpleWireInterface<SoftWire>         |   2936/  135 |  2480/  124 |
@@ -137,6 +146,7 @@ I2C implementations:
 |---------------------------------------+--------------+-------------|
 | TestatoWireInterface<SoftwareWire>    |   2454/   72 |  1998/   61 |
 | ThexenoWireInterface<TwoWire>         |   2264/  477 |  1808/  466 |
+| TodbotWireInterface<SoftI2CMaster>    |   3068/  239 |  2612/  228 |
 +--------------------------------------------------------------------+
 
 ```
@@ -153,9 +163,10 @@ I2C implementations:
 |---------------------------------------+--------------+-------------|
 | baseline                              |   3472/  151 |     0/    0 |
 |---------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>             |   5910/  369 |  2438/  218 |
 | SimpleWireInterface                   |   4428/  156 |   956/    5 |
 | SimpleWireFastInterface               |   3728/  153 |   256/    2 |
+|---------------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>             |   5910/  369 |  2438/  218 |
 |---------------------------------------+--------------+-------------|
 | FeliasFoggWireInterface<SlowSoftWire> |   5070/  223 |  1598/   72 |
 | MarpleWireInterface<SoftWire>         |   5924/  275 |  2452/  124 |
@@ -164,6 +175,7 @@ I2C implementations:
 |---------------------------------------+--------------+-------------|
 | TestatoWireInterface<SoftwareWire>    |   5388/  212 |  1916/   61 |
 | ThexenoWireInterface<TwoWire>         |   5322/  617 |  1850/  466 |
+| TodbotWireInterface<SoftI2CMaster>    |   6150/  379 |  2678/  228 |
 +--------------------------------------------------------------------+
 
 ```
@@ -180,8 +192,9 @@ I2C implementations:
 |---------------------------------------+--------------+-------------|
 | baseline                              |  21880/ 3540 |     0/    0 |
 |---------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>             |  29164/ 3752 |  7284/  212 |
 | SimpleWireInterface                   |  24672/ 3568 |  2792/   28 |
+|---------------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>             |  29164/ 3752 |  7284/  212 |
 |---------------------------------------+--------------+-------------|
 | FeliasFoggWireInterface<SlowSoftWire> |  25552/ 3620 |  3672/   80 |
 | MarpleWireInterface<SoftWire>         |  25880/ 3692 |  4000/  152 |
@@ -203,8 +216,9 @@ I2C implementations:
 |---------------------------------------+--------------+-------------|
 | baseline                              | 260089/27892 |     0/    0 |
 |---------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>             | 264485/28384 |  4396/  492 |
 | SimpleWireInterface                   | 261521/28000 |  1432/  108 |
+|---------------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>             | 264485/28384 |  4396/  492 |
 |---------------------------------------+--------------+-------------|
 | FeliasFoggWireInterface<SlowSoftWire> | 263513/28056 |  3424/  164 |
 | MarpleWireInterface<SoftWire>         | 263753/28128 |  3664/  236 |
@@ -226,8 +240,9 @@ I2C implementations:
 |---------------------------------------+--------------+-------------|
 | baseline                              | 204501/16060 |     0/    0 |
 |---------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>             | 231965/16940 | 27464/  880 |
 | SimpleWireInterface                   | 207621/16236 |  3120/  176 |
+|---------------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>             | 231965/16940 | 27464/  880 |
 |---------------------------------------+--------------+-------------|
 | FeliasFoggWireInterface<SlowSoftWire> | 209825/16308 |  5324/  248 |
 | MarpleWireInterface<SoftWire>         | 209989/16372 |  5488/  312 |
@@ -250,8 +265,9 @@ I2C implementations:
 |---------------------------------------+--------------+-------------|
 | baseline                              |  10216/ 4152 |     0/    0 |
 |---------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>             |  14400/ 4984 |  4184/  832 |
 | SimpleWireInterface                   |  11736/ 4160 |  1520/    8 |
+|---------------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>             |  14400/ 4984 |  4184/  832 |
 |---------------------------------------+--------------+-------------|
 | FeliasFoggWireInterface<SlowSoftWire> |  11932/ 4212 |  1716/   60 |
 | MarpleWireInterface<SoftWire>         |  12248/ 4280 |  2032/  128 |
