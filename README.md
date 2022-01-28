@@ -44,17 +44,21 @@ deficiencies:
 
 * The standard `<Wire.h>` library uses hardware interrupts supported only
   on certain GPIO pins (`SDA` and `SCL` pins).
-* The `TwoWire` class on many platforms (e.g. AVR) is hardcoded to use a 32-byte
-  RX and TX buffer, which is insufficient for certain types of I2C devices.
-* Simply including `#include <Wire.h>` in a user application causes flash usage
-  to increase by ~1100 bytes, and static memory to increase by ~110 bytes,
-  even if nothing uses the `Wire` object.
-    * This means that if a third party library supports, for example, both SPI
-      and I2C of a device, and therefore must include `<Wire.h>`, the end-user
-      application pulls in code from the `<Wire.h>` library even if it uses only
-      the SPI version of the device.
+* The `TwoWire` class on some platforms (e.g. AVR, STM32) are hardcoded to use a
+  32-byte RX and TX buffer, which is insufficient for certain types of I2C
+  devices.
+* The `<Wire.h>` pre-creates an `extern TwoWire Wire` instance which is not
+  optimized away by the compiler/linker if it is never used in the application.
+    * This means that simply including `#include <Wire.h>` in a user application
+      (either directly, or through a dependent library) causes flash usage to
+      increase by ~1100 bytes, and static memory to increase by ~110 bytes, even
+      if the I2C library is never usd.
+    * If some other third party library includes both the SPI and I2C versions
+      of a device driver, which must perform a `#include <Wire.h>`, the flash
+      usage of the end-user application increases by ~1100 bytes even though the
+      I2C functionality is never used.
 * The `TwoWire` class inherits from the `Print` and `Stream` classes, which
-  makes the surface area of the API far too large.
+  makes the surface area of the API unnecessarily large.
     * More interestingly, the methods which are relevant to the I2C
       functionality are not part of the `Print` and `Stream` API.
     * But these I2C-related functions are *not* marked `virtual`, which prevents
@@ -74,11 +78,11 @@ have been written to get around some of these problems. But the APIs for these
 third party libraries often diverge in subtle ways from the `TwoWire` class.
 
 The AceWire library solves the API incompatibility problem by providing wrapper
-classes that map the various APIs to the same [AceWire
-Interface](#AceWireInterface) used by the `SimpleWireInterface` and
-`SimpleWireFastInterface` classes. This makes it easier for the application to
-switch to different the I2C libraries. Here is the list of adapter classes
-provided by AceWire:
+classes that map the various third party classes to the same [AceWire
+Interface API](#AceWireInterface) used by the `SimpleWireInterface` and
+`SimpleWireFastInterface` classes. This makes it easier for an application to
+switch to use different the I2C libraries. Here is the list of the adapter
+classes provided by AceWire:
 
 * Native `<Wire.h>` library
     * `TwoWireInterface` (all platforms)
@@ -111,12 +115,12 @@ provided by AceWire:
         * Wrapper around the `SoftI2CMaster` class from the
           https://github.com/todbot/SoftI2CMaster library.
 
-AceWire uses several techniques to reduce the overhead of inserting a wrapper
-class to translate the API:
+AceWire uses several techniques to reduce or completely eliminate the overhead
+of inserting a wrapper class to translate the API:
 
 * The wrapper classes do not use virtual functions.
-    * They are written as C++ template classes, providing compile-time
-      polymorphism instead of runtime polymorphism.
+    * They are C++ template classes, providing compile-time polymorphism instead
+      of runtime polymorphism.
     * The compiler is able to optimize away all or almost all of the overhead of
       the indirection of the wrapper class.
     * The resulting code is often equivalent to calling the underlying I2C
@@ -209,6 +213,12 @@ digitalWriteFast libraries, for example:
 
 * https://github.com/watterott/Arduino-Libs/tree/master/digitalWriteFast
 * https://github.com/NicksonYap/digitalWriteFast
+
+Each `XxxInterface` wrapper class depends on its corresponding third party
+library. However, those wrapper classes are written as C++ templates, so the
+dependent library is a compile-time dependency only if the particular wrapper
+class is used by the application. Otherwise, the third party library does not
+need to be installed.
 
 <a name="Documentation"></a>
 ## Documentation
@@ -582,7 +592,6 @@ class MyClass {
 
       uint8_t n = mWireInterface.endTransmission();
       if (n == 0) { /*error*/ }
-      }
     }
 
     void readFromDevice() {
