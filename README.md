@@ -36,7 +36,7 @@ with the following limitations:
 * master mode only, no slave
 * no multi-master negotiation
 * no clock stretching
-* only 7-bit addresses needed, no 10-bit addresses
+* only 7-bit addresses supported, no 10-bit addresses
 
 For more advanced usage, the standard `<Wire.h>` library is available for each
 Arduino platform. But the standard `<Wire.h>` library has number of
