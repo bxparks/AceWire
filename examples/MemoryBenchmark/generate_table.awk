@@ -7,15 +7,16 @@
 
 BEGIN {
   labels[0] = "baseline"
-  labels[1] = "TwoWireInterface<TwoWire>";
-  labels[2] = "SimpleWireInterface";
-  labels[3] = "SimpleWireFastInterface";
+  labels[1] = "SimpleWireInterface";
+  labels[2] = "SimpleWireFastInterface";
+  labels[3] = "TwoWireInterface<TwoWire>";
   labels[4] = "FeliasFoggWireInterface<SlowSoftWire>";
   labels[5] = "MarpleWireInterface<SoftWire>";
   labels[6] = "RaemondWireInterface<SWire>";
   labels[7] = "SeeedWireInterface<SoftwareI2C>";
   labels[8] = "TestatoWireInterface<SoftwareWire>";
   labels[9] = "ThexenoWireInterface<TwoWire>";
+  labels[10] = "TodbotWireInterface<SoftI2CMaster>";
   record_index = 0
 }
 {
@@ -46,6 +47,7 @@ END {
     name = labels[i]
 
     if (name ~ /^baseline/ \
+        || name ~ /^SimpleWireInterface/ \
         || name ~ /^TwoWireInterface/ \
         || name ~ /^FeliasFoggWireInterface/ \
         || name ~ /^TestatoWireInterface/) {

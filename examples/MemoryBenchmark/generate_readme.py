@@ -38,7 +38,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceWire v0.4.0
+**Version**: AceWire v0.4.1
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -87,30 +87,37 @@ $ make README.md
   pre-defined instances of various I2C classes. Analogous to the `Wire` instance
   for the `TwoWire` class.
 
-* Initial iteration of MemoryBenchmarks.
+**v0.4.1**
+
+* Add `TodbotWireInterface` to support https://github.com/todbot/SoftI2CMaster.
 
 ## Results
 
 The following shows the flash and static memory sizes of the following 
 I2C implementations:
 
-* `TwoWireInterface<TwoWire>`: The hardware `<Wire.h>` library.
-* `SimpleWireInterface`: AceWire's own Software I2C using `digitalWrite()`.
-* `SimpleWireFastInterface`: AceWire's own Software I2C using a
-  `digitalWriteFast()` library. (AVR only)
-* Third party libraries
-    * `RaemondWireInterface<SoftWare>`: Software I2C using
-      https://github.com/RaemondBW/SWire
+* AceWire I2C implementations
+    * `SimpleWireInterface`: AceWire's own Software I2C using `digitalWrite()`.
+    * `SimpleWireFastInterface`: AceWire's own Software I2C using a
+    `digitalWriteFast()` library. (AVR only)
+* Native `<Wire.h>` (all platforms)
+    * `TwoWireInterface<TwoWire>`: Hardware I2C using preinstalled `<Wire.h>`.
+* Third party libraries (all platforms)
     * `FeliasFoggWireInterface<SlowSoftWire>`: Software I2C using
       https://github.com/felias-fogg/SlowSoftWire
+    * `MarpleWireInterface<SoftWire>`: Software I2C using
+      https://github.com/stevemarple/SoftWire library.
+    * `RaemondWireInterface<SoftWare>`: Software I2C using
+      https://github.com/RaemondBW/SWire
     * `SeeedWireInterface<SoftwareI2C>`: Software I2C using
       https://github.com/Seeed-Studio/Arduino_Software_I2C
-    * `TestatoWireInterface<SoftwareWire>,100kHz`: Software I2C using
-      https://github.com/Testato/SoftwareWire set to 100 kHz (compatible with
-      AVR only).
-    * `TestatoWireInterface<SoftwareWire>,400kHz`: Software I2C using
-      https://github.com/Testato/SoftwareWire set to 400 kHz (compatible with
-      AVR only).
+* Third party libraries (AVR only)
+    * `TestatoWireInterface<SoftwareWire>`: Software I2C using
+      https://github.com/Testato/SoftwareWire
+    * `ThexenoWireInterface<TwoWire>`: Software I2C using
+      https://github.com/thexeno/HardWire-Arduino-Library
+    * `TodbotWireInterface<SoftI2CMaster>`: Software I2C using
+      https://github.com/todbot/SoftI2CMaster
 
 ### ATtiny85
 

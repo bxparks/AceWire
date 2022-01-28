@@ -112,7 +112,8 @@ class TodbotWireInterface {
      */
     uint8_t requestFrom(uint8_t addr, uint8_t quantity, bool sendStop = true)
         const {
-      return mWire.requestFrom(addr, quantity, (uint8_t) sendStop);
+      (void) sendStop; // sendStop not implemented by SoftI2CMaster
+      return mWire.requestFrom(addr, quantity);
     }
 
     /**

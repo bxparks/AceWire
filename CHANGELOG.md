@@ -1,6 +1,11 @@
 # Changelog
 
 * Unreleased
+* 0.4.1 (2022-01-28)
+    * Refactor README.md so that the compelling reason for using AceWire are
+      the `SimpleWireInterface` and `SimpleWireFastInterface`.
+        * Downgrade various `XxxInterface` wrapper classes for other I2C
+          libraries as side benefits.
 * 0.4.0 (2022-01-26)
     * Write custom wrapper classes for various third party I2C libraries.
         * `src/ace_wire/FeliasFoggWireInterface.h`

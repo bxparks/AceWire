@@ -2,135 +2,140 @@
 
 [![Validation](https://github.com/bxparks/AceWire/actions/workflows/validation.yml/badge.svg)](https://github.com/bxparks/AceWire/actions/workflows/validation.yml)
 
-This library provides helper and wrapper classes to allow user applications to
-use different I2C libraries through a small, consistent, and unified API on
-different Arduino platforms. This library was originally part of the
-[AceSegment](https://github.com/bxparks/AceSegment) library, but was extracted
-into a separate library because it seemed useful as a separate library.
+This library provides 2 of the smallest and fastest software I2C implementations
+(`SimpleWireInterface` and `SimpleWireFastInterface`) for Arduino platforms
+using a minimal [AceWire Interface](#AceWireInterface) described below. It also
+provides adapter classes to allow the application to use the `<Wire.h>` library
+and various third party I2C libraries using the same API. This library was
+originally part of the [AceSegment](https://github.com/bxparks/AceSegment)
+library, but was extracted into a separate library because it seemed useful as a
+separate library.
 
-This library exists to work around a number of deficiencies in the standard
-`<Wire.h>` library.
-
-* The `TwoWire` class [cannot be used
-  polymorphically](https://github.com/Testato/SoftwareWire/issues/28).
-  In other words, the `TwoWire` class cannot be subclassed to implement
-  different implementations.
-* The `TwoWire` class inherits from the `Print` and `Stream` classes, which
-  makes the surface area of the API far too large.
-    * More frustratingly, the methods which are relevant to the I2C
-      functionality are not part of the `Print` and `Stream` API.
-    * But these I2C-related functions are *not* marked `virtual`, which prevents
-      the `TwoWire` class from being a consistent API for different I2C
-      implementations.
-* Simply including `#include <Wire.h>` in a user application causes flash usage
-  to increase by ~1100 bytes, and static memory to increase by ~110 bytes,
-  even if nothing uses the `Wire` object.
-    * This prevents a third party library from including device driver code for
-      both SPI and I2C (for example), without inflating the flash usage for
-      downstream applications which use only the SPI version.
-* If an application written against the `<Wire.h>` API, it becomes difficult to
-  switch to a different I2C library because various libraries have slightly
-  different signatures and slightly semantics.
-* The `TwoWire` class on many platforms (e.g. AVR) is hardcoded to use a 32-byte
-  RX and TX buffer, which is insufficient for certain types of devices.
-* The standard `<Wire.h>` library uses hardware interrupts which are supported
-  on only certain GPIO pins (`SDA` and `SCL`).
-
-Numerous [third party I2C
-libraries](https://github.com/Testato/SoftwareWire/wiki/Arduino-I2C-libraries)
-have been written to get around some of these problems. But the APIs for these
-third party libraries often diverge in subtle ways from the `TwoWire` class,
-and it can be difficult to write an application that is compatible with
-different I2C libraries.
-
-The AceWire library attempts to address these problems by making it easier to
-use switch among the various third party I2C libraries so that the application
-can decide to use the most appropriate implementation. The AceWire library
-provides the following:
-
-* Defines a small, unified [AceWire Interface](#AceWireInterface) to interact
-  with various third party I2C libraries.
-    * If applications can be written against the AceWire API, different I2C
-      libraries can be swapped in with only small or no changes to the
-      application code.
-* Provides C++ template classes to wrap various third party libraries so that
-  they can be used using the common API.
-    * This AceWire does not directly depend on any other third party libraries,
-      include `<Wire.h>`.
-    * This means that third party device libraries can depend on AceWire,
-      without pulling in `<Wire.h>`, which saves ~1100 bytes of flash if the
-      downstream application never uses `<Wire.h>`.
-* Does not use virtual functions to avoid runtime overhead.
-    * The AceWire API is implemented as contracts, not through virtual
-      functions, using compile-time polymorphism instead of runtime
-      polymorphism.
-    * This means that the compiler is able to optimize away all or almost all of
-      the overhead of the indirection of the wrapper class.
-
-The AceWire library provides wrapper interfaces for 8 of those third party
-libraries:
-
-* `TwoWireInterface` (all platforms)
-    * Wrapper around the `TwoWire` class from the built-in `<Wire.h>` library.
-* `FeliasFoggWireInterface` (all platforms)
-    * Wrapper around the `SlowSoftWire` class from the
-      https://github.com/felias-fogg/SlowSoftWire library.
-* `MarpleWireInterface` (all platforms)
-    * Wrapper around the `SoftWire` class from the
-      https://github.com/stevemarple/SoftWire library.
-* `RaemondWireInterface` (all platforms)
-    * Wrapper around the `SoftWire` class from the
-      https://github.com/RaemondBW/SWire library.
-* `SeeedWireInterface` (all platforms)
-    * Wrapper around the `SoftwareI2C` class from the
-      https://github.com/Seeed-Studio/Arduino_Software_I2C library.
-    * Not recommended due to the lack of any control over the I2C speed, and its
-      use of actively driving the open-drain lines on the I2C bus.
-* `TestatoWireInterface` (AVR only)
-    * Wrapper around the `SoftwareWire` class from the
-      https://github.com/Testato/SoftwareWire library.
-* `ThexenoWireInterface` (AVR only)
-    * Wrapper around the `TwoWire` class from the
-      https://github.com/thexeno/HardWire-Arduino-Library library.
-    * The `TwoWire` class name from this library is the same as the one from
-      `<Wire.h>`.
-* `TodbotWireInterface` (AVR only)
-    * Wrapper around the `SoftI2CMaster` class from the
-      https://github.com/todbot/SoftI2CMaster library.
-
-The AceWire library also provides 2 classes which are not wrapper classes, but
-are direct implementations of the AceWire API. According to
-[examples/MemoryBenchmark](examples/MemoryBenchmark), these 2 implementations
-consume the least amount of flash and static memory among the ones that I have
-personally tested. I use these interface classes for many of my simpler projects
-which do not require advanced I2C features:
+According to [examples/MemoryBenchmark](examples/MemoryBenchmark), the
+`SimpleWireInterface` and `SimpleWireFastInterface` implementations consume the
+least amount of flash and static memory among the ones that I have personally
+tested.
 
 * `SimpleWireInterface` (all platforms)
-    * Software bitbanging implementation using `digitalWrite()` and
-      `pinMode()`.
+    * Software bitbanging implementation using `digitalWrite()` and `pinMode()`.
     * Capable of 50 kHz (AVR) to 200 kHz (Teensy 3.2) throughput.
+    * Consumes about 880 bytes of flash on AVR, compared to 2500 for the
+      built-in `<Wire.h>` library.
 * `SimpleWireFastInterface` (AVR only)
     * Same as `SimpleWireInterface.h` using the `digitalWriteFast()` and
       `pinModeFast()` from one of the `<digitalWriteFast.h>` libraries on AVR
       processors.
-    * Can be **10X** faster than `SimpleWireInterface` on AVR processors.
-    * Can reduce flash memory consumption by **10X** compared to `<Wire.h>`,
-      about 250 bytes of flash compared to 2500 bytes.
     * Capable of 500-600 kHz throughput on AVR.
+    * Consumes **10X** less flash compared to `<Wire.h>`, about 260 bytes
+      compared to 2500 bytes.
 
-Once the user application implements the unified [AceWire
-Interface](#AceWireInterface), it becomes easy to use alternative I2C libraries
-instead of being locked into the pre-installed `<Wire.h>` library.
+These 2 implementations can be sufficient in many simple projects that can deal
+with the following limitations:
 
-AceWire does have limitations. Its API is small and supports only a limited set
-of I2C functionality, but these are often enough for many I2C devices:
-
+* no interrupt safety on GPIO pins
 * master mode only, no slave
 * no multi-master negotiation
 * no clock stretching
-* only 7-bit addresses are supported, 10-bit addresses are not supported
+* only 7-bit addresses supported, no 10-bit addresses
 
-**Version**: 0.4.0 (2022-01-26)
+For more advanced usage, the standard `<Wire.h>` library is available for each
+Arduino platform. But the standard `<Wire.h>` library has number of
+deficiencies:
+
+* The standard `<Wire.h>` library uses hardware interrupts supported only
+  on certain GPIO pins (`SDA` and `SCL` pins).
+* The `TwoWire` class on some platforms (e.g. AVR, STM32) are hardcoded to use a
+  32-byte RX and TX buffer, which is insufficient for certain types of I2C
+  devices.
+* The `<Wire.h>` pre-creates an `extern TwoWire Wire` instance which is not
+  optimized away by the compiler/linker if it is never used in the application.
+    * This means that simply including `#include <Wire.h>` in a user application
+      (either directly, or through a dependent library) causes flash usage to
+      increase by ~1100 bytes, and static memory to increase by ~110 bytes, even
+      if the I2C library is never usd.
+    * If some other third party library includes both the SPI and I2C versions
+      of a device driver, which must perform a `#include <Wire.h>`, the flash
+      usage of the end-user application increases by ~1100 bytes even though the
+      I2C functionality is never used.
+* The `TwoWire` class inherits from the `Print` and `Stream` classes, which
+  makes the surface area of the API unnecessarily large.
+    * More interestingly, the methods which are relevant to the I2C
+      functionality are not part of the `Print` and `Stream` API.
+    * But these I2C-related functions are *not* marked `virtual`, which prevents
+      the `TwoWire` class from being a consistent API for different I2C
+      implementations.
+* The `TwoWire` class [cannot be used
+  polymorphically](https://github.com/Testato/SoftwareWire/issues/28).
+  In other words, the `TwoWire` class cannot be subclassed to implement
+  different implementations.
+* If an application written against the `<Wire.h>` API, it becomes difficult to
+  switch to a different I2C library because various libraries have slightly
+  different signatures and semantics.
+
+Numerous [third party I2C
+libraries](https://github.com/Testato/SoftwareWire/wiki/Arduino-I2C-libraries)
+have been written to get around some of these problems. But the APIs for these
+third party libraries often diverge in subtle ways from the `TwoWire` class.
+
+The AceWire library solves the API incompatibility problem by providing wrapper
+classes that map the various third party classes to the same [AceWire
+Interface API](#AceWireInterface) used by the `SimpleWireInterface` and
+`SimpleWireFastInterface` classes. This makes it easier for an application to
+switch to use different the I2C libraries. Here is the list of the adapter
+classes provided by AceWire:
+
+* Native `<Wire.h>` library
+    * `TwoWireInterface` (all platforms)
+        * Wrapper around the `TwoWire` class from the built-in `<Wire.h>`.
+* All platforms
+    * `FeliasFoggWireInterface`
+        * Wrapper around the `SlowSoftWire` class from the
+          https://github.com/felias-fogg/SlowSoftWire library.
+    * `MarpleWireInterface`
+        * Wrapper around the `SoftWire` class from the
+          https://github.com/stevemarple/SoftWire library.
+    * `RaemondWireInterface`
+        * Wrapper around the `SoftWire` class from the
+          https://github.com/RaemondBW/SWire library.
+    * `SeeedWireInterface`
+        * Wrapper around the `SoftwareI2C` class from the
+          https://github.com/Seeed-Studio/Arduino_Software_I2C library.
+        * Not recommended due to the lack of any control over the I2C speed, and
+          its use of actively driving the open-drain lines on the I2C bus.
+* AVR only
+    * `TestatoWireInterface`
+        * Wrapper around the `SoftwareWire` class from the
+          https://github.com/Testato/SoftwareWire library.
+    * `ThexenoWireInterface`
+        * Wrapper around the `TwoWire` class from the
+          https://github.com/thexeno/HardWire-Arduino-Library library.
+        * The `TwoWire` class name from this library is the same as the one from
+          `<Wire.h>`.
+    * `TodbotWireInterface`
+        * Wrapper around the `SoftI2CMaster` class from the
+          https://github.com/todbot/SoftI2CMaster library.
+
+AceWire uses several techniques to reduce or completely eliminate the overhead
+of inserting a wrapper class to translate the API:
+
+* The wrapper classes do not use virtual functions.
+    * They are C++ template classes, providing compile-time polymorphism instead
+      of runtime polymorphism.
+    * The compiler is able to optimize away all or almost all of the overhead of
+      the indirection of the wrapper class.
+    * The resulting code is often equivalent to calling the underlying I2C
+      library directly.
+* The AceWire library does not directly depend on any other third party library,
+  including `<Wire.h>`.
+    * This means that third party device libraries can depend on `AceWire.h`,
+      without pulling in `<Wire.h>`, which saves ~1100 bytes of flash if the
+      downstream application never uses `<Wire.h>`.
+* Defines an [AceWire Interface](#AceWireInterface) with a small surface area.
+    * Increases the compatibility with other third party libraries.
+    * Decreases the work required in the application layer when substituting
+      other I2C libraries.
+
+**Version**: 0.4.1 (2022-01-28)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -153,6 +158,8 @@ of I2C functionality, but these are often enough for many I2C devices:
         * [Reading from I2C](#ReadingFromI2C)
         * [Error Handling](#ErrorHandling)
     * [Interface Classes](#InterfaceClasses)
+        * [SimpleWireInterface](#SimpleWireInterface)
+        * [SimpleWireFastInterface](#SimpleWireFastInterface)
         * [TwoWireInterface](#TwoWireInterface)
         * [FeliasFoggWireInterface](#FeliasFoggWireInterface)
         * [MarpleWireInterface](#MarpleWireInterface)
@@ -161,8 +168,7 @@ of I2C functionality, but these are often enough for many I2C devices:
         * [TestatoWireInterface](#TestatoWireInterface)
         * [ThexenoWireInterface](#ThexenoWireInterface)
         * [TodbotWireInterface](#TodbotWireInterface)
-        * [SimpleWireInterface](#SimpleWireInterface)
-        * [SimpleWireFastInterface](#SimpleWireFastInterface)
+        * [Additional Interfaces](#AdditionalInterfaces)
     * [Storing Interface Objects](#StoringInterfaceObjects)
 * [Resource Consumption](#ResourceConsumption)
     * [Flash And Static Memory](#FlashAndStaticMemory)
@@ -208,6 +214,12 @@ digitalWriteFast libraries, for example:
 * https://github.com/watterott/Arduino-Libs/tree/master/digitalWriteFast
 * https://github.com/NicksonYap/digitalWriteFast
 
+Each `XxxInterface` wrapper class depends on its corresponding third party
+library. However, those wrapper classes are written as C++ templates, so the
+dependent library is a compile-time dependency only if the particular wrapper
+class is used by the application. Otherwise, the third party library does not
+need to be installed.
+
 <a name="Documentation"></a>
 ## Documentation
 
@@ -234,7 +246,7 @@ libraries. The specifics are detailed below.
 <a name="AceWireInterface"></a>
 ### AceWire Interface
 
-The classes in this library provide the unified interface described by
+All classes in this library implement the unified API described by
 the `XxxInterface` below. Downstream application classes can be coded against
 this unified interface using C++ templates so that different implementations can
 be selected at compile-time.
@@ -540,20 +552,21 @@ But I am not very familiar with those latest feature additions.
 ### Interface Classes
 
 This section contains concrete code fragments that show how to initialize and
-use specific AceWire wrapper interface classes which are designed to work with
+use specific AceWire interface classes which are designed to work with
 specific I2C libraries.
 
-<a name="TwoWireInterface"></a>
-#### TwoWireInterface
+<a name="SimpleWireInterface"></a>
+#### SimpleWireInterface
 
-The `TwoWireInterface` is a thin wrapper around the `TwoWire` class provided by
-the pre-installed `<Wire.h>` library. It is configured and used like this:
+The `SimpleWireInterface` is a direct implementation of the [AceWire
+Interface](#AceWireInterface) implementing software I2C using `digitalWrite()`
+and `pinMode()`. Instead of making the user code `MyClass` depend directly on
+the `SimpleWireInterface` class, we use a C++ template like this:
 
 ```C++
 #include <Arduino.h>
-#include <Wire.h> // TwoWire, Wire
 #include <AceWire.h>
-using ace_wire::TwoWireInterface;
+using ace_wire::SimpleWireInterface;
 
 template <typename T_WIREI>
 class MyClass {
@@ -567,22 +580,157 @@ class MyClass {
     {...}
 
     void writeToDevice() {
-      mWireInterface.beginTransmission(ADDRESS);
-      mWireInterface.write(data1);
-      mWireInterface.write(data2);
+      uint8_t status = mWireInterface.beginTransmission(ADDRESS);
+      if (status) { /*error*/ }
+
+      uint8_t n = mWireInterface.write(data1);
+      if (n == 0) { /*error*/ }
+
+      uint8_t n = mWireInterface.write(data2);
+      if (n == 0) { /*error*/ }
       ...
-      mWireInterface.endTransmission();
+
+      uint8_t n = mWireInterface.endTransmission();
+      if (n == 0) { /*error*/ }
     }
 
     void readFromDevice() {
-      mWireInterface.requestFrom(ADDRESS, NUM_BYTES);
-      uint8_t data1 = mWireInterface.read();
-      uint8_t data2 = mWireInterface.read();
-      ...
+      uint8_t status = mWireInterface.requestFrom(ADDRESS, NUM_BYTES);
+      if (status == 0) {
+        /*error*/
+      } else {
+        uint8_t data1 = mWireInterface.read();
+        uint8_t data2 = mWireInterface.read();
+        ... // for total of 'NUM_BYTES' bytes
+      }
     }
 
   private:
     T_WIREI mWireInterface; // copied by value
+};
+
+const uint8_t SCL_PIN = SCL;
+const uint8_t SDA_PIN = SDA;
+const uint8_t DELAY_MICROS = 4;
+
+using WireInterface = SimpleWireInterface;
+WireInterface wireInterface(SDA_PIN, SCL_PIN, DELAY_MICROS);
+MyClass<WireInterface> myClass(wireInterface);
+
+void setup() {
+  wireInterface.begin();
+  myClass.writeToDevice();
+  myClass.readFromDevice();
+  ...
+}
+```
+
+The `DELAY_MICROS` parameter is the number of microseconds to wait between
+transitions of the SCL and SDA signals. The smallest value of this parameter
+depends on the capacitance and resistance of the SCL and SDA lines, and the
+capabilities of the target device, with smaller values requiring lower
+capacitance and lower resistance. The largest value of this parameter depends
+mostly on the capabilities of the target device.
+
+The actual delay between the transitions of the SCL and SDA signal may be
+significantly different from the `DELAY_MICROS` parameter for several reasons:
+
+* The accuracy of the `delayMicroseconds()` function on AVR processors is
+  signficantly degraded for values less than about 10 microseconds.
+* The speed of the `digitalWrite()` function is known to be particularly slow
+  on AVR processors, and it may take more time than the value of `DELAY_MICROS`.
+
+Trial and error may be required to determine an appropriate value of
+`DELAY_MICROS`.
+
+The `using WireInterface = SimpleWireInterface` statement is the C++11 version
+of a `typedef` for `WireInterface`. It is not strictly necessary here, but it
+allows the same code structure to be used for the more complicated examples
+below.
+
+See the [Writing to I2C](#WritingToI2C) and [Reading from I2C](#ReadingFromI2C)
+sections above for information about the `beginTransmission()`,
+`endTransmission()`, and `requestFrom()` methods.
+
+**Important**: The `SimpleWireInterface` class does not need the `<Wire.h>`
+library. You should *not* add an `#include <Wire.h>` statement in your program
+if nothing else in your program needs it. Adding that single include line
+increases the flash memory consumption on AVR processors by about 1140 bytes and
+increases static ram consumption by 113 bytes, even if the `Wire` object is
+never used.
+
+<a name="SimpleWireFastInterface"></a>
+#### SimpleWireFastInterface
+
+The `SimpleWireFastInterface` is the same as `SimpleWireInterface` but using the
+`digitalWriteFast()` and `pinModeFast()` functions. These functions are provided
+by at least 2 third party libraries which must be pulled in manually:
+
+* https://github.com/watterott/Arduino-Libs/tree/master/digitalWriteFast
+* https://github.com/NicksonYap/digitalWriteFast
+
+It is configured as shown below with an explicit `#if defined(ARDUINO_ARCH_AVR)`
+conditional. The `<ace_wire/SimpleWireFastInterface.h>` file must be pulled in
+manually because it is not included in the `<AceWire.h>` file by default. It
+would trigger compiler errors if the user was not compiling on an AVR processor,
+or if the user did not have one of the `digitalWriteFast` libraries installed.
+
+```C++
+#include <Arduino.h>
+#include <AceWire.h>
+#if defined(ARDUINO_ARCH_AVR)
+  #include <digitalWriteFast.h>
+  #include <ace_wire/SimpleWireFastInterface.h>
+  using ace_wire::SimpleWireFastInterface;
+#endif
+
+template <typename T_WIREI>
+class MyClass {
+  // Exactly the same as above.
+};
+
+const uint8_t SCL_PIN = SCL;
+const uint8_t SDA_PIN = SDA;
+const uint8_t DELAY_MICROS = 4;
+
+using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, DELAY_MICROS>;
+WireInterface wireInterface;
+MyClass<WireInterface> myClass(wireInterface);
+
+void setup() {
+  wireInterface.begin();
+  myClass.writeToDevice();
+  myClass.readFromDevice();
+  ...
+}
+```
+
+**Important**: The `SimpleWireFastInterface` class does not need the `<Wire.h>`
+library. You should *not* add an `#include <Wire.h>` statement in your program
+if nothing else in your program needs it. Adding that single include line
+increases the flash memory consumption on AVR processors by about 1140 bytes and
+increases static ram consumption by 113 bytes, even if the `Wire` object is
+never used.
+
+<a name="TwoWireInterface"></a>
+#### TwoWireInterface
+
+Once an application code (describe by `MyClass<WIRE_T>` above) is written for a
+`SimpleWireInterface` or `SimpleWireFastInterface`, we can switch to a different
+I2C library relatively easily using the adapter interface classes provided in
+this library. The `TwoWireInterface` is a thin wrapper around the `TwoWire`
+class provided by the pre-installed `<Wire.h>` library. It is configured and
+used like this:
+
+```C++
+#include <Arduino.h>
+#include <Wire.h> // TwoWire, Wire
+#include <AceWire.h>
+using ace_wire::TwoWireInterface;
+
+template <typename T_WIREI>
+class MyClass {
+  // Exactly the same as above.
 };
 
 using WireInterface = TwoWireInterface<TwoWire>;
@@ -599,29 +747,20 @@ void setup() {
 }
 ```
 
-The `using` statement is the C++11 version of a `typedef` that defines
-`WireInterface`. It is not strictly necessary here, but it allows the same
-code structure to be used for the more complicated examples below.
-
-Both the `T_WIRE` and `T_WIREI` template parameters contain a `T_` prefix to
-avoid name collisions with the numerous `#define` macros defined in the global
-namespace on Arduino platforms. The difference between `T_WIRE` and `T_WIREI`
+The `T_WIREI` template parameter refers to one of the `XxxWireInterface`
+classes. This is different from the `T_WIRE` template parameter used internally
+by each `XxxWireInterface` class. The difference between `T_WIRE` and `T_WIREI`
 may be a bit confusing so I hope the following explanation helps:
 
 * `T_WIRE`
-    * template parameter of the `TwoWireInterface` template class
-    * represents a class that looks and acts like the `TwoWire` class from the
-      built-in `<Wire.h>` library
-    * can be a class from a third party library
+    * template parameter of the various `XxxWireInterface` wrapper classes
+    * represents a concrete class from the third party library that implements
+      the I2C protocol (e.g. `TwoWire` from the `<Wire.h>` library).
 * `T_WIREI`
-    * template parameter of a user-defined class from the calling application
-    * represents one of the "interface" classes in *this* library: e.g.
-      `TwoWireInterface`, `FeliasFoggWireInterface`, `SimpleWireInterface`,
-      `SimpleWireFastInterface`, etc.
-
-See the [Writing to I2C](#WritingToI2C) and [Reading from I2C](#ReadingFromI2C)
-sections above for documentation about the `beginTransmission()`,
-`endTransmission()`, and `requestFrom()`.
+    * template parameter of the user-defined class in the application
+    * represents one of the `XxxWireInterface` classes in *this* library: e.g.
+      `SimpleWireInterface`, `SimpleWireFastInterface`, `TwoWireInterface`,
+      `FeliasFoggWireInterface`, etc.
 
 <a name="FeliasFoggWireInterface"></a>
 #### FeliasFoggWireInterface
@@ -665,7 +804,8 @@ void setup() {
 The `MarpleWireInterface` is a thin wrapper around the `SoftWire` class
 provided by the https://github.com/stevemarple/SoftWire library.
 It is a software implementation of I2C that is compatible across all platforms.
-It is configured and used like this:
+It is one of the few (maybe only?) I2C libraries that allows the end-user to
+define the size of the RX and TX buffers. It is configured and used like this:
 
 ```C++
 #include <Arduino.h>
@@ -885,7 +1025,7 @@ class MyClass {
 
 const uint8_t SDA_PIN = 2;
 const uint8_t SCL_PIN = 3;
-SoftwareI2CMaster todbotWire(SCL_PIN, SDA_PIN);
+SoftI2CMaster todbotWire(SCL_PIN, SDA_PIN);
 using WireInterface = TodbotWireInterface<SoftI2CMaster>;
 WireInterface wireInterface(todbotWire);
 
@@ -900,112 +1040,13 @@ void setup() {
 }
 ```
 
-<a name="SimpleWireInterface"></a>
-#### SimpleWireInterface
+<a name="AdditionalInterfaces"></a>
+#### Additional Interfaces
 
-The `SimpleWireInterface` is a software implementation of I2C using
-`digitalWrite()` and `pinMode()`. It is not a wrapper class, it implements the
-AceWire API directly. It is configured and used like this:
-
-```C++
-#include <Arduino.h>
-#include <AceWire.h>
-using ace_wire::SimpleWireInterface;
-
-template <typename T_WIREI>
-class MyClass {
-  // Exactly the same as above.
-};
-
-const uint8_t SCL_PIN = SCL;
-const uint8_t SDA_PIN = SDA;
-const uint8_t DELAY_MICROS = 4;
-
-using WireInterface = SimpleWireInterface;
-WireInterface wireInterface(SDA_PIN, SCL_PIN, DELAY_MICROS);
-MyClass<WireInterface> myClass(wireInterface);
-
-void setup() {
-  wireInterface.begin();
-  ...
-}
-```
-
-The `DELAY_MICROS` parameter is the number of microseconds to wait between
-transitions of the SCL and SDA signals. The smallest value of this parameter
-depends on the capacitance and resistance of the SCL and SDA lines, and the
-capabilities of the target device, with smaller values requiring lower
-capacitance and lower resistance. The largest value of this parameter depends
-mostly on the capabilities of the target device.
-
-The actual delay between the transitions of the SCL and SDA signal may be
-significantly different from the `DELAY_MICROS` parameter for several reasons:
-
-* The accuracy of the `delayMicroseconds()` function on AVR processors is
-  signficantly degraded for values less than about 10 microseconds.
-* The speed of the `digitalWrite()` function is known to be particularly slow
-  on AVR processors, and it may take more time than the value of `DELAY_MICROS`.
-
-Trial and error may be required to determine an appropriate value of
-`DELAY_MICROS`.
-
-**Important**: The `SimpleWireInterface` class does not need the `<Wire.h>`
-library. You should *not* add an `#include <Wire.h>` statement in your program
-if nothing else in your program needs it. Adding that single include line
-increases the flash memory consumption on AVR processors by about 1140 bytes and
-increases static ram consumption by 113 bytes, even if the `Wire` object is
-never used.
-
-<a name="SimpleWireFastInterface"></a>
-#### SimpleWireFastInterface
-
-The `SimpleWireFastInterface` is the same as `SimpleWireInterface` but using the
-`digitalWriteFast()` and `pinModeFast()` functions. These functions are provided
-by at least 2 third party libraries which must be pulled in manually:
-
-* https://github.com/watterott/Arduino-Libs/tree/master/digitalWriteFast
-* https://github.com/NicksonYap/digitalWriteFast
-
-It is configured as shown below with an explicit `#if defined(ARDUINO_ARCH_AVR)`
-conditional. The `<ace_wire/SimpleWireFastInterface.h>` file must be pulled in
-manually because it is not included in the `<AceWire.h>` file by default. It
-would trigger compiler errors if the user was not compiling on an AVR processor,
-or if the user did not have one of the `digitalWriteFast` libraries installed.
-
-```C++
-#include <Arduino.h>
-#include <AceWire.h>
-#if defined(ARDUINO_ARCH_AVR)
-  #include <digitalWriteFast.h>
-  #include <ace_wire/SimpleWireFastInterface.h>
-  using ace_wire::SimpleWireFastInterface;
-#endif
-
-template <typename T_WIREI>
-class MyClass {
-  // Exactly the same as above.
-};
-
-const uint8_t SCL_PIN = SCL;
-const uint8_t SDA_PIN = SDA;
-const uint8_t DELAY_MICROS = 4;
-
-using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, DELAY_MICROS>;
-WireInterface wireInterface;
-MyClass<WireInterface> myClass(wireInterface);
-
-void setup() {
-  wireInterface.begin();
-  ...
-}
-```
-
-**Important**: The `SimpleWireFastInterface` class does not need the `<Wire.h>`
-library. You should *not* add an `#include <Wire.h>` statement in your program
-if nothing else in your program needs it. Adding that single include line
-increases the flash memory consumption on AVR processors by about 1140 bytes and
-increases static ram consumption by 113 bytes, even if the `Wire` object is
-never used.
+Additional wrapper interfaces can be written for other third party libraries.
+Users are invited to submit new ones to this project. Some third party libraries
+deviate from the `TwoWire` class significantly, and the adapter interfaces for
+these may be harder to write.
 
 <a name="StoringInterfaceObjects"></a>
 ### Storing Interface Objects
@@ -1058,9 +1099,10 @@ The Memory benchmark numbers can be seen in
 |---------------------------------------+--------------+-------------|
 | baseline                              |    456/   11 |     0/    0 |
 |---------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>             |   2926/  229 |  2470/  218 |
 | SimpleWireInterface                   |   1336/   16 |   880/    5 |
 | SimpleWireFastInterface               |    714/   13 |   258/    2 |
+|---------------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>             |   2926/  229 |  2470/  218 |
 |---------------------------------------+--------------+-------------|
 | FeliasFoggWireInterface<SlowSoftWire> |   2008/   83 |  1552/   72 |
 | MarpleWireInterface<SoftWire>         |   2936/  135 |  2480/  124 |
@@ -1069,6 +1111,7 @@ The Memory benchmark numbers can be seen in
 |---------------------------------------+--------------+-------------|
 | TestatoWireInterface<SoftwareWire>    |   2454/   72 |  1998/   61 |
 | ThexenoWireInterface<TwoWire>         |   2264/  477 |  1808/  466 |
+| TodbotWireInterface<SoftI2CMaster>    |   3068/  239 |  2612/  228 |
 +--------------------------------------------------------------------+
 ```
 
@@ -1080,8 +1123,9 @@ The Memory benchmark numbers can be seen in
 |---------------------------------------+--------------+-------------|
 | baseline                              | 260089/27892 |     0/    0 |
 |---------------------------------------+--------------+-------------|
-| TwoWireInterface<TwoWire>             | 264485/28384 |  4396/  492 |
 | SimpleWireInterface                   | 261521/28000 |  1432/  108 |
+|---------------------------------------+--------------+-------------|
+| TwoWireInterface<TwoWire>             | 264485/28384 |  4396/  492 |
 |---------------------------------------+--------------+-------------|
 | FeliasFoggWireInterface<SlowSoftWire> | 263513/28056 |  3424/  164 |
 | MarpleWireInterface<SoftWire>         | 263753/28128 |  3664/  236 |
@@ -1102,17 +1146,18 @@ The CPU benchmark numbers can be seen in
 +-------------------------------------------+-------------------+----------+
 | Functionality                             |   min/  avg/  max | eff kbps |
 |-------------------------------------------+-------------------+----------|
-| TwoWireInterface<TwoWire>,100kHz          |   932/  936/  948 |     86.5 |
-| TwoWireInterface<TwoWire>,400kHz          |   312/  321/  332 |    252.3 |
-| SimpleWireInterface,1us                   |  1644/ 1664/ 1824 |     48.7 |
-| SimpleWireFastInterface,1us               |   140/  152/  160 |    532.9 |
+| SimpleWireInterface,1us                   |  1644/ 1674/ 1824 |     48.4 |
+| SimpleWireFastInterface,1us               |   140/  152/  164 |    532.9 |
 |-------------------------------------------+-------------------+----------|
-| RaemondWireInterface<SoftWire>            |  2504/ 2526/ 2772 |     32.1 |
-| FeliasFoggWireInterface<SlowSoftWire>     |  1852/ 1871/ 2048 |     43.3 |
-| SeeedWireInterface<SoftwareI2C>           |  1912/ 1936/ 2116 |     41.8 |
+| TwoWireInterface<TwoWire>,100kHz          |   932/  935/  948 |     86.6 |
+| TwoWireInterface<TwoWire>,400kHz          |   308/  322/  332 |    251.6 |
 |-------------------------------------------+-------------------+----------|
-| TestatoWireInterface<SoftwareWire>,100kHz |  1368/ 1374/ 1432 |     59.0 |
-| TestatoWireInterface<SoftwareWire>,400kHz |   980/  995/ 1088 |     81.4 |
+| FeliasFoggWireInterface<SlowSoftWire>     |  1852/ 1870/ 2048 |     43.3 |
+| RaemondWireInterface<SoftWire>            |  2504/ 2524/ 2764 |     32.1 |
+| SeeedWireInterface<SoftwareI2C>           |  1912/ 1933/ 2116 |     41.9 |
+|-------------------------------------------+-------------------+----------|
+| TestatoWireInterface<SoftwareWire>,100kHz |  1368/ 1376/ 1480 |     58.9 |
+| TestatoWireInterface<SoftwareWire>,400kHz |   988/  996/ 1088 |     81.3 |
 +-------------------------------------------+-------------------+----------+
 ```
 
@@ -1122,12 +1167,13 @@ The CPU benchmark numbers can be seen in
 +-------------------------------------------+-------------------+----------+
 | Functionality                             |   min/  avg/  max | eff kbps |
 |-------------------------------------------+-------------------+----------|
-| TwoWireInterface<TwoWire>,100kHz          |  1105/ 1113/ 1259 |     72.8 |
-| TwoWireInterface<TwoWire>,400kHz          |   229/  229/  232 |    353.7 |
-| SimpleWireInterface,1us                   |   816/  818/  860 |     99.0 |
+| SimpleWireInterface,1us                   |   816/  819/  867 |     98.9 |
 |-------------------------------------------+-------------------+----------|
-| RaemondWireInterface<SoftWire>            |   988/  991/ 1059 |     81.7 |
+| TwoWireInterface<TwoWire>,100kHz          |  1105/ 1113/ 1251 |     72.8 |
+| TwoWireInterface<TwoWire>,400kHz          |   229/  229/  229 |    353.7 |
+|-------------------------------------------+-------------------+----------|
 | FeliasFoggWireInterface<SlowSoftWire>     |   828/  831/  895 |     97.5 |
+| RaemondWireInterface<SoftWire>            |   988/  992/ 1059 |     81.7 |
 | SeeedWireInterface<SoftwareI2C>           |   598/  601/  650 |    134.8 |
 +-------------------------------------------+-------------------+----------+
 ```
