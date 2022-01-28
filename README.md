@@ -131,7 +131,7 @@ class to translate the API:
     * Decreases the work required in the application layer when substituting
       other I2C libraries.
 
-**Version**: 0.4.0 (2022-01-26)
+**Version**: 0.4.1 (2022-01-28)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 

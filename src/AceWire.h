@@ -37,8 +37,8 @@ SOFTWARE.
 #define ACE_WIRE_H
 
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_WIRE_VERSION 400
-#define ACE_WIRE_VERSION_STRING "0.4.0"
+#define ACE_WIRE_VERSION 401
+#define ACE_WIRE_VERSION_STRING "0.4.1"
 
 // Blacklist platforms using https://github.com/arduino/ArduinoCore-api due to
 // incompatibilities.
@@ -47,18 +47,27 @@ SOFTWARE.
 #endif
 
 // Files exported by this main header file.
-#include "ace_wire/TwoWireInterface.h"
+
+// Implementations provided by this library.
 #include "ace_wire/SimpleWireInterface.h"
+
+// The following commented out because it works only on AVR platforms with a
+// suitable <digitalWriteFast.h> library. End-user should include this header
+// file manually, right after the `#include <AceWire.h>`.
+//#include "ace_wire/SimpleWireFastInterface.h"
+
+// Wrapper around pre-installed <Wire.h>.
+#include "ace_wire/TwoWireInterface.h"
+
+// Implementations for all platforms.
+#include "ace_wire/FeliasFoggWireInterface.h"
 #include "ace_wire/MarpleWireInterface.h"
 #include "ace_wire/RaemondWireInterface.h"
 #include "ace_wire/SeeedWireInterface.h"
-#include "ace_wire/FeliasFoggWireInterface.h"
+
+// Implementations for AVR only.
 #include "ace_wire/TestatoWireInterface.h"
 #include "ace_wire/ThexenoWireInterface.h"
 #include "ace_wire/TodbotWireInterface.h"
-
-// The following are commented out because they work only on AVR platforms with
-// a suitable <digitalWriteFast.h> library.
-//#include "ace_wire/SimpleWireFastInterface.h"
 
 #endif
