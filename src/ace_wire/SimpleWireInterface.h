@@ -231,9 +231,12 @@ class SimpleWireInterface {
       return data;
     }
 
-    // Use default copy constructor and assignment operator.
+    // Use default copy constructor. Delete the assignment operator because it
+    // cannot work with constant fields (mDataPin, mClockPin, mDelayMicros).
+    // clang++ 13 prints warnings if the assignment operator is marked
+    // 'default', but g++ does not.
     SimpleWireInterface(const SimpleWireInterface&) = default;
-    SimpleWireInterface& operator=(const SimpleWireInterface&) = default;
+    SimpleWireInterface& operator=(const SimpleWireInterface&) = delete;
 
   private:
     /**
