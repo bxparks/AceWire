@@ -530,7 +530,7 @@ conventions described by [API Methods](#ApiMethods) above.
 
 For some non-critical applications with simple hardware configurations using
 only a few I2C devices, it may be acceptable to just ignore the error statuses,
-and blindly read from and write from the I2C devices, assuming that the writing
+and blindly read from and write to the I2C devices, assuming that the writing
 or reading operations are always successful.
 
 Keep in mind that different I2C libraries may trigger error conditions at
