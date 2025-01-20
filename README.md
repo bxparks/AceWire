@@ -1246,9 +1246,10 @@ This library is *not* compatible with:
 
 * Any platform using the
   [ArduinoCore-API](https://github.com/arduino/ArduinoCore-api), for example:
-    * [Arduino megaAVR](https://github.com/arduino/ArduinoCore-megaavr/)
-    * [MegaCoreX](https://github.com/MCUdude/MegaCoreX)
-    * [Arduino SAMD Boards >=1.8.10](https://github.com/arduino/ArduinoCore-samd)
+    * Arduino Nano Every
+    * Arduino MKRZero
+    * Arduino UNO R4
+    * Raspberry Pi Pico RP2040
 
 It should work with [PlatformIO](https://platformio.org/) but I have
 not tested it.
